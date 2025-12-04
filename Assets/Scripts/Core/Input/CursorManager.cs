@@ -1,7 +1,7 @@
 using SmallAmbitions;
 using UnityEngine;
 
-public class CursorManager : MonoBehaviour
+public sealed class CursorManager : MonoBehaviour
 {
     [Header("Cursor Graphics")]
     [SerializeField] private CursorTheme _cursorTheme;

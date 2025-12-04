@@ -3,19 +3,19 @@ using UnityEngine.Events;
 
 namespace SmallAmbitions
 {
-    public class GameEventListener<T> : MonoBehaviour
+    public abstract class GameEventListener<T> : MonoBehaviour
     {
         [SerializeField] private GameEvent<T> _event;
         [SerializeField] private UnityEvent<T> _response;
 
         private void OnEnable()
         {
-            _event.RegisterListener(this);
+            _event.RegisterListener(OnEventRaised);
         }
 
         private void OnDisable()
         {
-            _event.UnregisterListener(this);
+            _event.UnregisterListener(OnEventRaised);
         }
 
         public void OnEventRaised(T value)
@@ -23,4 +23,7 @@ namespace SmallAmbitions
             _response?.Invoke(value);
         }
     }
+
+    public sealed class GameEventListener : GameEventListener<Void>
+    { }
 }

@@ -1,34 +1,25 @@
-using System.Collections.Generic;
+using System;
 using UnityEngine;
 
 namespace SmallAmbitions
 {
     public abstract class GameEvent<T> : ScriptableObject
     {
-        private readonly List<GameEventListener<T>> _eventListeners = new List<GameEventListener<T>>();
+        private event Action<T> _event;
 
-        public void Raise(T value)
-        {
-            for (int i = _eventListeners.Count - 1; i >= 0; --i)
-            {
-                _eventListeners[i].OnEventRaised(value);
-            }
-        }
+        public void Raise(T value) => _event?.Invoke(value);
 
-        public void RegisterListener(GameEventListener<T> listener)
-        {
-            if (!_eventListeners.Contains(listener))
-            {
-                _eventListeners.Add(listener);
-            }
-        }
+        public void RegisterListener(Action<T> callback) => _event += callback;
 
-        public void UnregisterListener(GameEventListener<T> listener)
-        {
-            if (_eventListeners.Contains(listener))
-            {
-                _eventListeners.Remove(listener);
-            }
-        }
+        public void UnregisterListener(Action<T> callback) => _event -= callback;
+    }
+
+    public readonly struct Void
+    { }
+
+    [CreateAssetMenu(menuName = "Small Ambitions/Game Events/Game Event", fileName = "GameEvent")]
+    public sealed class GameEvent : GameEvent<Void>
+    {
+        public void Raise() => Raise(new Void());
     }
 }

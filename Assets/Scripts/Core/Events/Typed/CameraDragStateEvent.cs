@@ -2,8 +2,8 @@ using UnityEngine;
 
 namespace SmallAmbitions
 {
-    [CreateAssetMenu(fileName = "Evt_Camera_CameraDragState", menuName = "Small Ambitions/Game Events/Camera Drag State Event")]
-    public class CameraDragStateEvent : GameEvent<CameraDragState>
+    [CreateAssetMenu(menuName = "Small Ambitions/Game Events/Camera Drag State Event", fileName = "CameraDragStateEvent")]
+    public sealed class CameraDragStateEvent : GameEvent<CameraDragState>
     {
     }
 }

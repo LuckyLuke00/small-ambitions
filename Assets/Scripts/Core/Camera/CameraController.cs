@@ -10,25 +10,22 @@ namespace SmallAmbitions
         Orbit
     }
 
-    public class CameraController : MonoBehaviour
+    public sealed class CameraController : MonoBehaviour
     {
         [Header("References")]
         [SerializeField] private Camera _mainCamera;
 
         [Header("Movement Settings")]
         [SerializeField] private float _moveSpeed = 5f;
-
         [SerializeField] private float _dragMoveSensitivity = 0.0075f;
 
         [Header("Zoom Settings")]
         [SerializeField] private float _zoomSpeed = 50f;
-
         [SerializeField] private float _minFov = 45f;
         [SerializeField] private float _maxFov = 60f;
 
         [Header("Orbit Settings")]
         [SerializeField] private float _orbitSpeed = 100f;
-
         [SerializeField] private float _dragOrbitSensitivity = 0.25f;
 
         [Header("Game Events")]
