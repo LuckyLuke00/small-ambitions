@@ -1,0 +1,23 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d4e7b1ae69564b6449fb046633740b5b, type: 3}
+  m_Name: CursorTheme_Default
+  m_EditorClassIdentifier: Assembly-CSharp::CursorTheme
+  <DefaultCursor>k__BackingField:
+    <Texture>k__BackingField: {fileID: 2800000, guid: 9bce444bb61cce345b472f346f6a08e7, type: 3}
+    <Hotspot>k__BackingField: {x: 0, y: 0}
+  <GrabCursor>k__BackingField:
+    <Texture>k__BackingField: {fileID: 2800000, guid: 3507b4e4fcd7a0548b8f494374fddc41, type: 3}
+    <Hotspot>k__BackingField: {x: 0, y: 0}
+  <RotateCursor>k__BackingField:
+    <Texture>k__BackingField: {fileID: 2800000, guid: 8701e88a20cbcf343ad5f100dbb2588a, type: 3}
+    <Hotspot>k__BackingField: {x: 0, y: 0}

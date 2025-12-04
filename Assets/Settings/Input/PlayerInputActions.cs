@@ -104,6 +104,15 @@ namespace SmallAmbitions
                     ""initialStateCheck"": true
                 },
                 {
+                    ""name"": ""Start Drag Move"",
+                    ""type"": ""Button"",
+                    ""id"": ""ec54007d-21ff-455d-8bf0-06c50d911f6c"",
+                    ""expectedControlType"": """",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
+                },
+                {
                     ""name"": ""Drag Move"",
                     ""type"": ""Value"",
                     ""id"": ""ec35a37c-1c89-499d-8377-011841608df7"",
@@ -111,6 +120,15 @@ namespace SmallAmbitions
                     ""processors"": """",
                     ""interactions"": """",
                     ""initialStateCheck"": true
+                },
+                {
+                    ""name"": ""Start Drag Orbit"",
+                    ""type"": ""Button"",
+                    ""id"": ""edc11f8b-a2d0-4748-96ea-aaa32be2c71f"",
+                    ""expectedControlType"": """",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
                 },
                 {
                     ""name"": ""Drag Orbit"",
@@ -318,70 +336,48 @@ namespace SmallAmbitions
                     ""isPartOfComposite"": true
                 },
                 {
-                    ""name"": ""Drag Move"",
-                    ""id"": ""2183c491-b0c5-4698-8cbc-869b1dba630c"",
-                    ""path"": ""OneModifier"",
-                    ""interactions"": """",
-                    ""processors"": """",
-                    ""groups"": """",
-                    ""action"": ""Drag Move"",
-                    ""isComposite"": true,
-                    ""isPartOfComposite"": false
-                },
-                {
-                    ""name"": ""modifier"",
-                    ""id"": ""205cf20c-5c3e-44ab-93a3-de3e2b98ac99"",
+                    ""name"": """",
+                    ""id"": ""457ff9a6-2c3e-43bd-a975-ad60859973e2"",
                     ""path"": ""<Mouse>/leftButton"",
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": """",
-                    ""action"": ""Drag Move"",
+                    ""action"": ""Start Drag Move"",
                     ""isComposite"": false,
-                    ""isPartOfComposite"": true
-                },
-                {
-                    ""name"": ""binding"",
-                    ""id"": ""f56a3a1e-e117-4281-84e5-309ec22140ff"",
-                    ""path"": ""<Mouse>/delta"",
-                    ""interactions"": """",
-                    ""processors"": """",
-                    ""groups"": """",
-                    ""action"": ""Drag Move"",
-                    ""isComposite"": false,
-                    ""isPartOfComposite"": true
-                },
-                {
-                    ""name"": ""Drag Orbit"",
-                    ""id"": ""318e86af-fe42-4131-b440-f6b6e72c5c9a"",
-                    ""path"": ""OneModifier"",
-                    ""interactions"": """",
-                    ""processors"": """",
-                    ""groups"": """",
-                    ""action"": ""Drag Orbit"",
-                    ""isComposite"": true,
                     ""isPartOfComposite"": false
                 },
                 {
-                    ""name"": ""modifier"",
-                    ""id"": ""f646a0df-238d-43d0-8747-9fd78a1be182"",
+                    ""name"": """",
+                    ""id"": ""1ac714d6-bf02-4085-9dec-ba3b1cf0df53"",
                     ""path"": ""<Mouse>/middleButton"",
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": """",
-                    ""action"": ""Drag Orbit"",
+                    ""action"": ""Start Drag Orbit"",
                     ""isComposite"": false,
-                    ""isPartOfComposite"": true
+                    ""isPartOfComposite"": false
                 },
                 {
-                    ""name"": ""binding"",
-                    ""id"": ""2c748172-6d68-4467-8492-10a0121f34cf"",
+                    ""name"": """",
+                    ""id"": ""9676d8f1-c714-4184-a7a7-38a7ff1259b8"",
+                    ""path"": ""<Mouse>/delta"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Drag Move"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""fa6e7bb0-b9d4-4388-a61d-3df030923fd5"",
                     ""path"": ""<Mouse>/delta"",
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": """",
                     ""action"": ""Drag Orbit"",
                     ""isComposite"": false,
-                    ""isPartOfComposite"": true
+                    ""isPartOfComposite"": false
                 }
             ]
         }
@@ -391,7 +387,9 @@ namespace SmallAmbitions
             // Camera
             m_Camera = asset.FindActionMap("Camera", throwIfNotFound: true);
             m_Camera_Move = m_Camera.FindAction("Move", throwIfNotFound: true);
+            m_Camera_StartDragMove = m_Camera.FindAction("Start Drag Move", throwIfNotFound: true);
             m_Camera_DragMove = m_Camera.FindAction("Drag Move", throwIfNotFound: true);
+            m_Camera_StartDragOrbit = m_Camera.FindAction("Start Drag Orbit", throwIfNotFound: true);
             m_Camera_DragOrbit = m_Camera.FindAction("Drag Orbit", throwIfNotFound: true);
             m_Camera_Zoom = m_Camera.FindAction("Zoom", throwIfNotFound: true);
             m_Camera_Orbit = m_Camera.FindAction("Orbit", throwIfNotFound: true);
@@ -476,7 +474,9 @@ namespace SmallAmbitions
         private readonly InputActionMap m_Camera;
         private List<ICameraActions> m_CameraActionsCallbackInterfaces = new List<ICameraActions>();
         private readonly InputAction m_Camera_Move;
+        private readonly InputAction m_Camera_StartDragMove;
         private readonly InputAction m_Camera_DragMove;
+        private readonly InputAction m_Camera_StartDragOrbit;
         private readonly InputAction m_Camera_DragOrbit;
         private readonly InputAction m_Camera_Zoom;
         private readonly InputAction m_Camera_Orbit;
@@ -496,9 +496,17 @@ namespace SmallAmbitions
             /// </summary>
             public InputAction @Move => m_Wrapper.m_Camera_Move;
             /// <summary>
+            /// Provides access to the underlying input action "Camera/StartDragMove".
+            /// </summary>
+            public InputAction @StartDragMove => m_Wrapper.m_Camera_StartDragMove;
+            /// <summary>
             /// Provides access to the underlying input action "Camera/DragMove".
             /// </summary>
             public InputAction @DragMove => m_Wrapper.m_Camera_DragMove;
+            /// <summary>
+            /// Provides access to the underlying input action "Camera/StartDragOrbit".
+            /// </summary>
+            public InputAction @StartDragOrbit => m_Wrapper.m_Camera_StartDragOrbit;
             /// <summary>
             /// Provides access to the underlying input action "Camera/DragOrbit".
             /// </summary>
@@ -540,9 +548,15 @@ namespace SmallAmbitions
                 @Move.started += instance.OnMove;
                 @Move.performed += instance.OnMove;
                 @Move.canceled += instance.OnMove;
+                @StartDragMove.started += instance.OnStartDragMove;
+                @StartDragMove.performed += instance.OnStartDragMove;
+                @StartDragMove.canceled += instance.OnStartDragMove;
                 @DragMove.started += instance.OnDragMove;
                 @DragMove.performed += instance.OnDragMove;
                 @DragMove.canceled += instance.OnDragMove;
+                @StartDragOrbit.started += instance.OnStartDragOrbit;
+                @StartDragOrbit.performed += instance.OnStartDragOrbit;
+                @StartDragOrbit.canceled += instance.OnStartDragOrbit;
                 @DragOrbit.started += instance.OnDragOrbit;
                 @DragOrbit.performed += instance.OnDragOrbit;
                 @DragOrbit.canceled += instance.OnDragOrbit;
@@ -566,9 +580,15 @@ namespace SmallAmbitions
                 @Move.started -= instance.OnMove;
                 @Move.performed -= instance.OnMove;
                 @Move.canceled -= instance.OnMove;
+                @StartDragMove.started -= instance.OnStartDragMove;
+                @StartDragMove.performed -= instance.OnStartDragMove;
+                @StartDragMove.canceled -= instance.OnStartDragMove;
                 @DragMove.started -= instance.OnDragMove;
                 @DragMove.performed -= instance.OnDragMove;
                 @DragMove.canceled -= instance.OnDragMove;
+                @StartDragOrbit.started -= instance.OnStartDragOrbit;
+                @StartDragOrbit.performed -= instance.OnStartDragOrbit;
+                @StartDragOrbit.canceled -= instance.OnStartDragOrbit;
                 @DragOrbit.started -= instance.OnDragOrbit;
                 @DragOrbit.performed -= instance.OnDragOrbit;
                 @DragOrbit.canceled -= instance.OnDragOrbit;
@@ -626,12 +646,26 @@ namespace SmallAmbitions
             /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
             void OnMove(InputAction.CallbackContext context);
             /// <summary>
+            /// Method invoked when associated input action "Start Drag Move" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+            /// </summary>
+            /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
+            /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
+            /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
+            void OnStartDragMove(InputAction.CallbackContext context);
+            /// <summary>
             /// Method invoked when associated input action "Drag Move" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
             /// </summary>
             /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
             /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
             /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
             void OnDragMove(InputAction.CallbackContext context);
+            /// <summary>
+            /// Method invoked when associated input action "Start Drag Orbit" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+            /// </summary>
+            /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
+            /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
+            /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
+            void OnStartDragOrbit(InputAction.CallbackContext context);
             /// <summary>
             /// Method invoked when associated input action "Drag Orbit" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
             /// </summary>
