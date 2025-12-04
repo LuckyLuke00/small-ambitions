@@ -10,12 +10,12 @@ namespace SmallAmbitions
 
         private void OnEnable()
         {
-            _event.RegisterListener(OnEventRaised);
+            _event?.RegisterListener(OnEventRaised);
         }
 
         private void OnDisable()
         {
-            _event.UnregisterListener(OnEventRaised);
+            _event?.UnregisterListener(OnEventRaised);
         }
 
         public void OnEventRaised(T value)
