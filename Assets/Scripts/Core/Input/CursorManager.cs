@@ -1,3 +1,4 @@
+using SmallAmbitions;
 using UnityEngine;
 
 public class CursorManager : MonoBehaviour
@@ -23,5 +24,23 @@ public class CursorManager : MonoBehaviour
     private void SetCursor(CursorTheme.CursorData cursorData)
     {
         Cursor.SetCursor(cursorData.Texture, cursorData.Hotspot, CursorMode.Auto);
+    }
+
+    public void OnCameraDragStateChanged(CameraDragState state)
+    {
+        switch (state)
+        {
+            case CameraDragState.None:
+                SetDefaultCursor();
+                break;
+
+            case CameraDragState.Move:
+                SetGrabCursor();
+                break;
+
+            case CameraDragState.Orbit:
+                SetRotateCursor();
+                break;
+        }
     }
 }

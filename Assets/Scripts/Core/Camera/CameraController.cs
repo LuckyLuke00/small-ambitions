@@ -17,22 +17,22 @@ namespace SmallAmbitions
 
         [Header("Movement Settings")]
         [SerializeField] private float _moveSpeed = 5f;
+
         [SerializeField] private float _dragMoveSensitivity = 0.0075f;
 
         [Header("Zoom Settings")]
         [SerializeField] private float _zoomSpeed = 50f;
+
         [SerializeField] private float _minFov = 45f;
         [SerializeField] private float _maxFov = 60f;
 
         [Header("Orbit Settings")]
         [SerializeField] private float _orbitSpeed = 100f;
+
         [SerializeField] private float _dragOrbitSensitivity = 0.25f;
 
         [Header("Game Events")]
-        [SerializeField] private GameEvent _cameraDragMoveEvent;
-
-        [SerializeField] private GameEvent _cameraDragOrbitEvent;
-        [SerializeField] private GameEvent _cameraDragStopEvent;
+        [SerializeField] private GameEvent<CameraDragState> _cameraDragStateEvent;
 
         private PlayerInputActions _inputActionAsset;
         private CameraDragState _currentDragState = CameraDragState.None;
@@ -210,21 +210,7 @@ namespace SmallAmbitions
             }
 
             _currentDragState = newState;
-
-            switch (_currentDragState)
-            {
-                case CameraDragState.Move:
-                    _cameraDragMoveEvent.Raise();
-                    break;
-
-                case CameraDragState.Orbit:
-                    _cameraDragOrbitEvent.Raise();
-                    break;
-
-                case CameraDragState.None:
-                    _cameraDragStopEvent.Raise();
-                    break;
-            }
+            _cameraDragStateEvent.Raise(_currentDragState);
         }
     }
 }

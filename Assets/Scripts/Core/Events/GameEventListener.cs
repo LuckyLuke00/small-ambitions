@@ -1,23 +1,26 @@
 using UnityEngine;
 using UnityEngine.Events;
 
-public class GameEventListener : MonoBehaviour
+namespace SmallAmbitions
 {
-    [SerializeField] private GameEvent _gameEvent;
-    [SerializeField] private UnityEvent _response;
-
-    private void OnEnable()
+    public class GameEventListener<T> : MonoBehaviour
     {
-        _gameEvent.RegisterListener(this);
-    }
+        [SerializeField] private GameEvent<T> _event;
+        [SerializeField] private UnityEvent<T> _response;
 
-    private void OnDisable()
-    {
-        _gameEvent.UnregisterListener(this);
-    }
+        private void OnEnable()
+        {
+            _event.RegisterListener(this);
+        }
 
-    public void OnEventRaised()
-    {
-        _response.Invoke();
+        private void OnDisable()
+        {
+            _event.UnregisterListener(this);
+        }
+
+        public void OnEventRaised(T value)
+        {
+            _response?.Invoke(value);
+        }
     }
 }
