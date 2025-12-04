@@ -1,0 +1,27 @@
+using UnityEngine;
+
+public class CursorManager : MonoBehaviour
+{
+    [Header("Cursor Graphics")]
+    [SerializeField] private CursorTheme _cursorTheme;
+
+    public void SetDefaultCursor()
+    {
+        SetCursor(_cursorTheme.DefaultCursor);
+    }
+
+    public void SetGrabCursor()
+    {
+        SetCursor(_cursorTheme.GrabCursor);
+    }
+
+    public void SetRotateCursor()
+    {
+        SetCursor(_cursorTheme.RotateCursor);
+    }
+
+    private void SetCursor(CursorTheme.CursorData cursorData)
+    {
+        Cursor.SetCursor(cursorData.Texture, cursorData.Hotspot, CursorMode.Auto);
+    }
+}

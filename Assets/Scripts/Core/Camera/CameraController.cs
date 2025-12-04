@@ -3,6 +3,13 @@ using UnityEngine.InputSystem;
 
 namespace SmallAmbitions
 {
+    public enum CameraDragState
+    {
+        None,
+        Move,
+        Orbit
+    }
+
     public class CameraController : MonoBehaviour
     {
         [Header("References")]
@@ -21,7 +28,14 @@ namespace SmallAmbitions
         [SerializeField] private float _orbitSpeed = 100f;
         [SerializeField] private float _dragOrbitSensitivity = 0.25f;
 
+        [Header("Game Events")]
+        [SerializeField] private GameEvent _cameraDragMoveEvent;
+
+        [SerializeField] private GameEvent _cameraDragOrbitEvent;
+        [SerializeField] private GameEvent _cameraDragStopEvent;
+
         private PlayerInputActions _inputActionAsset;
+        private CameraDragState _currentDragState = CameraDragState.None;
 
         private Vector2 _moveInput;
         private Vector2 _dragMoveInput;
@@ -48,11 +62,17 @@ namespace SmallAmbitions
             _inputActionAsset.Camera.Move.performed += OnMove;
             _inputActionAsset.Camera.Move.canceled += OnMove;
 
+            _inputActionAsset.Camera.StartDragMove.started += OnDragMoveStarted;
+            _inputActionAsset.Camera.StartDragMove.canceled += OnDragMoveStarted;
+
             _inputActionAsset.Camera.DragMove.performed += OnDragMove;
             _inputActionAsset.Camera.DragMove.canceled += OnDragMove;
 
             _inputActionAsset.Camera.Zoom.performed += OnZoom;
             _inputActionAsset.Camera.Zoom.canceled += OnZoom;
+
+            _inputActionAsset.Camera.StartDragOrbit.started += OnDragOrbitStarted;
+            _inputActionAsset.Camera.StartDragOrbit.canceled += OnDragOrbitStarted;
 
             _inputActionAsset.Camera.Orbit.performed += OnOrbit;
             _inputActionAsset.Camera.Orbit.canceled += OnOrbit;
@@ -66,6 +86,9 @@ namespace SmallAmbitions
             _inputActionAsset.Camera.DragOrbit.canceled -= OnDragOrbit;
             _inputActionAsset.Camera.DragOrbit.performed -= OnDragOrbit;
 
+            _inputActionAsset.Camera.StartDragOrbit.canceled += OnDragOrbitStarted;
+            _inputActionAsset.Camera.StartDragOrbit.started += OnDragOrbitStarted;
+
             _inputActionAsset.Camera.Orbit.canceled -= OnOrbit;
             _inputActionAsset.Camera.Orbit.performed -= OnOrbit;
 
@@ -75,15 +98,61 @@ namespace SmallAmbitions
             _inputActionAsset.Camera.DragMove.canceled -= OnDragMove;
             _inputActionAsset.Camera.DragMove.performed -= OnDragMove;
 
+            _inputActionAsset.Camera.StartDragOrbit.canceled -= OnDragOrbitStarted;
+            _inputActionAsset.Camera.StartDragOrbit.started -= OnDragOrbitStarted;
+
             _inputActionAsset.Camera.Move.canceled -= OnMove;
             _inputActionAsset.Camera.Move.performed -= OnMove;
 
             _inputActionAsset.Camera.Disable();
         }
 
-        private void OnDragMove(InputAction.CallbackContext ctx) => _dragMoveInput = ctx.ReadValue<Vector2>();
+        private void OnDragMoveStarted(InputAction.CallbackContext ctx)
+        {
+            if (ctx.started)
+            {
+                SetCameraDragState(CameraDragState.Move);
+            }
 
-        private void OnDragOrbit(InputAction.CallbackContext ctx) => _dragOrbitInput = ctx.ReadValue<Vector2>();
+            if (ctx.canceled)
+            {
+                SetCameraDragState(CameraDragState.None);
+            }
+        }
+
+        private void OnDragMove(InputAction.CallbackContext ctx)
+        {
+            if (_currentDragState != CameraDragState.Move)
+            {
+                _dragMoveInput = Vector2.zero;
+                return;
+            }
+
+            _dragMoveInput = ctx.ReadValue<Vector2>();
+        }
+
+        private void OnDragOrbitStarted(InputAction.CallbackContext ctx)
+        {
+            if (ctx.started)
+            {
+                SetCameraDragState(CameraDragState.Orbit);
+            }
+
+            if (ctx.canceled)
+            {
+                SetCameraDragState(CameraDragState.None);
+            }
+        }
+
+        private void OnDragOrbit(InputAction.CallbackContext ctx)
+        {
+            if (_currentDragState != CameraDragState.Orbit)
+            {
+                _dragOrbitInput = Vector2.zero;
+                return;
+            }
+            _dragOrbitInput = ctx.ReadValue<Vector2>();
+        }
 
         private void OnMove(InputAction.CallbackContext ctx) => _moveInput = ctx.ReadValue<Vector2>();
 
@@ -122,14 +191,40 @@ namespace SmallAmbitions
 
         private void UpdateOrbit()
         {
-            if (MathUtils.IsNearlyZero(_orbitInput) && MathUtils.IsNearlyZero(_dragOrbitInput.x))
+            if (MathUtils.IsNearlyZero(_orbitInput) && MathUtils.IsNearlyZero(_dragOrbitInput))
             {
                 return;
             }
 
             float inputYaw = _orbitInput * _orbitSpeed * Time.deltaTime;
             float dragYaw = _dragOrbitInput.x * _dragOrbitSensitivity;
+
             transform.Rotate(Vector3.up, inputYaw + dragYaw);
+        }
+
+        private void SetCameraDragState(CameraDragState newState)
+        {
+            if (_currentDragState == newState)
+            {
+                return;
+            }
+
+            _currentDragState = newState;
+
+            switch (_currentDragState)
+            {
+                case CameraDragState.Move:
+                    _cameraDragMoveEvent.Raise();
+                    break;
+
+                case CameraDragState.Orbit:
+                    _cameraDragOrbitEvent.Raise();
+                    break;
+
+                case CameraDragState.None:
+                    _cameraDragStopEvent.Raise();
+                    break;
+            }
         }
     }
 }
