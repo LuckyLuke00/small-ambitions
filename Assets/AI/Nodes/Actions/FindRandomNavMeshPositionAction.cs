@@ -9,7 +9,7 @@ using Action = Unity.Behavior.Action;
 [NodeDescription(name: "Find Random NavMesh Position", story: "Find Random NavMesh [Position] for [Agent]", category: "Action", id: "33638a73a2ba172e622b6877ad2f3f8c")]
 public partial class FindRandomNavMeshPositionAction : Action
 {
-    [SerializeReference] public BlackboardVariable<GameObject> Position;
+    [SerializeReference] public BlackboardVariable<Vector3> Position;
     [SerializeReference] public BlackboardVariable<GameObject> Agent;
     [SerializeReference] public BlackboardVariable<float> SearchRadius = new BlackboardVariable<float>(10.0f);
 
@@ -27,23 +27,18 @@ public partial class FindRandomNavMeshPositionAction : Action
             return Status.Failure;
         }
 
-        if (Position.Value == null)
-        {
-            Position.Value = new GameObject("RandomNavMeshPosition");
-        }
-
         if (!TryFindRandomNavMeshPosition(Agent.Value.transform.position, SearchRadius.Value, out Vector3 foundPosition))
         {
             return Status.Failure;
         }
 
-        Position.Value.transform.position = foundPosition;
+        Position.Value = foundPosition;
         return Status.Success;
     }
 
     private bool TryFindRandomNavMeshPosition(Vector3 origin, float radius, out Vector3 result)
     {
-        Vector3 randomPosition = origin + UnityEngine.Random.insideUnitSphere * SearchRadius.Value;
+        Vector3 randomPosition = origin + UnityEngine.Random.insideUnitSphere * radius;
 
         if (NavMesh.SamplePosition(randomPosition, out NavMeshHit hit, radius, NavMesh.AllAreas))
         {

@@ -74,7 +74,7 @@ public class AnimatorParameterDrawer : PropertyDrawer
 
     private static int DrawParameterPopup(Rect position, GUIContent label, SerializedProperty nameProp, GUIContent[] paramNames)
     {
-        int selectedIndex = System.Array.IndexOf(paramNames, paramNames.FirstOrDefault(p => p.text.StartsWith(nameProp.stringValue)));
+        int selectedIndex = System.Array.FindIndex(paramNames, p => p.text == nameProp.stringValue);
         selectedIndex = Mathf.Clamp(selectedIndex, 0, paramNames.Length - 1);
 
         return EditorGUI.Popup(position, label, selectedIndex, paramNames);
@@ -84,13 +84,13 @@ public class AnimatorParameterDrawer : PropertyDrawer
     {
         using (new EditorGUI.DisabledScope(true))
         {
-            var prefix = EditorGUI.PrefixLabel(position, label);
+            var fieldRect = EditorGUI.PrefixLabel(position, label);
 
             Color oldColor = GUI.color;
             GUI.color = Color.softYellow;
 
             GUIContent content = new GUIContent(message, EditorGUIUtility.IconContent("console.warnicon.sml").image);
-            EditorGUI.LabelField(prefix, content, EditorStyles.popup);
+            EditorGUI.LabelField(fieldRect, content, EditorStyles.popup);
 
             GUI.color = oldColor;
         }

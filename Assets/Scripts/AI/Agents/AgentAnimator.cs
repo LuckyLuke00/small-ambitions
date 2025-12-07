@@ -15,7 +15,7 @@ namespace SmallAmbitions
 
         private void Update()
         {
-            float speedPercent = _navMeshAgent.velocity.magnitude / _navMeshAgent.speed;
+            float speedPercent = MathUtils.SafeDivide(_navMeshAgent.velocity.magnitude, _navMeshAgent.speed);
             _animator.SetFloat(_speed.Hash, speedPercent);
         }
     }

@@ -3,7 +3,7 @@ using UnityEngine;
 
 namespace SmallAmbitions
 {
-    public sealed class Utils : MonoBehaviour
+    public static class Utils
     {
         public static bool HasAnimatorParameter(Animator animator, string parameterName)
         {
