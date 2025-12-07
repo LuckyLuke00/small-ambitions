@@ -75,10 +75,7 @@ namespace SmallAmbitions.Editor
 
         private static int DrawParameterPopup(Rect position, GUIContent label, SerializedProperty nameProp, GUIContent[] paramNames)
         {
-            if (paramNames.Length == 0)
-            {
-                return -1;
-            }
+            Debug.Assert(paramNames.Length > 0, "DrawParameterPopup should not be called with an empty array");
 
             int selectedIndex = System.Array.FindIndex(paramNames, p => p.text == nameProp.stringValue);
             selectedIndex = Mathf.Clamp(selectedIndex, 0, paramNames.Length - 1);
