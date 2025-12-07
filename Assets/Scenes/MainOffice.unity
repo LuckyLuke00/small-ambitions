@@ -1081,7 +1081,7 @@ MonoBehaviour:
   m_OverrideTileSize: 0
   m_TileSize: 256
   m_OverrideVoxelSize: 0
-  m_VoxelSize: 0.05
+  m_VoxelSize: 0.41666666
   m_MinRegionArea: 2
   m_NavMeshData: {fileID: 23800000, guid: 8b42d220fa240014db5d56ecc2956b34, type: 2}
   m_BuildHeightMesh: 0
@@ -1412,6 +1412,18 @@ PrefabInstance:
     - target: {fileID: 1798884220012120685, guid: 6e6e6c76b760462439cd3662e3df6c85, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3476717510983712729, guid: 6e6e6c76b760462439cd3662e3df6c85, type: 3}
+      propertyPath: speed.name
+      value: Sex
+      objectReference: {fileID: 0}
+    - target: {fileID: 3476717510983712729, guid: 6e6e6c76b760462439cd3662e3df6c85, type: 3}
+      propertyPath: _speed.name
+      value: New
+      objectReference: {fileID: 0}
+    - target: {fileID: 3476717510983712729, guid: 6e6e6c76b760462439cd3662e3df6c85, type: 3}
+      propertyPath: _speedSex.name
+      value: Speed
       objectReference: {fileID: 0}
     - target: {fileID: 5263839998645613914, guid: 6e6e6c76b760462439cd3662e3df6c85, type: 3}
       propertyPath: m_Name
