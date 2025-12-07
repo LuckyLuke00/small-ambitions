@@ -124,8 +124,8 @@ MonoBehaviour:
   _navMeshAgent: {fileID: 6808465034734159474}
   _animator: {fileID: 3046596120324259411}
   _speed:
-    _name: SpeedMagnitude (Float)
-    _hash: 1838652848
+    _name: Speed
+    _hash: -823668238
 --- !u!1 &7140124184001892672
 GameObject:
   m_ObjectHideFlags: 0
