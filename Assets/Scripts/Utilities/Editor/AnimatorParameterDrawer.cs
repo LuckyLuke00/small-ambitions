@@ -1,5 +1,6 @@
 using SmallAmbitions;
 using System.Linq;
+using Unity.VisualScripting;
 using UnityEditor;
 using UnityEditor.Animations;
 using UnityEngine;
@@ -9,40 +10,41 @@ public class AnimatorParameterDrawer : PropertyDrawer
 {
     public override void OnGUI(Rect position, SerializedProperty property, GUIContent label)
     {
-        var nameProp = property.FindPropertyRelative("name");
-        if (nameProp == null) return;
+        SerializedProperty nameProp = property.FindPropertyRelativeOrFail("_name");
+        SerializedProperty hashProp = property.FindPropertyRelativeOrFail("_hash");
 
-        var animator = GetAnimatorFromTarget(property);
-        string[] paramNames = GetAnimatorParameters(animator);
+        Animator animator = GetAnimatorFromTarget(property);
+        GUIContent[] paramNames = GetAnimatorParameters(animator);
 
         EditorGUI.BeginProperty(position, label, property);
 
-        if (animator != null && animator.runtimeAnimatorController is AnimatorController controller && controller.parameters.Length > 0)
+        if (animator == null)
         {
-            paramNames = controller.parameters
-                .Select(p => $"{p.name} ({p.type})")
-                .ToArray();
+            DrawDisabledPopup(position, label, "No Animator Component");
         }
-
-        EditorGUI.BeginProperty(position, label, property);
-
-        using (new EditorGUI.DisabledScope(animator == null || paramNames.Length == 0))
+        else if (animator.runtimeAnimatorController == null)
         {
-            if (animator == null)
+            DrawDisabledPopup(position, label, "No Animator Controller");
+        }
+        else if (paramNames.Length == 0)
+        {
+            DrawDisabledPopup(position, label, "No Parameters");
+        }
+        else
+        {
+            hashProp.intValue = Animator.StringToHash(nameProp.stringValue);
+
+            string hashText = $"Hash: {hashProp.intValue}";
+            Vector2 hashSize = EditorStyles.miniLabel.CalcSize(new GUIContent(hashText));
+
+            Rect popupRect = new Rect(position.x, position.y, position.width - hashSize.x, position.height);
+            Rect hashRect = new Rect(popupRect.xMax, position.y, hashSize.x, position.height);
+
+            DrawParameterPopup(popupRect, label, nameProp, paramNames);
+
+            using (new EditorGUI.DisabledScope(true))
             {
-                DrawLabel(position, label, "No Animator component");
-            }
-            else if (animator.runtimeAnimatorController == null)
-            {
-                DrawLabel(position, label, "No Animator Controller");
-            }
-            else if (paramNames.Length == 0)
-            {
-                DrawLabel(position, label, "No parameters");
-            }
-            else
-            {
-                DrawParameterPopup(position, label, nameProp, paramNames);
+                EditorGUI.LabelField(hashRect, hashText, EditorStyles.miniLabel);
             }
         }
 
@@ -51,7 +53,7 @@ public class AnimatorParameterDrawer : PropertyDrawer
 
     public override float GetPropertyHeight(SerializedProperty property, GUIContent label) => EditorGUIUtility.singleLineHeight;
 
-    private Animator GetAnimatorFromTarget(SerializedProperty property)
+    private static Animator GetAnimatorFromTarget(SerializedProperty property)
     {
         if (property.serializedObject.targetObject is MonoBehaviour mb && mb.TryGetComponent(out Animator animator))
         {
@@ -61,33 +63,38 @@ public class AnimatorParameterDrawer : PropertyDrawer
         return null;
     }
 
-    private string[] GetAnimatorParameters(Animator animator)
+    private static GUIContent[] GetAnimatorParameters(Animator animator)
     {
-        if (animator == null || animator.runtimeAnimatorController == null)
+        if (animator == null || animator.runtimeAnimatorController is not AnimatorController controller)
         {
-            return System.Array.Empty<string>();
+            return System.Array.Empty<GUIContent>();
         }
 
-        return animator.parameters.Select(p => $"{p.name} ({p.type})").ToArray();
+        return animator.parameters.Select(p => new GUIContent($"{p.name} ({p.type})")).ToArray();
     }
 
-    private void DrawLabel(Rect position, GUIContent label, string message)
+    private static void DrawParameterPopup(Rect position, GUIContent label, SerializedProperty nameProp, GUIContent[] paramNames)
     {
-        EditorGUI.LabelField(position, label, new GUIContent(message), EditorStyles.popup);
+        int selectedIndex = System.Array.IndexOf(paramNames, paramNames.FirstOrDefault(p => p.text.StartsWith(nameProp.stringValue)));
+        selectedIndex = Mathf.Clamp(selectedIndex, 0, paramNames.Length - 1);
+
+        selectedIndex = EditorGUI.Popup(position, label, selectedIndex, paramNames);
+        nameProp.stringValue = paramNames[selectedIndex].text;
     }
 
-    private void DrawParameterPopup(Rect position, GUIContent label, SerializedProperty nameProp, string[] paramNames)
+    private static void DrawDisabledPopup(Rect position, GUIContent label, string message)
     {
-        string currentName = nameProp.stringValue;
-        string cleanCurrent = string.IsNullOrEmpty(currentName) ? string.Empty : currentName.Split(' ')[0];
+        using (new EditorGUI.DisabledScope(true))
+        {
+            var prefix = EditorGUI.PrefixLabel(position, label);
 
-        int selectedIndex = System.Array.IndexOf(paramNames, paramNames.FirstOrDefault(p => p.StartsWith(cleanCurrent)));
-        if (selectedIndex < 0) selectedIndex = 0;
+            Color oldColor = GUI.color;
+            GUI.color = Color.softYellow;
 
-        selectedIndex = EditorGUI.Popup(position, label.text, selectedIndex, paramNames);
+            GUIContent content = new GUIContent(message, EditorGUIUtility.IconContent("console.warnicon.sml").image);
+            EditorGUI.LabelField(prefix, content, EditorStyles.popup);
 
-        string selectedWithType = paramNames[selectedIndex];
-        string cleanName = selectedWithType.Split(' ')[0];
-        nameProp.stringValue = cleanName;
+            GUI.color = oldColor;
+        }
     }
 }

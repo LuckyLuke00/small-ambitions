@@ -100,7 +100,7 @@ NavMeshAgent:
   m_Speed: 3.5
   m_Acceleration: 8
   avoidancePriority: 50
-  m_AngularSpeed: 120
+  m_AngularSpeed: 140
   m_StoppingDistance: 0
   m_AutoTraverseOffMeshLink: 1
   m_AutoBraking: 1
@@ -124,8 +124,8 @@ MonoBehaviour:
   _navMeshAgent: {fileID: 6808465034734159474}
   _animator: {fileID: 3046596120324259411}
   _speed:
-    name: Speed
-    hash: 0
+    _name: SpeedMagnitude (Float)
+    _hash: 1838652848
 --- !u!1 &7140124184001892672
 GameObject:
   m_ObjectHideFlags: 0
@@ -167,6 +167,18 @@ PrefabInstance:
     m_TransformParent: {fileID: 2891259981177804142}
     m_Modifications:
     - target: {fileID: -8679921383154817045, guid: 652d5da1af336734a8aeb6c5f607a23b, type: 3}
+      propertyPath: m_LocalScale.x
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 652d5da1af336734a8aeb6c5f607a23b, type: 3}
+      propertyPath: m_LocalScale.y
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 652d5da1af336734a8aeb6c5f607a23b, type: 3}
+      propertyPath: m_LocalScale.z
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 652d5da1af336734a8aeb6c5f607a23b, type: 3}
       propertyPath: m_LocalPosition.x
       value: 0
       objectReference: {fileID: 0}
@@ -205,6 +217,10 @@ PrefabInstance:
     - target: {fileID: -8679921383154817045, guid: 652d5da1af336734a8aeb6c5f607a23b, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 652d5da1af336734a8aeb6c5f607a23b, type: 3}
+      propertyPath: m_ConstrainProportionsScale
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 919132149155446097, guid: 652d5da1af336734a8aeb6c5f607a23b, type: 3}
       propertyPath: m_Name

@@ -1413,18 +1413,6 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: 3476717510983712729, guid: 6e6e6c76b760462439cd3662e3df6c85, type: 3}
-      propertyPath: speed.name
-      value: Sex
-      objectReference: {fileID: 0}
-    - target: {fileID: 3476717510983712729, guid: 6e6e6c76b760462439cd3662e3df6c85, type: 3}
-      propertyPath: _speed.name
-      value: New
-      objectReference: {fileID: 0}
-    - target: {fileID: 3476717510983712729, guid: 6e6e6c76b760462439cd3662e3df6c85, type: 3}
-      propertyPath: _speedSex.name
-      value: Speed
-      objectReference: {fileID: 0}
     - target: {fileID: 5263839998645613914, guid: 6e6e6c76b760462439cd3662e3df6c85, type: 3}
       propertyPath: m_Name
       value: Employee_Base

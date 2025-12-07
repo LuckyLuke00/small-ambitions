@@ -12,10 +12,5 @@ namespace SmallAmbitions
 
         [Header("Animator Parameters")]
         [SerializeField] private AnimatorParameter _speed;
-
-        private void Update()
-        {
-            float speedPercent = _navMeshAgent.velocity.sqrMagnitude / (_navMeshAgent.speed * _navMeshAgent.speed);
-        }
     }
 }
