@@ -3,24 +3,19 @@ using UnityEngine;
 namespace SmallAmbitions
 {
     [System.Serializable]
-    public sealed class AnimatorParameter
+    public sealed class AnimatorParameter : ISerializationCallbackReceiver
     {
         [SerializeField] private string _name = string.Empty;
         [SerializeField, HideInInspector] private int _hash = 0;
 
         public string Name => _name;
-        public int Hash
-        {
-            get
-            {
-                if (_hash == 0)
-                {
-                    _hash = Animator.StringToHash(_name);
-                    Debug.LogWarning($"AnimatorParameter: Hash for '{_name}' was uninitialized. Calculated on access: {_hash}");
-                }
+        public int Hash => _hash;
 
-                return _hash;
-            }
+        public void OnBeforeSerialize() { /* No action needed before serialization. */ }
+
+        public void OnAfterDeserialize()
+        {
+            _hash = Animator.StringToHash(_name);
         }
     }
 }

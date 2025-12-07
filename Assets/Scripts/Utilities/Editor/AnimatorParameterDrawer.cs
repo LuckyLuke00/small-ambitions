@@ -32,15 +32,14 @@ public class AnimatorParameterDrawer : PropertyDrawer
         }
         else
         {
-            hashProp.intValue = Animator.StringToHash(nameProp.stringValue);
-
             string hashText = $"Hash: {hashProp.intValue}";
             Vector2 hashSize = EditorStyles.miniLabel.CalcSize(new GUIContent(hashText));
 
             Rect popupRect = new Rect(position.x, position.y, position.width - hashSize.x, position.height);
             Rect hashRect = new Rect(popupRect.xMax, position.y, hashSize.x, position.height);
 
-            DrawParameterPopup(popupRect, label, nameProp, paramNames);
+            int selectedIndex = DrawParameterPopup(popupRect, label, nameProp, paramNames);
+            nameProp.stringValue = paramNames[selectedIndex].text;
 
             using (new EditorGUI.DisabledScope(true))
             {
@@ -70,16 +69,15 @@ public class AnimatorParameterDrawer : PropertyDrawer
             return System.Array.Empty<GUIContent>();
         }
 
-        return animator.parameters.Select(p => new GUIContent($"{p.name} ({p.type})")).ToArray();
+        return animator.parameters.Select(p => new GUIContent(p.name)).ToArray();
     }
 
-    private static void DrawParameterPopup(Rect position, GUIContent label, SerializedProperty nameProp, GUIContent[] paramNames)
+    private static int DrawParameterPopup(Rect position, GUIContent label, SerializedProperty nameProp, GUIContent[] paramNames)
     {
         int selectedIndex = System.Array.IndexOf(paramNames, paramNames.FirstOrDefault(p => p.text.StartsWith(nameProp.stringValue)));
         selectedIndex = Mathf.Clamp(selectedIndex, 0, paramNames.Length - 1);
 
-        selectedIndex = EditorGUI.Popup(position, label, selectedIndex, paramNames);
-        nameProp.stringValue = paramNames[selectedIndex].text;
+        return EditorGUI.Popup(position, label, selectedIndex, paramNames);
     }
 
     private static void DrawDisabledPopup(Rect position, GUIContent label, string message)
