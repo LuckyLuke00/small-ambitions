@@ -123,7 +123,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::SmallAmbitions.AgentAnimator
   _navMeshAgent: {fileID: 6808465034734159474}
   _animator: {fileID: 3046596120324259411}
-  _speedParameterName: 'sPEED '
+  _speed:
+    name: Speed
+    hash: 0
 --- !u!1 &7140124184001892672
 GameObject:
   m_ObjectHideFlags: 0
@@ -153,10 +155,10 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
-  - {fileID: 2866671052189444300}
+  - {fileID: 5725909419370695958}
   m_Father: {fileID: 1798884220012120685}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!1001 &2324648365798248231
+--- !u!1001 &5259145787989437181
 PrefabInstance:
   m_ObjectHideFlags: 0
   serializedVersion: 2
@@ -164,18 +166,6 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 2891259981177804142}
     m_Modifications:
-    - target: {fileID: -8679921383154817045, guid: 652d5da1af336734a8aeb6c5f607a23b, type: 3}
-      propertyPath: m_LocalScale.x
-      value: 2
-      objectReference: {fileID: 0}
-    - target: {fileID: -8679921383154817045, guid: 652d5da1af336734a8aeb6c5f607a23b, type: 3}
-      propertyPath: m_LocalScale.y
-      value: 2
-      objectReference: {fileID: 0}
-    - target: {fileID: -8679921383154817045, guid: 652d5da1af336734a8aeb6c5f607a23b, type: 3}
-      propertyPath: m_LocalScale.z
-      value: 2
-      objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 652d5da1af336734a8aeb6c5f607a23b, type: 3}
       propertyPath: m_LocalPosition.x
       value: 0
@@ -216,21 +206,18 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: -8679921383154817045, guid: 652d5da1af336734a8aeb6c5f607a23b, type: 3}
-      propertyPath: m_ConstrainProportionsScale
-      value: 1
-      objectReference: {fileID: 0}
     - target: {fileID: 919132149155446097, guid: 652d5da1af336734a8aeb6c5f607a23b, type: 3}
       propertyPath: m_Name
       value: characterMedium
       objectReference: {fileID: 0}
-    m_RemovedComponents: []
+    m_RemovedComponents:
+    - {fileID: 5866666021909216657, guid: 652d5da1af336734a8aeb6c5f607a23b, type: 3}
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 652d5da1af336734a8aeb6c5f607a23b, type: 3}
---- !u!4 &2866671052189444300 stripped
+--- !u!4 &5725909419370695958 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: 652d5da1af336734a8aeb6c5f607a23b, type: 3}
-  m_PrefabInstance: {fileID: 2324648365798248231}
+  m_PrefabInstance: {fileID: 5259145787989437181}
   m_PrefabAsset: {fileID: 0}
