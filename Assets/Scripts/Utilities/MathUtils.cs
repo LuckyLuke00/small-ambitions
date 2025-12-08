@@ -11,4 +11,9 @@ public static class MathUtils
     {
         return IsNearlyZero(vector.x) && IsNearlyZero(vector.y);
     }
+
+    public static float SafeDivide(float numerator, float denominator, float fallback = 0f)
+    {
+        return denominator != 0f ? numerator / denominator : fallback;
+    }
 }
