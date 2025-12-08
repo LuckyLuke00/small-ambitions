@@ -1,7 +1,6 @@
+using System;
 using System.Linq;
-using Unity.VisualScripting;
 using UnityEditor;
-using UnityEditor.Animations;
 using UnityEngine;
 
 namespace SmallAmbitions.Editor
@@ -9,43 +8,48 @@ namespace SmallAmbitions.Editor
     [CustomPropertyDrawer(typeof(AnimatorParameter))]
     public class AnimatorParameterDrawer : PropertyDrawer
     {
+        private const string _nameField = "_name";
+        private const string _hashField = "_hash";
+
         public override void OnGUI(Rect position, SerializedProperty property, GUIContent label)
         {
-            SerializedProperty nameProp = property.FindPropertyRelativeOrFail("_name");
-            SerializedProperty hashProp = property.FindPropertyRelativeOrFail("_hash");
+            EditorGUI.BeginProperty(position, label, property);
+
+            SerializedProperty nameProp = property.FindPropertyRelative(_nameField);
+            SerializedProperty hashProp = property.FindPropertyRelative(_hashField);
+
+            if (nameProp == null || hashProp == null)
+            {
+                DrawWarningMessage(position, label, $"Missing \"{_nameField}\" or \"{_hashField}\" field");
+                EditorGUI.EndProperty();
+                return;
+            }
 
             Animator animator = GetAnimatorFromTarget(property);
-            GUIContent[] paramNames = GetAnimatorParameters(animator);
-
-            EditorGUI.BeginProperty(position, label, property);
+            GUIContent[] paramOptions = GetAnimatorParameterOptions(animator);
+            string[] paramNames = paramOptions.Select(p => p.text).ToArray();
 
             if (animator == null)
             {
-                DrawDisabledPopup(position, label, "No Animator Component");
+                DrawWarningMessage(position, label, "No Animator Component");
             }
             else if (animator.runtimeAnimatorController == null)
             {
-                DrawDisabledPopup(position, label, "No Animator Controller");
+                DrawWarningMessage(position, label, "No Animator Controller");
             }
-            else if (paramNames.Length == 0)
+            else if (paramOptions.Length == 0)
             {
-                DrawDisabledPopup(position, label, "No Parameters");
+                DrawWarningMessage(position, label, "No Parameters");
             }
             else
             {
-                string hashText = $"Hash: {hashProp.intValue}";
-                Vector2 hashSize = EditorStyles.miniLabel.CalcSize(new GUIContent(hashText));
+                int selectedIndex = DrawParameterPopupWithHash(position, label, nameProp, hashProp, paramOptions);
+                string selectedName = paramNames[selectedIndex];
 
-                Rect popupRect = new Rect(position.x, position.y, position.width - hashSize.x, position.height);
-                Rect hashRect = new Rect(popupRect.xMax, position.y, hashSize.x, position.height);
+                nameProp.stringValue = selectedName;
+                hashProp.intValue = Animator.StringToHash(selectedName);
 
-                int selectedIndex = DrawParameterPopup(popupRect, label, nameProp, paramNames);
-                nameProp.stringValue = paramNames[selectedIndex].text;
-
-                using (new EditorGUI.DisabledScope(true))
-                {
-                    EditorGUI.LabelField(hashRect, hashText, EditorStyles.miniLabel);
-                }
+                property.serializedObject.ApplyModifiedProperties();
             }
 
             EditorGUI.EndProperty();
@@ -63,25 +67,46 @@ namespace SmallAmbitions.Editor
             return null;
         }
 
-        private static GUIContent[] GetAnimatorParameters(Animator animator)
+        private static GUIContent[] GetAnimatorParameterOptions(Animator animator)
         {
-            if (animator == null || animator.runtimeAnimatorController is not AnimatorController controller)
+            if (animator != null)
             {
-                return System.Array.Empty<GUIContent>();
+                return animator.parameters.Select(p => new GUIContent(p.name)).ToArray();
             }
 
-            return animator.parameters.Select(p => new GUIContent(p.name)).ToArray();
+            return Array.Empty<GUIContent>();
         }
 
-        private static int DrawParameterPopup(Rect position, GUIContent label, SerializedProperty nameProp, GUIContent[] paramNames)
+        private static int GetSelectedParameterIndex(SerializedProperty nameProp, GUIContent[] paramNames)
         {
-            int selectedIndex = System.Array.FindIndex(paramNames, p => p.text == nameProp.stringValue);
-            selectedIndex = Mathf.Clamp(selectedIndex, 0, paramNames.Length - 1);
-
-            return EditorGUI.Popup(position, label, selectedIndex, paramNames);
+            return (paramNames != null) ? Array.FindIndex(paramNames, p => p.text == nameProp.stringValue) : -1;
         }
 
-        private static void DrawDisabledPopup(Rect position, GUIContent label, string message)
+        private static int DrawParameterPopupWithHash(Rect position, GUIContent label, SerializedProperty nameProp, SerializedProperty hashProp, GUIContent[] paramNames)
+        {
+            string hashText = $"Hash: {hashProp.intValue}";
+            Vector2 hashSize = EditorStyles.miniLabel.CalcSize(new GUIContent(hashText));
+
+            Rect popupRect = new Rect(position.x, position.y, position.width - hashSize.x, position.height);
+            Rect hashRect = new Rect(popupRect.xMax, position.y, hashSize.x, position.height);
+
+            int selectedIndex = GetSelectedParameterIndex(nameProp, paramNames);
+            if (!Utils.IsValidIndex(paramNames, selectedIndex))
+            {
+                return 0;
+            }
+
+            int newIndex = EditorGUI.Popup(popupRect, label, selectedIndex, paramNames);
+
+            using (new EditorGUI.DisabledScope(true))
+            {
+                EditorGUI.LabelField(hashRect, hashText, EditorStyles.miniLabel);
+            }
+
+            return newIndex;
+        }
+
+        private static void DrawWarningMessage(Rect position, GUIContent label, string message)
         {
             using (new EditorGUI.DisabledScope(true))
             {
@@ -90,7 +115,8 @@ namespace SmallAmbitions.Editor
                 Color oldColor = GUI.color;
                 GUI.color = Color.softYellow;
 
-                GUIContent content = new GUIContent(message, EditorGUIUtility.IconContent("console.warnicon.sml").image);
+                Texture icon = EditorGUIUtility.IconContent("console.warnicon.sml").image;
+                GUIContent content = EditorGUIUtility.TrTextContentWithIcon(message, icon);
                 EditorGUI.LabelField(fieldRect, content, EditorStyles.popup);
 
                 GUI.color = oldColor;
