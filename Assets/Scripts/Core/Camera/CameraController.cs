@@ -95,8 +95,8 @@ namespace SmallAmbitions
             _inputActionAsset.Camera.DragMove.canceled -= OnDragMove;
             _inputActionAsset.Camera.DragMove.performed -= OnDragMove;
 
-            _inputActionAsset.Camera.StartDragOrbit.canceled -= OnDragOrbitStarted;
-            _inputActionAsset.Camera.StartDragOrbit.started -= OnDragOrbitStarted;
+            _inputActionAsset.Camera.StartDragMove.canceled -= OnDragMoveStarted;
+            _inputActionAsset.Camera.StartDragMove.started -= OnDragMoveStarted;
 
             _inputActionAsset.Camera.Move.canceled -= OnMove;
             _inputActionAsset.Camera.Move.performed -= OnMove;
