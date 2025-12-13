@@ -1,10 +1,10 @@
-using System;
 using SmallAmbitions;
+using System;
 using Unity.Behavior;
+using Unity.Properties;
 using UnityEngine;
 using UnityEngine.AI;
 using Action = Unity.Behavior.Action;
-using Unity.Properties;
 
 [Serializable, GeneratePropertyBag]
 [NodeDescription(name: "TryMoveToAutonomyTarget", story: "[Agent] moves to [AutonomyTarget]", category: "Action",
@@ -75,7 +75,7 @@ public partial class TryMoveToAutonomyTargetAction : Action
         {
             return Status.Failure;
         }
-        
+
         _agent.ResetPath();
         _targetPosition = AutonomyTarget.Value.StandingSpot.position;
 

@@ -46,7 +46,7 @@ namespace SmallAmbitions
 
             return closest;
         }
-        
+
         public T GetRandom()
         {
             return _items[Random.Range(0, _items.Count)];

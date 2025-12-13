@@ -1,9 +1,9 @@
 using SmallAmbitions;
 using System;
 using Unity.Behavior;
+using Unity.Properties;
 using UnityEngine;
 using Action = Unity.Behavior.Action;
-using Unity.Properties;
 
 [Serializable, GeneratePropertyBag]
 [NodeDescription(name: "Acquire Autonomy Target", story: "Acquire New Autonomy [Target] From [AutonomyController]", category: "Action", id: "0786501c3aebd9eaf464a43bcacf256a")]
@@ -23,9 +23,8 @@ public partial class AcquireAutonomyTargetAction : Action
         {
             return Status.Failure;
         }
-        
+
         Target.Value = autonomyTarget;
         return Status.Success;
     }
 }
-
