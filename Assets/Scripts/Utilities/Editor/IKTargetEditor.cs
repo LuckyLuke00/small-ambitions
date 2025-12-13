@@ -10,7 +10,7 @@ namespace SmallAmbitions.Editor
     {
         private const string _ikTargetsPropName = "_ikTargets";
         private const string _ikTargetRootName = "IK Targets";
-            
+
         private ReorderableList _list;
         private SerializedProperty _ikTargetsProp;
 
@@ -97,14 +97,14 @@ namespace SmallAmbitions.Editor
             {
                 return ikTargetRoot;
             }
-            
-            GameObject newRootObj =  new GameObject(_ikTargetRootName);
+
+            GameObject newRootObj = new GameObject(_ikTargetRootName);
             Undo.RegisterCreatedObjectUndo(newRootObj, "Create IK Targets Root");
-            
+
             newRootObj.transform.SetParent(script.transform, false);
             newRootObj.transform.localPosition = Vector3.zero;
             newRootObj.transform.localRotation = Quaternion.identity;
-            
+
             return newRootObj.transform;
         }
 

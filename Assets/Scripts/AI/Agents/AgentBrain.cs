@@ -8,7 +8,7 @@ namespace SmallAmbitions
         [Header("References")]
         [SerializeField] private NavMeshAgent _agent_TEMP;
         [SerializeField] private SmartObjectSet _smartObjectSet;
-        [SerializeField] private IKController  _ikController;
+        [SerializeField] private IKController _ikController;
 
         private SmartObject _currentFocus;
 

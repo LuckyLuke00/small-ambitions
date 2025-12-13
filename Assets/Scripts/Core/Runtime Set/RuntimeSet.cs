@@ -34,7 +34,7 @@ namespace SmallAmbitions
                 {
                     continue;
                 }
-                
+
                 float sqrDistance = (item.transform.position - position).sqrMagnitude;
 
                 if (sqrDistance < minSqrDistance)
@@ -43,7 +43,7 @@ namespace SmallAmbitions
                     closest = item;
                 }
             }
-            
+
             return closest;
         }
     }
