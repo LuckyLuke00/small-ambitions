@@ -5,16 +5,16 @@ namespace SmallAmbitions
 {
     public sealed class SmartObject : MonoBehaviour
     {
-        [Header("References")] 
+        [Header("References")]
         [SerializeField] private SmartObjectSet _smartObjectSet;
-        
+
         [Header("Settings (Optional)")]
         [Tooltip("The actual object to pick up")]
         [SerializeField] private GameObject _propToGrab;
 
         [Tooltip("Where the NPC stands. If null, uses this object's transform.")]
         [SerializeField] private Transform _standingSpot;
-        
+
         [Header("IK Setup")]
         [SerializeField] private List<IKTarget> _ikTargets = new List<IKTarget>();
 
@@ -41,9 +41,10 @@ namespace SmallAmbitions
 
         private void CreateLookup()
         {
+            _lookup = new Dictionary<IKTargetType, Transform>();
+
             foreach (var entry in _ikTargets)
             {
-                _lookup = new Dictionary<IKTargetType, Transform>();
                 if (!_lookup.ContainsKey(entry.Type))
                     _lookup.Add(entry.Type, entry.Target);
             }
@@ -62,7 +63,7 @@ namespace SmallAmbitions
                 Gizmos.color = Color.yellow;
                 Gizmos.DrawSphere(StandingSpot.position, 0.1f);
             }
-            
+
             if (_ikTargets == null || _ikTargets.Count == 0)
             {
                 return;
@@ -74,12 +75,12 @@ namespace SmallAmbitions
                 {
                     continue;
                 }
-                
+
                 Gizmos.color = GetColorForType(target.Type);
                 Gizmos.DrawSphere(target.Target.position, 0.1f);
             }
         }
-        
+
         private static Color GetColorForType(IKTargetType type)
         {
             int index = (int)type;
