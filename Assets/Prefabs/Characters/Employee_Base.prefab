@@ -222,9 +222,10 @@ GameObject:
   - component: {fileID: 3046596120324259411}
   - component: {fileID: 1229367597119580074}
   - component: {fileID: 6808465034734159474}
-  - component: {fileID: 3476717510983712729}
   - component: {fileID: 6819498843884966407}
   - component: {fileID: 6759348930365202615}
+  - component: {fileID: 3476717510983712729}
+  - component: {fileID: 8533491680985174757}
   m_Layer: 0
   m_Name: Employee_Base
   m_TagString: Untagged
@@ -285,6 +286,7 @@ MonoBehaviour:
   m_Graph: {fileID: -2950765659375523651, guid: ea5d3fdd69abf524a9fdb3d59d6fdb37, type: 2}
   m_BlackboardVariableOverridesList:
   - rid: 6996978783024841053
+  - rid: 6996978943698665783
   m_OriginalGraph: {fileID: -2950765659375523651, guid: ea5d3fdd69abf524a9fdb3d59d6fdb37, type: 2}
   m_IsInitialised: 0
   m_IsStarted: 0
@@ -299,6 +301,14 @@ MonoBehaviour:
           m_Value1: 0
         Name: Self
         m_Value: {fileID: 5263839998645613914}
+    - rid: 6996978943698665783
+      type: {class: 'BlackboardVariable`1[[SmallAmbitions.AutonomyController, Assembly-CSharp]]', ns: Unity.Behavior, asm: Unity.Behavior}
+      data:
+        GUID:
+          m_Value0: 2106868079758787542
+          m_Value1: 9933189715984107677
+        Name: AutonomyController
+        m_Value: {fileID: 8533491680985174757}
 --- !u!195 &6808465034734159474
 NavMeshAgent:
   m_ObjectHideFlags: 0
@@ -309,7 +319,7 @@ NavMeshAgent:
   m_Enabled: 1
   m_AgentTypeID: 0
   m_Radius: 1.25
-  m_Speed: 3.5
+  m_Speed: 5
   m_Acceleration: 8
   avoidancePriority: 50
   m_AngularSpeed: 140
@@ -321,23 +331,6 @@ NavMeshAgent:
   m_BaseOffset: 0
   m_WalkableMask: 4294967295
   m_ObstacleAvoidanceType: 4
---- !u!114 &3476717510983712729
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5263839998645613914}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: c402591203729c44790316fd925c4c42, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::SmallAmbitions.AgentAnimator
-  _navMeshAgent: {fileID: 6808465034734159474}
-  _animator: {fileID: 3046596120324259411}
-  _speed:
-    _name: Speed
-    _hash: -823668238
 --- !u!114 &6819498843884966407
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -431,6 +424,36 @@ MonoBehaviour:
   - m_Rig: {fileID: 4340915272714348035}
     m_Active: 1
   m_Effectors: []
+--- !u!114 &3476717510983712729
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5263839998645613914}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c402591203729c44790316fd925c4c42, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::SmallAmbitions.AgentAnimator
+  _navMeshAgent: {fileID: 6808465034734159474}
+  _animator: {fileID: 3046596120324259411}
+  _speed:
+    _name: Speed
+    _hash: -823668238
+--- !u!114 &8533491680985174757
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5263839998645613914}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a3affbb16154533489abdd932bfe5eac, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::SmallAmbitions.AutonomyController
+  _smartObjects: {fileID: 11400000, guid: f6e43819e6e557147b62c87d16694009, type: 2}
 --- !u!1 &6737122899413042394
 GameObject:
   m_ObjectHideFlags: 0
