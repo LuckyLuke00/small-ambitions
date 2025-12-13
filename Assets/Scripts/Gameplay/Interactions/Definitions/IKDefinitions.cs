@@ -16,6 +16,14 @@ namespace SmallAmbitions
         [field: SerializeField] public IKTargetType Type { get; private set; }
         [field: SerializeField] public Transform Target { get; private set; }
 
+        public Vector3 Position => Target.position;
+        public Quaternion Rotation => Target.rotation;
+
+        public Vector3 LocalPosition => Target.localPosition;
+        public Quaternion LocalRotation => Target.localRotation;
+
+        public Transform Transform => Target;
+
         public IKTarget(IKTargetType type, Transform target)
         {
             Type = type;
