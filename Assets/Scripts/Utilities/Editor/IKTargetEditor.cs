@@ -8,15 +8,17 @@ namespace SmallAmbitions.Editor
     [CustomEditor(typeof(SmartObject))]
     public sealed class IKTargetEditor : UnityEditor.Editor
     {
-        private const string _ikTargetsPropName = "_ikTargets";
-        private const string _ikTargetRootName = "IK Targets";
+        private const string IkTargetsRootName = "IK Targets";
+        private const string _ikTargetsFieldName = "_ikTargets";
+        private const string _ikTargetTypeFieldName = "Type";
+        private const string _ikTargetTransformFieldName = "Transform";
 
         private ReorderableList _list;
         private SerializedProperty _ikTargetsProp;
 
         private void OnEnable()
         {
-            _ikTargetsProp = serializedObject.FindProperty(_ikTargetsPropName);
+            _ikTargetsProp = serializedObject.FindProperty(_ikTargetsFieldName);
 
             _list = new ReorderableList(serializedObject, _ikTargetsProp, true, true, true, true);
 
@@ -26,10 +28,10 @@ namespace SmallAmbitions.Editor
             {
                 var element = _ikTargetsProp.GetArrayElementAtIndex(index);
                 // Handle [field: SerializeField] backing fields
-                var typeProp = element.FindPropertyRelative("<Type>k__BackingField") ??
-                               element.FindPropertyRelative("Type");
-                var targetProp = element.FindPropertyRelative("<Target>k__BackingField") ??
-                                 element.FindPropertyRelative("Target");
+                var typeProp = element.FindPropertyRelative($"<{_ikTargetTypeFieldName}>k__BackingField") ??
+                               element.FindPropertyRelative(_ikTargetTypeFieldName);
+                var targetProp = element.FindPropertyRelative($"<{_ikTargetTransformFieldName}>k__BackingField") ??
+                                 element.FindPropertyRelative(_ikTargetTransformFieldName);
 
                 string label = typeProp.enumDisplayNames[typeProp.enumValueIndex];
 
@@ -46,7 +48,7 @@ namespace SmallAmbitions.Editor
                 var script = (SmartObject)target;
                 var allTypes = System.Enum.GetValues(typeof(IKTargetType)).Cast<IKTargetType>();
                 var usedTypes = script.IKTargets.Select(x => x.Type).ToList();
-                var available = allTypes.Except(usedTypes).Where(t => t != IKTargetType.IK_None);
+                var available = allTypes.Except(usedTypes).Where(t => t != IKTargetType.None);
 
                 if (!available.Any()) menu.AddDisabledItem(new GUIContent("All Types Assigned"));
                 else
@@ -60,8 +62,8 @@ namespace SmallAmbitions.Editor
             _list.onRemoveCallback = (ReorderableList l) =>
             {
                 var element = _ikTargetsProp.GetArrayElementAtIndex(l.index);
-                var targetProp = element.FindPropertyRelative("<Target>k__BackingField") ??
-                                 element.FindPropertyRelative("Target");
+                var targetProp = element.FindPropertyRelative($"<{_ikTargetTransformFieldName}>k__BackingField") ??
+                                 element.FindPropertyRelative(_ikTargetTransformFieldName);
 
                 // If the GameObject exists, destroy it
                 if (targetProp.objectReferenceValue != null)
@@ -80,7 +82,7 @@ namespace SmallAmbitions.Editor
             IKTargetType type = (IKTargetType)targetEnum;
             SmartObject script = (SmartObject)target;
 
-            GameObject newObj = new GameObject($"{type}");
+            GameObject newObj = new GameObject($"IK_{type}");
             newObj.transform.SetParent(GetOrCreateIKRoot(script), false);
 
             Undo.RegisterCreatedObjectUndo(newObj, "Create IK Target");
@@ -92,13 +94,13 @@ namespace SmallAmbitions.Editor
 
         private static Transform GetOrCreateIKRoot(SmartObject script)
         {
-            Transform ikTargetRoot = script.transform.Find(_ikTargetRootName);
+            Transform ikTargetRoot = script.transform.Find(IkTargetsRootName);
             if (ikTargetRoot != null)
             {
                 return ikTargetRoot;
             }
 
-            GameObject newRootObj = new GameObject(_ikTargetRootName);
+            GameObject newRootObj = new GameObject(IkTargetsRootName);
             Undo.RegisterCreatedObjectUndo(newRootObj, "Create IK Targets Root");
 
             newRootObj.transform.SetParent(script.transform, false);
@@ -120,7 +122,7 @@ namespace SmallAmbitions.Editor
             for (int i = script.IKTargets.Count - 1; i >= 0; --i)
             {
                 // If the Target Transform is missing (null), it means the user deleted the GameObject in the scene
-                if (script.IKTargets[i].Target == null)
+                if (script.IKTargets[i].Transform == null)
                 {
                     script.IKTargets.RemoveAt(i);
                     listDirty = true;
@@ -134,7 +136,7 @@ namespace SmallAmbitions.Editor
                 EditorUtility.SetDirty(script);
             }
 
-            DrawPropertiesExcluding(serializedObject, _ikTargetsPropName, "m_Script");
+            DrawPropertiesExcluding(serializedObject, _ikTargetsFieldName, "m_Script");
             GUILayout.Space(10);
             _list.DoLayoutList();
 

@@ -15,17 +15,20 @@ namespace SmallAmbitions
         [Tooltip("Where the NPC stands. If null, uses this object's transform.")]
         [SerializeField] private Transform _standingSpot;
 
+        [Tooltip("How long the interaction lasts (in seconds) before animations are ready.")]
+        [SerializeField] private float _interactionTime = 3.0f;
+
         [Header("IK Setup")]
         [SerializeField] private List<IKTarget> _ikTargets = new List<IKTarget>();
 
-        public List<IKTarget> IKTargets => _ikTargets;
+        public float InteractionTime => _interactionTime;
         public Transform StandingSpot => _standingSpot;
+        public List<IKTarget> IKTargets => _ikTargets;
 
         private Dictionary<IKTargetType, Transform> _lookup;
 
         private void Awake()
         {
-            CreateLookup();
             _standingSpot ??= transform;
         }
 
@@ -37,17 +40,6 @@ namespace SmallAmbitions
         private void OnDisable()
         {
             _smartObjectSet.Remove(this);
-        }
-
-        private void CreateLookup()
-        {
-            _lookup = new Dictionary<IKTargetType, Transform>();
-
-            foreach (var entry in _ikTargets)
-            {
-                if (!_lookup.ContainsKey(entry.Type))
-                    _lookup.Add(entry.Type, entry.Target);
-            }
         }
 
         public Transform GetIKTarget(IKTargetType type)

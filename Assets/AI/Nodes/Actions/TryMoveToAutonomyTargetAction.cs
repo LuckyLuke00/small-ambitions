@@ -16,6 +16,7 @@ public partial class TryMoveToAutonomyTargetAction : Action
 
     private NavMeshAgent _agent;
     private Vector3 _targetPosition;
+    private Quaternion _targetRotation;
 
     protected override Status OnStart()
     {
@@ -42,7 +43,12 @@ public partial class TryMoveToAutonomyTargetAction : Action
 
         if (_agent.remainingDistance <= _agent.stoppingDistance)
         {
-            return Status.Success;
+            if (IsFacingSmartObject())
+            {
+                return Status.Success;
+            }
+
+            RotateTowardsSmartObject();
         }
 
         return Status.Running;
@@ -78,6 +84,7 @@ public partial class TryMoveToAutonomyTargetAction : Action
 
         _agent.ResetPath();
         _targetPosition = AutonomyTarget.Value.StandingSpot.position;
+        _targetRotation = AutonomyTarget.Value.StandingSpot.rotation;
 
         if (!_agent.SetDestination(_targetPosition))
         {
@@ -85,5 +92,17 @@ public partial class TryMoveToAutonomyTargetAction : Action
         }
 
         return Status.Running;
+    }
+
+    private void RotateTowardsSmartObject()
+    {
+        Transform agentTransform = _agent.transform;
+        agentTransform.rotation = Quaternion.RotateTowards(agentTransform.rotation, _targetRotation,
+            _agent.angularSpeed * Time.deltaTime);
+    }
+
+    private bool IsFacingSmartObject()
+    {
+        return _agent.transform.rotation == _targetRotation;
     }
 }

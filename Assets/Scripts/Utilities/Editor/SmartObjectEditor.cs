@@ -40,7 +40,7 @@ namespace SmallAmbitions.Editor
         {
             // Anchor
             Gizmos.color = GetColorForType(ikTarget.Type);
-            Gizmos.DrawSphere(ikTarget.Position, _sphereGizmoRadius);
+            Gizmos.DrawSphere(ikTarget.Transform.position, _sphereGizmoRadius);
 
             // Orientation
             DrawOrientationAxes(ikTarget.Transform, _orientationLineLength);

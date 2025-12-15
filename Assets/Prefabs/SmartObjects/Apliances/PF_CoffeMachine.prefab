@@ -1,36 +1,5 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
---- !u!1 &2951858406042683543
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 4559913275571236885}
-  m_Layer: 0
-  m_Name: IK_RightHand
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &4559913275571236885
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2951858406042683543}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0.275, y: 0.625, z: 0.785}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 9032109687031965843}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &8186235048857171586
 GameObject:
   m_ObjectHideFlags: 0
@@ -62,6 +31,37 @@ Transform:
   m_Children: []
   m_Father: {fileID: 8700307239561372322}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &8808916792188288152
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 2260465872191487601}
+  m_Layer: 0
+  m_Name: IK_RightHand
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &2260465872191487601
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8808916792188288152}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0.5, y: 0.5, z: 0.5, w: 0.5}
+  m_LocalPosition: {x: 0.275, y: 0.625, z: 0.785}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 9032109687031965843}
+  m_LocalEulerAnglesHint: {x: 0, y: 90, z: 90}
 --- !u!1001 &1213374311721450519
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -214,9 +214,9 @@ PrefabInstance:
       value: 3
       objectReference: {fileID: 0}
     - target: {fileID: 3978731109185685195, guid: f9b39f59bc5d4e24daa53e85bdcb8197, type: 3}
-      propertyPath: _ikTargets.Array.data[0].<Target>k__BackingField
+      propertyPath: _ikTargets.Array.data[0].<Transform>k__BackingField
       value: 
-      objectReference: {fileID: 4559913275571236885}
+      objectReference: {fileID: 2260465872191487601}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects:
@@ -228,7 +228,7 @@ PrefabInstance:
       addedObject: {fileID: 1683357784701197308}
     - targetCorrespondingSourceObject: {fileID: 3241035371974949964, guid: f9b39f59bc5d4e24daa53e85bdcb8197, type: 3}
       insertIndex: -1
-      addedObject: {fileID: 4559913275571236885}
+      addedObject: {fileID: 2260465872191487601}
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: f9b39f59bc5d4e24daa53e85bdcb8197, type: 3}
 --- !u!4 &4616646350239392011 stripped
