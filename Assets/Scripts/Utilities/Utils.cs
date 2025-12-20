@@ -8,5 +8,10 @@ namespace SmallAmbitions
         {
             return collection != null && index >= 0 && index < collection.Count;
         }
+
+        public static bool IsNullOrEmpty<T>(this ICollection<T> collection)
+        {
+            return collection == null || collection.Count == 0;
+        }
     }
 }

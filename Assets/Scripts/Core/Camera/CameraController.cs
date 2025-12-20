@@ -104,6 +104,11 @@ namespace SmallAmbitions
             _inputActionAsset.Camera.Disable();
         }
 
+        private void OnDestroy()
+        {
+            _inputActionAsset.Dispose();
+        }
+
         private void OnDragMoveStarted(InputAction.CallbackContext ctx)
         {
             if (ctx.started)

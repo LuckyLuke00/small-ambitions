@@ -49,6 +49,11 @@ namespace SmallAmbitions
 
         public T GetRandom()
         {
+            if (!Utils.IsNullOrEmpty(_items))
+            {
+                return null;
+            }
+
             return _items[Random.Range(0, _items.Count)];
         }
     }
