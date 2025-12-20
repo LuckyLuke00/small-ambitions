@@ -194,9 +194,6 @@ GameObject:
   - component: {fileID: 6819498843884966407}
   - component: {fileID: 6759348930365202615}
   - component: {fileID: 3476717510983712729}
-  - component: {fileID: 8533491680985174757}
-  - component: {fileID: 3481078778095394623}
-  - component: {fileID: 2361218157799892388}
   m_Layer: 0
   m_Name: Employee_Base
   m_TagString: Untagged
@@ -257,7 +254,6 @@ MonoBehaviour:
   m_Graph: {fileID: -2950765659375523651, guid: ea5d3fdd69abf524a9fdb3d59d6fdb37, type: 2}
   m_BlackboardVariableOverridesList:
   - rid: 6996978783024841053
-  - rid: 6996978943698665783
   m_OriginalGraph: {fileID: -2950765659375523651, guid: ea5d3fdd69abf524a9fdb3d59d6fdb37, type: 2}
   m_IsInitialised: 0
   m_IsStarted: 0
@@ -272,14 +268,6 @@ MonoBehaviour:
           m_Value1: 0
         Name: Self
         m_Value: {fileID: 5263839998645613914}
-    - rid: 6996978943698665783
-      type: {class: 'BlackboardVariable`1[[SmallAmbitions.AutonomyController, Assembly-CSharp]]', ns: Unity.Behavior, asm: Unity.Behavior}
-      data:
-        GUID:
-          m_Value0: 2106868079758787542
-          m_Value1: 9933189715984107677
-        Name: AutonomyController
-        m_Value: {fileID: 8533491680985174757}
 --- !u!195 &6808465034734159474
 NavMeshAgent:
   m_ObjectHideFlags: 0
@@ -414,61 +402,6 @@ MonoBehaviour:
   _speed:
     _name: Speed
     _hash: -823668238
---- !u!114 &8533491680985174757
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5263839998645613914}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: a3affbb16154533489abdd932bfe5eac, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::SmallAmbitions.AutonomyController
-  _smartObjects: {fileID: 11400000, guid: f6e43819e6e557147b62c87d16694009, type: 2}
---- !u!114 &3481078778095394623
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5263839998645613914}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 18297d111f2496c478279baa3ca4a66b, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::SmallAmbitions.InteractionController
-  _ikController: {fileID: 2361218157799892388}
-  _agent: {fileID: 6808465034734159474}
---- !u!114 &2361218157799892388
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5263839998645613914}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 35d489f8eb870794c9c9a503aca63057, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::SmallAmbitions.IKController
-  _rigs:
-    _entries:
-    - Key: 2
-      Value:
-        <Rig>k__BackingField: {fileID: 1956167577538903743}
-        <IKTarget>k__BackingField: {fileID: 5122542979762009948}
-        <ActiveWeight>k__BackingField: 0.11
-        <BlendInSpeed>k__BackingField: 2
-        <BlendOutSpeed>k__BackingField: 2
-    - Key: 3
-      Value:
-        <Rig>k__BackingField: {fileID: 4340915272714348035}
-        <IKTarget>k__BackingField: {fileID: 3600659495596488626}
-        <ActiveWeight>k__BackingField: 1
-        <BlendInSpeed>k__BackingField: 2
-        <BlendOutSpeed>k__BackingField: 2
 --- !u!1 &5376613160728717634
 GameObject:
   m_ObjectHideFlags: 0
