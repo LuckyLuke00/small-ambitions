@@ -11,7 +11,8 @@ namespace SmallAmbitions
         public string Name => _name;
         public int Hash => _hash;
 
-        public void OnBeforeSerialize() { /* No action needed before serialization. */ }
+        public void OnBeforeSerialize()
+        { /* No action needed before serialization. */ }
 
         public void OnAfterDeserialize()
         {
