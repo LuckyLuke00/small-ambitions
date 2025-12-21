@@ -1,27 +1,24 @@
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
 namespace SmallAmbitions
 {
-    public abstract class RuntimeSet<T> : ScriptableObject where T : Component
+    public abstract class RuntimeSet<T> : ScriptableObject, IEnumerable<T> where T : Component
     {
-        [SerializeField] private List<T> _items = new List<T>();
+        private readonly HashSet<T> _items = new();
 
-        public void Add(T item)
-        {
-            if (!_items.Contains(item))
-            {
-                _items.Add(item);
-            }
-        }
+        public int Count => _items.Count;
 
-        public void Remove(T item)
-        {
-            if (_items.Contains(item))
-            {
-                _items.Remove(item);
-            }
-        }
+        public void Add(T item) => _items.Add(item);
+
+        public void Remove(T item) => _items.Remove(item);
+
+        public void Clear() => _items.Clear();
+
+        public IEnumerator<T> GetEnumerator() => _items.GetEnumerator();
+
+        IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 
         public T FindClosest(Vector3 position)
         {
@@ -49,12 +46,7 @@ namespace SmallAmbitions
 
         public T GetRandom()
         {
-            if (!Utils.IsNullOrEmpty(_items))
-            {
-                return null;
-            }
-
-            return _items[Random.Range(0, _items.Count)];
+            return Utils.GetRandomElement(_items);
         }
     }
 }

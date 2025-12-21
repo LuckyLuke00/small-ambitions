@@ -1,6 +1,6 @@
 namespace SmallAmbitions
 {
-    public class CameraDragStateListener : GameEventListener<CameraDragState>
+    public sealed class CameraDragStateListener : GameEventListener<CameraDragState>
     {
     }
 }

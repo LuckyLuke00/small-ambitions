@@ -3,7 +3,7 @@ using UnityEngine;
 namespace SmallAmbitions
 {
     [CreateAssetMenu(fileName = "CursorTheme", menuName = "Small Ambitions/UI/Cursor Theme")]
-    public class CursorTheme : ScriptableObject
+    public sealed class CursorTheme : ScriptableObject
     {
         [System.Serializable]
         public struct CursorData
