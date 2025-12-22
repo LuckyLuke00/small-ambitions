@@ -6,7 +6,7 @@ using UnityEngine;
 namespace SmallAmbitions
 {
     [Serializable]
-    public sealed class SerializableMap<TKey, TValue> : ISerializationCallbackReceiver, IEnumerable<KeyValuePair<TKey, TValue>> where TKey : unmanaged
+    public sealed class SerializableMap<TKey, TValue> : ISerializationCallbackReceiver, IEnumerable<KeyValuePair<TKey, TValue>>
     {
         [Serializable]
         private struct Entry
@@ -15,8 +15,8 @@ namespace SmallAmbitions
             public TValue Value;
         }
 
-        [SerializeField] private List<Entry> _entries = new();
-        private Dictionary<TKey, TValue> _dictionary = new();
+        [SerializeField] private readonly List<Entry> _entries = new();
+        private readonly Dictionary<TKey, TValue> _dictionary = new();
 
         #region ISerializationCallbackReceiver
 
