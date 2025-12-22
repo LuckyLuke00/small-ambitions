@@ -114,6 +114,7 @@ namespace SmallAmbitions.Editor
         private static bool HasDuplicatesGeneric(SerializedProperty entries)
         {
             // Fallback for unsupported types: use DataEquals with copied properties
+            // Note: This is O(n²) but should rarely be hit due to unmanaged constraint and comprehensive type coverage
             var seenKeys = new System.Collections.Generic.List<SerializedProperty>();
 
             for (int i = 0; i < entries.arraySize; ++i)
