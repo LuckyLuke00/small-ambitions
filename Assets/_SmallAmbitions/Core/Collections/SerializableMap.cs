@@ -15,7 +15,7 @@ namespace SmallAmbitions
             public TValue Value;
         }
 
-        [SerializeField] private readonly List<Entry> _entries = new();
+        [SerializeField] private List<Entry> _entries = new();
         private readonly Dictionary<TKey, TValue> _dictionary = new();
 
         #region ISerializationCallbackReceiver

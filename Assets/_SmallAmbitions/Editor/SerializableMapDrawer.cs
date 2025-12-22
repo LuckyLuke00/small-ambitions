@@ -54,23 +54,23 @@ namespace SmallAmbitions.Editor
         private static bool HasDuplicateKeys(SerializedProperty mapProperty)
         {
             var entries = mapProperty.FindPropertyRelative(EntriesFieldName);
-            if (entries == null || !entries.isArray)
+            if (entries == null || !entries.isArray || entries.arraySize < 2)
             {
                 return false;
             }
 
             for (int i = 0; i < entries.arraySize; ++i)
             {
-                var keyA = entries.GetArrayElementAtIndex(i)?.FindPropertyRelative(KeyFieldName);
-                if (keyA == null)
+                var key = entries.GetArrayElementAtIndex(i)?.FindPropertyRelative(KeyFieldName);
+                if (key == null)
                 {
                     continue;
                 }
 
                 for (int j = i + 1; j < entries.arraySize; ++j)
                 {
-                    var keyB = entries.GetArrayElementAtIndex(j)?.FindPropertyRelative(KeyFieldName);
-                    if (keyB != null && SerializedProperty.DataEquals(keyA, keyB))
+                    var otherKey = entries.GetArrayElementAtIndex(j)?.FindPropertyRelative(KeyFieldName);
+                    if (otherKey != null && SerializedProperty.DataEquals(key, otherKey))
                     {
                         return true;
                     }
