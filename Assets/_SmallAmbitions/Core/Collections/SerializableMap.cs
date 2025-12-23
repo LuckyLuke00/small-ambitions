@@ -6,7 +6,7 @@ using UnityEngine;
 namespace SmallAmbitions
 {
     [Serializable]
-    public sealed class SerializableMap<TKey, TValue> : ISerializationCallbackReceiver, IEnumerable<KeyValuePair<TKey, TValue>>
+    public sealed class SerializableMap<TKey, TValue> : ISerializationCallbackReceiver, IEnumerable<KeyValuePair<TKey, TValue>> where TKey : notnull
     {
         [Serializable]
         private struct Entry
