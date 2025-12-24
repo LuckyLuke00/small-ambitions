@@ -4067,9 +4067,21 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 4340915272714348035, guid: 6e6e6c76b760462439cd3662e3df6c85, type: 3}
+      propertyPath: m_Enabled
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 5263839998645613914, guid: 6e6e6c76b760462439cd3662e3df6c85, type: 3}
       propertyPath: m_Name
       value: Employee_Base
+      objectReference: {fileID: 0}
+    - target: {fileID: 6759348930365202615, guid: 6e6e6c76b760462439cd3662e3df6c85, type: 3}
+      propertyPath: m_Enabled
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 6819498843884966407, guid: 6e6e6c76b760462439cd3662e3df6c85, type: 3}
+      propertyPath: m_Enabled
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
