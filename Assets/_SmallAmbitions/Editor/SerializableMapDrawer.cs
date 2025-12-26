@@ -71,23 +71,42 @@ namespace SmallAmbitions.Editor
 
         private static bool IsSupportedKeyType(SerializedProperty key)
         {
-            return TryGetComparableKey(key, out _);
+            return TryGetComparableKey(key, out _, out _);
         }
 
         private static bool HasDuplicateKeys(SerializedProperty entries)
         {
-            var seen = new HashSet<object>();
+            var seenNumerics = new HashSet<long>();
+            var seenStrings = new HashSet<string>();
+
             for (int i = 0; i < entries.arraySize; ++i)
             {
-                var key = entries.GetArrayElementAtIndex(i)?.FindPropertyRelative(KeyPropertyName);
-                if (key == null || !TryGetComparableKey(key, out var comparableKey))
+                var element = entries.GetArrayElementAtIndex(i);
+                if (element == null)
+                {
+                    return false;
+                }
+
+                var keyProp = element.FindPropertyRelative(KeyPropertyName);
+                if (keyProp == null)
+                {
+                    return false;
+                }
+
+                if (!TryGetComparableKey(keyProp, out var numeric, out var str))
                 {
                     continue;
                 }
 
-                if (!seen.Add(comparableKey))
+                if (str != null)
                 {
-                    return true;
+                    if (!seenStrings.Add(str))
+                        return true;
+                }
+                else
+                {
+                    if (!seenNumerics.Add(numeric))
+                        return true;
                 }
             }
             return false;
@@ -106,9 +125,10 @@ namespace SmallAmbitions.Editor
             return null;
         }
 
-        private static bool TryGetComparableKey(SerializedProperty keyProperty, out object comparableKey)
+        private static bool TryGetComparableKey(SerializedProperty keyProperty, out long numericKey, out string stringKey)
         {
-            comparableKey = null;
+            numericKey = default;
+            stringKey = null;
 
             if (keyProperty == null)
             {
@@ -118,23 +138,23 @@ namespace SmallAmbitions.Editor
             switch (keyProperty.propertyType)
             {
                 case SerializedPropertyType.Integer:
-                    comparableKey = keyProperty.longValue;
+                    numericKey = keyProperty.longValue;
                     return true;
 
                 case SerializedPropertyType.Boolean:
-                    comparableKey = keyProperty.boolValue;
+                    numericKey = keyProperty.boolValue ? 1 : 0;
                     return true;
 
                 case SerializedPropertyType.String:
-                    comparableKey = keyProperty.stringValue;
+                    stringKey = keyProperty.stringValue;
                     return true;
 
                 case SerializedPropertyType.Enum:
-                    comparableKey = keyProperty.intValue;
+                    numericKey = keyProperty.intValue;
                     return true;
 
                 case SerializedPropertyType.Character:
-                    comparableKey = (char)keyProperty.intValue;
+                    numericKey = keyProperty.intValue;
                     return true;
 
                 default:

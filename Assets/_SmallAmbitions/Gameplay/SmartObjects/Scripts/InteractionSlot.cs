@@ -2,10 +2,11 @@ namespace SmallAmbitions
 {
     public enum InteractionSlotType
     {
-        None,
+        None = 0,
         StandPosition,
         LeftHand,
         RightHand,
+        Pelvis,
         LookAt
     }
 }

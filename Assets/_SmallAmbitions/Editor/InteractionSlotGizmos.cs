@@ -1,11 +1,9 @@
-using System.Collections.Generic;
+using System;
 using UnityEditor;
 using UnityEngine;
-using UnityEngine.Rendering;
 
 namespace SmallAmbitions.Editor
 {
-    [InitializeOnLoad]
     public static class InteractionSlotGizmos
     {
         private const float GizmoSize = 0.15f;
@@ -14,29 +12,21 @@ namespace SmallAmbitions.Editor
         private const float ColorSaturation = 0.9f;
         private const float ColorValue = 0.9f;
 
-        private static readonly Dictionary<Transform, InteractionSlotType> InteractionSlots = new();
-        private static readonly InteractionSlotType[] SlotTypes = (InteractionSlotType[])System.Enum.GetValues(typeof(InteractionSlotType));
-        private static readonly List<Transform> KeysToRemove = new();
+        private static readonly InteractionSlotType[] SlotTypes = (InteractionSlotType[])Enum.GetValues(typeof(InteractionSlotType));
 
-        static InteractionSlotGizmos()
+        [DrawGizmo(GizmoType.Selected | GizmoType.NonSelected)]
+        private static void DrawSmartObjectGizmos(SmartObject smartObject, GizmoType gizmoType)
         {
-            InteractionSlots.Clear();
-
-            SceneView.duringSceneGui += OnSceneGUI;
-            EditorApplication.playModeStateChanged += OnPlayModeStateChanged;
-        }
-
-        private static void OnPlayModeStateChanged(PlayModeStateChange change)
-        {
-            // Find all SmartObjects
-            InteractionSlots.Clear();
-
-            var smartObjects = UnityEngine.Object.FindObjectsByType<SmartObject>(FindObjectsSortMode.None);
-            foreach (var smartObject in smartObjects)
+            if (!ShouldDrawGizmos())
             {
-                foreach (var (slotType, slot) in smartObject.InteractionSlots)
+                return;
+            }
+
+            foreach (var (slotType, slot) in smartObject.InteractionSlots)
+            {
+                if (slot != null)
                 {
-                    Register(slot, slotType);
+                    DrawSlotHandle(slot, slotType);
                 }
             }
         }
@@ -48,58 +38,21 @@ namespace SmallAmbitions.Editor
             return selected != null && selected.GetComponentInParent<SmartObject>() != null;
         }
 
-        private static void OnSceneGUI(SceneView sceneView)
-        {
-            RemoveDestroyedTransforms();
-
-            if (!ShouldDrawGizmos() || InteractionSlots.Count == 0)
-            {
-                return;
-            }
-
-            // Make button hover highlighting work in editor mode
-            if (Event.current.type == EventType.MouseMove)
-            {
-                sceneView.Repaint();
-            }
-
-            var previousZTest = Handles.zTest;
-            Handles.zTest = CompareFunction.LessEqual;
-
-            foreach (var (slot, slotType) in InteractionSlots)
-            {
-                DrawSlotHandle(slot, slotType);
-            }
-
-            Handles.zTest = previousZTest;
-        }
-
         private static void DrawSlotHandle(Transform slot, InteractionSlotType slotType)
         {
-            Handles.color = GetColorForSlotType(slotType);
-            if (Handles.Button(slot.position, Quaternion.identity, GizmoSize, GizmoSize, Handles.SphereHandleCap))
-            {
-                Selection.activeGameObject = slot.gameObject;
-            }
+            var prevGizmoColor = Gizmos.color;
+            Gizmos.color = GetColorForSlotType(slotType);
+            Gizmos.DrawSphere(slot.position, GizmoSize);
+            Gizmos.color = prevGizmoColor;
+
             DrawOrientationAxes(slot);
-        }
-
-        public static void Register(Transform slot, InteractionSlotType slotType)
-        {
-            if (slot != null)
-            {
-                InteractionSlots[slot] = slotType;
-            }
-        }
-
-        public static void Unregister(Transform slot)
-        {
-            InteractionSlots.Remove(slot);
         }
 
         private static void DrawOrientationAxes(Transform transform)
         {
             Vector3 position = transform.position;
+
+            var prevHandleColor = Handles.color;
 
             Handles.color = Color.red;
             Handles.DrawLine(position, position + transform.right * OrientationLineLength);
@@ -109,36 +62,15 @@ namespace SmallAmbitions.Editor
 
             Handles.color = Color.blue;
             Handles.DrawLine(position, position + transform.forward * OrientationLineLength);
+
+            Handles.color = prevHandleColor;
         }
 
         private static Color GetColorForSlotType(InteractionSlotType slotType)
         {
-            int index = System.Array.IndexOf(SlotTypes, slotType);
-
-            if (index < 0)
-            {
-                return Color.white;
-            }
-
-            float hue = index / (float)SlotTypes.Length;
+            int index = Array.IndexOf(SlotTypes, slotType);
+            float hue = MathUtils.SafeDivide(index, SlotTypes.Length);
             return Color.HSVToRGB(hue, ColorSaturation, ColorValue);
-        }
-
-        private static void RemoveDestroyedTransforms()
-        {
-            KeysToRemove.Clear();
-            foreach (var key in InteractionSlots.Keys)
-            {
-                if (key == null)
-                {
-                    KeysToRemove.Add(key);
-                }
-            }
-
-            foreach (var key in KeysToRemove)
-            {
-                InteractionSlots.Remove(key);
-            }
         }
     }
 }

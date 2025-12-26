@@ -18,13 +18,26 @@ namespace SmallAmbitions.Editor
 
         private static readonly InteractionSlotType[] SlotTypes = (InteractionSlotType[])Enum.GetValues(typeof(InteractionSlotType));
 
-        private bool _orphanedEntriesDirty = true;
         private ReorderableList _list;
 
         private void OnEnable()
         {
+            if (serializedObject == null || serializedObject.targetObject == null)
+            {
+                return;
+            }
+
             var mapProp = serializedObject.FindProperty(InteractionSlotsProperty);
+            if (mapProp == null)
+            {
+                return;
+            }
+
             var entriesProp = mapProp.FindPropertyRelative(EntriesProperty);
+            if (entriesProp == null)
+            {
+                return;
+            }
 
             _list = new ReorderableList(serializedObject, entriesProp)
             {
@@ -33,16 +46,10 @@ namespace SmallAmbitions.Editor
                 onAddDropdownCallback = OnAddDropdown,
                 onRemoveCallback = OnRemove
             };
-
-            RegisterAllSlots();
-
-            EditorApplication.hierarchyChanged += MarkOrphanedDirty;
         }
 
         private void OnDisable()
         {
-            EditorApplication.hierarchyChanged -= MarkOrphanedDirty;
-
             if (_list == null)
             {
                 return;
@@ -53,22 +60,6 @@ namespace SmallAmbitions.Editor
             _list.onAddDropdownCallback = null;
             _list.onRemoveCallback = null;
             _list = null;
-        }
-
-        private void RegisterAllSlots()
-        {
-            var entries = _list.serializedProperty;
-            for (int i = 0; i < entries.arraySize; i++)
-            {
-                var element = entries.GetArrayElementAtIndex(i);
-                var key = element.FindPropertyRelative(KeyProperty);
-                var value = element.FindPropertyRelative(ValueProperty);
-
-                if (value.objectReferenceValue is Transform t && TryGetSlotType(key, out var slotType))
-                {
-                    InteractionSlotGizmos.Register(t, slotType);
-                }
-            }
         }
 
         private void OnDrawHeader(Rect rect)
@@ -96,29 +87,22 @@ namespace SmallAmbitions.Editor
             GUI.color = previousColor;
         }
 
-        private static bool TryGetEnumDisplayName(SerializedProperty enumProperty, out string displayName)
+        private static bool IsValidInteractionSlotType(int rawValue)
         {
-            if (TryGetSlotType(enumProperty, out var slotType))
-            {
-                displayName = slotType.ToString();
-                return true;
-            }
-
-            displayName = "Invalid (removed enum?)";
-            return false;
+            return Enum.IsDefined(typeof(InteractionSlotType), rawValue);
         }
 
-        private static bool TryGetSlotType(SerializedProperty enumProperty, out InteractionSlotType slotType)
+        private static bool TryGetEnumDisplayName(SerializedProperty enumProperty, out string displayName)
         {
-            int index = enumProperty.enumValueIndex;
+            int rawValue = enumProperty.intValue;
 
-            if (index >= 0 && index < SlotTypes.Length)
+            if (IsValidInteractionSlotType(rawValue))
             {
-                slotType = SlotTypes[index];
+                displayName = ((InteractionSlotType)rawValue).ToString();
                 return true;
             }
 
-            slotType = InteractionSlotType.None;
+            displayName = $"<Invalid ({rawValue})>";
             return false;
         }
 
@@ -130,57 +114,59 @@ namespace SmallAmbitions.Editor
             var used = new HashSet<int>(entries.arraySize);
             for (int i = 0; i < entries.arraySize; ++i)
             {
-                used.Add(entries.GetArrayElementAtIndex(i).FindPropertyRelative(KeyProperty).enumValueIndex);
+                var keyProp = entries.GetArrayElementAtIndex(i).FindPropertyRelative(KeyProperty);
+                used.Add(keyProp.intValue);
             }
 
-            for (int i = 0; i < SlotTypes.Length; ++i)
+            foreach (var slotType in SlotTypes)
             {
-                var slotType = SlotTypes[i];
                 if (slotType == InteractionSlotType.None) // Skip 'None' type as it's not a valid slot
                 {
                     continue;
                 }
 
+                int rawValue = (int)slotType;
                 var content = new GUIContent(slotType.ToString());
-                if (used.Contains(i))
+
+                if (used.Contains(rawValue))
                 {
                     menu.AddDisabledItem(content);
                 }
                 else
                 {
                     // Must capture in local variable; loop variable would have wrong value when lambda executes
-                    int capturedIndex = i;
-                    menu.AddItem(content, false, () => AddEntry(capturedIndex));
+                    int capturedValue = rawValue;
+                    menu.AddItem(content, false, () => AddEntry(capturedValue));
                 }
             }
 
             menu.ShowAsContext();
         }
 
-        private void AddEntry(int enumIndex)
+        private void AddEntry(int rawEnumValue)
         {
             serializedObject.Update();
 
             var entries = _list.serializedProperty;
-            int index = entries.arraySize++;
+            int index = entries.arraySize;
+            entries.InsertArrayElementAtIndex(index);
 
             var element = entries.GetArrayElementAtIndex(index);
             var key = element.FindPropertyRelative(KeyProperty);
             var value = element.FindPropertyRelative(ValueProperty);
 
-            key.enumValueIndex = enumIndex;
+            value.objectReferenceValue = null;
+            key.intValue = rawEnumValue;
 
             var root = GetOrCreateRoot(((SmartObject)target).transform);
-            var go = new GameObject(key.enumDisplayNames[enumIndex]);
+
+            TryGetEnumDisplayName(key, out string slotName);
+            var go = new GameObject(slotName);
 
             Undo.RegisterCreatedObjectUndo(go, "Create Interaction Slot");
             go.transform.SetParent(root, false);
-            value.objectReferenceValue = go.transform;
 
-            if (TryGetSlotType(key, out var slotType))
-            {
-                InteractionSlotGizmos.Register(go.transform, slotType);
-            }
+            value.objectReferenceValue = go.transform;
 
             serializedObject.ApplyModifiedProperties();
 
@@ -189,12 +175,16 @@ namespace SmallAmbitions.Editor
 
         private void OnRemove(ReorderableList list)
         {
+            if (list.index < 0 || list.index >= list.serializedProperty.arraySize)
+            {
+                return;
+            }
+
             var element = list.serializedProperty.GetArrayElementAtIndex(list.index);
             var valueProp = element.FindPropertyRelative(ValueProperty);
 
             if (valueProp.objectReferenceValue is Transform t && t != null)
             {
-                InteractionSlotGizmos.Unregister(t);
                 Undo.DestroyObjectImmediate(t.gameObject);
             }
 
@@ -209,15 +199,22 @@ namespace SmallAmbitions.Editor
             for (int i = entries.arraySize - 1; i >= 0; --i)
             {
                 var element = entries.GetArrayElementAtIndex(i);
-                var value = element.FindPropertyRelative(ValueProperty);
-
-                if (value.objectReferenceValue != null)
+                if (element == null)
                 {
                     continue;
                 }
 
-                entries.DeleteArrayElementAtIndex(i);
-                modified = true;
+                var valueProp = element.FindPropertyRelative(ValueProperty);
+                if (valueProp == null)
+                {
+                    continue;
+                }
+
+                if (valueProp.objectReferenceValue == null)
+                {
+                    entries.DeleteArrayElementAtIndex(i);
+                    modified = true;
+                }
             }
 
             return modified;
@@ -239,16 +236,17 @@ namespace SmallAmbitions.Editor
 
         public override void OnInspectorGUI()
         {
+            if (serializedObject == null || serializedObject.targetObject == null)
+            {
+                return;
+            }
+
             serializedObject.Update();
 
-            if (_orphanedEntriesDirty)
+            if (RemoveOrphanedEntries())
             {
-                if (RemoveOrphanedEntries())
-                {
-                    serializedObject.ApplyModifiedProperties();
-                    serializedObject.Update();
-                }
-                _orphanedEntriesDirty = false;
+                serializedObject.ApplyModifiedProperties();
+                serializedObject.Update();
             }
 
             DrawPropertiesExcluding(serializedObject, InteractionSlotsProperty, "m_Script");
@@ -256,11 +254,6 @@ namespace SmallAmbitions.Editor
             _list?.DoLayoutList();
 
             serializedObject.ApplyModifiedProperties();
-        }
-
-        private void MarkOrphanedDirty()
-        {
-            _orphanedEntriesDirty = true;
         }
     }
 }
