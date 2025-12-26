@@ -142,7 +142,7 @@ namespace SmallAmbitions.Editor
                     return true;
 
                 case SerializedPropertyType.Boolean:
-                    numericKey = keyProperty.boolValue ? 1 : 0;
+                    numericKey = keyProperty.boolValue ? 1L : 0L;
                     return true;
 
                 case SerializedPropertyType.String:

@@ -8,8 +8,6 @@ namespace SmallAmbitions
     {
         private readonly HashSet<T> _items = new();
 
-        private void OnEnable() => _items.Clear();
-
         public int Count => _items.Count;
 
         public void Add(T item) => _items.Add(item);
