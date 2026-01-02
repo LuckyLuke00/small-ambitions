@@ -6,8 +6,8 @@ namespace SmallAmbitions.Editor
 {
     public static class InteractionSlotGizmos
     {
-        private const float GizmoSize = 0.15f;
-        private const float OrientationLineLength = 0.25f;
+        private const float GizmoSize = 0.1f;
+        private const float OrientationLineLength = 0.15f;
 
         private const float ColorSaturation = 0.9f;
         private const float ColorValue = 0.9f;
@@ -22,8 +22,11 @@ namespace SmallAmbitions.Editor
                 return;
             }
 
-            foreach (var (slotType, slot) in smartObject.InteractionSlots)
+            foreach (var interactionSlot in smartObject.InteractionSlots)
             {
+                var slotType = interactionSlot.SlotType;
+                var slot = interactionSlot.SlotTransform;
+
                 if (slot != null)
                 {
                     DrawSlotHandle(slot, slotType);

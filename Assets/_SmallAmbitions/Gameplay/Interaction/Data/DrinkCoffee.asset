@@ -1,0 +1,36 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c61186f248df50144a5166caa0d7aa09, type: 3}
+  m_Name: DrinkCoffee
+  m_EditorClassIdentifier: Assembly-CSharp::SmallAmbitions.Interaction
+  <InteractionSequence>k__BackingField:
+    _steps:
+    - _animationClip: {fileID: 0}
+      _durationMode: 0
+      _fixedDuration: 1
+      <TargetRigWeight>k__BackingField: 1
+      <BlendTimeSeconds>k__BackingField: 1
+    - _animationClip: {fileID: 7400000, guid: 7da617ea2e49bd344bcc5d10200a1291, type: 2}
+      _durationMode: 0
+      _fixedDuration: 4
+      <TargetRigWeight>k__BackingField: 0
+      <BlendTimeSeconds>k__BackingField: 1
+    - _animationClip: {fileID: 0}
+      _durationMode: 0
+      _fixedDuration: 1
+      <TargetRigWeight>k__BackingField: 1
+      <BlendTimeSeconds>k__BackingField: 1
+  <RequiredPrimarySlots>k__BackingField:
+    _entries: 0300000001000000
+  <RequiredAmbientSlots>k__BackingField:
+    _entries: 
+  <PositionToleranceRadius>k__BackingField: 0

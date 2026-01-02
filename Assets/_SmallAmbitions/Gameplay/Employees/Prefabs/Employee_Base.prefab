@@ -189,11 +189,14 @@ GameObject:
   m_Component:
   - component: {fileID: 1798884220012120685}
   - component: {fileID: 3046596120324259411}
+  - component: {fileID: 5492292476053368191}
   - component: {fileID: 1229367597119580074}
   - component: {fileID: 6808465034734159474}
   - component: {fileID: 6819498843884966407}
   - component: {fileID: 6759348930365202615}
   - component: {fileID: 3476717510983712729}
+  - component: {fileID: 6012067894194855043}
+  - component: {fileID: -5910684115990834202}
   m_Layer: 0
   m_Name: Employee_Base
   m_TagString: Untagged
@@ -239,6 +242,23 @@ Animator:
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorStateOnDisable: 0
   m_WriteDefaultValuesOnDisable: 0
+--- !u!111 &5492292476053368191
+Animation:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5263839998645613914}
+  m_Enabled: 1
+  serializedVersion: 4
+  m_Animation: {fileID: 0}
+  m_Animations:
+  - {fileID: 7400000, guid: 7da617ea2e49bd344bcc5d10200a1291, type: 2}
+  m_WrapMode: 0
+  m_PlayAutomatically: 1
+  m_AnimatePhysics: 0
+  m_UpdateMode: 0
+  m_CullingType: 0
 --- !u!114 &1229367597119580074
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -402,6 +422,43 @@ MonoBehaviour:
   _speed:
     _name: Speed
     _hash: -823668238
+--- !u!114 &6012067894194855043
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5263839998645613914}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 51ec11f1840a54c4a9449cc075c59d0a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::SmallAmbitions.AutonomyController
+  _smartObjects: {fileID: 11400000, guid: 7e78ed2093b7c9a4ba514b1475974dbc, type: 2}
+--- !u!114 &-5910684115990834202
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5263839998645613914}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: eff6605a9e825d2428d581edf7cb8fa5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::SmallAmbitions.InteractionManager
+  _animaton: {fileID: 5492292476053368191}
+  _smartObjects: {fileID: 11400000, guid: 7e78ed2093b7c9a4ba514b1475974dbc, type: 2}
+  _interactionSlotBindings:
+    _entries:
+    - Key: 2
+      Value:
+        <Rig>k__BackingField: {fileID: 1956167577538903743}
+        <IKTarget>k__BackingField: {fileID: 5122542979762009948}
+    - Key: 3
+      Value:
+        <Rig>k__BackingField: {fileID: 4340915272714348035}
+        <IKTarget>k__BackingField: {fileID: 3600659495596488626}
 --- !u!1 &5376613160728717634
 GameObject:
   m_ObjectHideFlags: 0
