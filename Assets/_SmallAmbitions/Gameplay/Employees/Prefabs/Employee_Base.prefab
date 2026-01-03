@@ -413,7 +413,6 @@ MonoBehaviour:
   _speed:
     _name: Speed
     _hash: -823668238
-  TEMP_ANIM: {fileID: 7400000, guid: 7da617ea2e49bd344bcc5d10200a1291, type: 2}
 --- !u!1 &5376613160728717634
 GameObject:
   m_ObjectHideFlags: 0
