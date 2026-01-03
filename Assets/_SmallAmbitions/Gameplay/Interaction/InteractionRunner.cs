@@ -5,7 +5,7 @@ namespace SmallAmbitions
 {
     public sealed class InteractionRunner
     {
-        private readonly Animator _animator;
+        private readonly AgentAnimator _animator;
         private readonly Interaction _interaction;
         private readonly SmartObject _primarySmartObject;
 
@@ -17,7 +17,7 @@ namespace SmallAmbitions
 
         public bool IsInteractionComplete { get; private set; } = false;
 
-        public InteractionRunner(Interaction interaction, Animator animator = null, SmartObject primarySmartObject = null)
+        public InteractionRunner(Interaction interaction, AgentAnimator animator = null, SmartObject primarySmartObject = null)
         {
             _interaction = interaction;
             _animator = animator;
@@ -52,10 +52,7 @@ namespace SmallAmbitions
             }
 
             var currentStep = _interaction.Steps[_stepIndex];
-
             ApplyIKWeight(currentStep);
-            AttachToSlot(currentStep);
-            PlayAnimation(currentStep);
 
             if (currentStep.ResetAttachement)
             {
@@ -86,12 +83,16 @@ namespace SmallAmbitions
                 IsInteractionComplete = true;
                 return;
             }
+
+            var currentStep = _interaction.Steps[_stepIndex];
+            AttachToSlot(currentStep);
+            PlayAnimation(currentStep);
         }
 
         private void ApplyIKWeight(InteractionStep interactionStep)
         {
             float targetRigWeight = Mathf.Clamp01(interactionStep.TargetRigWeight);
-            float rigWeightBlendTime = MathUtils.SafeDivide(Time.deltaTime, interactionStep.DurationSeconds, fallback: 0f);
+            float rigWeightBlendTime = MathUtils.SafeDivide(Time.deltaTime, interactionStep.RigBlendDurationSeconds, fallback: 0f);
 
             foreach (var pair in _interactionSlotBindings)
             {
@@ -146,7 +147,7 @@ namespace SmallAmbitions
                 return;
             }
 
-            _animator.Play(animation.name);
+            _animator.PlayOneShot(animation, interactionStep.AnimationLayer);
         }
     }
 }

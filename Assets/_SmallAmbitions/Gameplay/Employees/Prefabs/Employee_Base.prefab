@@ -440,7 +440,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: eff6605a9e825d2428d581edf7cb8fa5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::SmallAmbitions.InteractionManager
-  _animator: {fileID: 3046596120324259411}
+  _animator: {fileID: 3476717510983712729}
   _smartObjects: {fileID: 11400000, guid: 7e78ed2093b7c9a4ba514b1475974dbc, type: 2}
   _interactionSlotBindings:
     _entries:

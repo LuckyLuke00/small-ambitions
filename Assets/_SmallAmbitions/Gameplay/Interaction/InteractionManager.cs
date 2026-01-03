@@ -19,7 +19,7 @@ namespace SmallAmbitions
 
     public sealed class InteractionManager : MonoBehaviour
     {
-        [SerializeField] private Animator _animator;
+        [SerializeField] private AgentAnimator _animator;
         [SerializeField] private SmartObjectRuntimeSet _smartObjects;
         [SerializeField] private SerializableMap<InteractionSlotType, IKRig> _interactionSlotBindings;
 
