@@ -3411,13 +3411,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::SmallAmbitions.SmartObject
   _interactionSlots:
-    _entries:
-    - Key: 1
-      Value: {fileID: 0}
-    - Key: 3
-      Value: {fileID: 0}
-    - Key: 5
-      Value: {fileID: 0}
+    _entries: []
   _smartObjects: {fileID: 11400000, guid: 7e78ed2093b7c9a4ba514b1475974dbc, type: 2}
 --- !u!1001 &1144572105
 PrefabInstance:
@@ -4089,21 +4083,9 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: 4340915272714348035, guid: 6e6e6c76b760462439cd3662e3df6c85, type: 3}
-      propertyPath: m_Enabled
-      value: 1
-      objectReference: {fileID: 0}
     - target: {fileID: 5263839998645613914, guid: 6e6e6c76b760462439cd3662e3df6c85, type: 3}
       propertyPath: m_Name
       value: Employee_Base
-      objectReference: {fileID: 0}
-    - target: {fileID: 6759348930365202615, guid: 6e6e6c76b760462439cd3662e3df6c85, type: 3}
-      propertyPath: m_Enabled
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 6819498843884966407, guid: 6e6e6c76b760462439cd3662e3df6c85, type: 3}
-      propertyPath: m_Enabled
-      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []

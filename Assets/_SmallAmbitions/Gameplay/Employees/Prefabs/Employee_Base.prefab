@@ -397,8 +397,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c402591203729c44790316fd925c4c42, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::SmallAmbitions.AgentAnimator
-  _navMeshAgent: {fileID: 6808465034734159474}
   _animator: {fileID: 3046596120324259411}
+  _navMeshAgent: {fileID: 6808465034734159474}
+  _oneShotPlaceholder: {fileID: 7400000, guid: 4cbae2c2abb8b3541958b26d956561cd, type: 2}
+  _oneShotTrigger:
+    _name: PlayOneShot
+    _hash: -604242828
   _speed:
     _name: Speed
     _hash: -823668238
