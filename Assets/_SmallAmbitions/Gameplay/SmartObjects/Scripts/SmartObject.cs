@@ -3,11 +3,37 @@ using UnityEngine;
 
 namespace SmallAmbitions
 {
+    public readonly struct TransformSnapshot
+    {
+        public readonly Transform Parent;
+        public readonly Vector3 LocalPosition;
+        public readonly Quaternion LocalRotation;
+        public readonly Vector3 LocalScale;
+
+        public TransformSnapshot(Transform transform)
+        {
+            Parent = transform.parent;
+            LocalPosition = transform.localPosition;
+            LocalRotation = transform.localRotation;
+            LocalScale = transform.localScale;
+        }
+
+        public void Restore(Transform transform)
+        {
+            transform.SetParent(Parent, worldPositionStays: false);
+            transform.localPosition = LocalPosition;
+            transform.localRotation = LocalRotation;
+            transform.localScale = LocalScale;
+        }
+    }
+
     public sealed class SmartObject : MonoBehaviour
     {
         [SerializeField] private List<InteractionSlotDefinition> _interactionSlots = new();
         [SerializeField] private SerializableSet<Interaction> _interactions = new();
         [SerializeField] private SmartObjectRuntimeSet _smartObjects;
+        [field: SerializeField] public GameObject AttachmentObject { get; private set; }
+        private TransformSnapshot _attachmentOriginalPose;
 
         private List<InteractionSlotInstance> _slotInstances;
 
@@ -17,6 +43,10 @@ namespace SmallAmbitions
         private void Awake()
         {
             BuildSlotInstances();
+            if (AttachmentObject != null)
+            {
+                _attachmentOriginalPose = new TransformSnapshot(AttachmentObject.transform);
+            }
         }
 
         private void OnEnable()
@@ -131,6 +161,27 @@ namespace SmallAmbitions
 
             standTransform = null;
             return false;
+        }
+
+        public void ResetAttachmentObjectTransform()
+        {
+            if (AttachmentObject == null)
+            {
+                return;
+            }
+
+            _attachmentOriginalPose.Restore(AttachmentObject.transform);
+        }
+
+        public void AttachAttachmentObject(Transform parentTransform)
+        {
+            if (AttachmentObject == null || parentTransform == null)
+            {
+                return;
+            }
+
+            var t = AttachmentObject.transform;
+            t.SetParent(parentTransform, worldPositionStays: true);
         }
     }
 }

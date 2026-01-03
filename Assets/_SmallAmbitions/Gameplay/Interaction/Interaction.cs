@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace SmallAmbitions
@@ -5,7 +6,7 @@ namespace SmallAmbitions
     [CreateAssetMenu(fileName = "Interaction", menuName = "Small Ambitions/Interactions/New Interaction")]
     public sealed class Interaction : ScriptableObject
     {
-        [field: SerializeField] public InteractionSequence InteractionSequence { get; private set; } = null;
+        [field: SerializeField] public List<InteractionStep> Steps { get; private set; } = new();
 
         [Tooltip("Must be resolved on the SmartObject offering the interaction.")]
         [field: SerializeField] public SerializableSet<InteractionSlotType> RequiredPrimarySlots { get; private set; } = new();

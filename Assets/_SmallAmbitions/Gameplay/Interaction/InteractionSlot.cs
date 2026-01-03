@@ -58,6 +58,7 @@ namespace SmallAmbitions
     {
         [field: SerializeField] public Rig Rig { get; private set; }
         [field: SerializeField] public Transform IKTarget { get; private set; }
+        [field: SerializeField] public Transform AttachmentPoint { get; private set; }
 
         public float Weight
         {

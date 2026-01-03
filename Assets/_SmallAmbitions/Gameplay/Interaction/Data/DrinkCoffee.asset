@@ -12,23 +12,32 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c61186f248df50144a5166caa0d7aa09, type: 3}
   m_Name: DrinkCoffee
   m_EditorClassIdentifier: Assembly-CSharp::SmallAmbitions.Interaction
-  <InteractionSequence>k__BackingField:
-    _steps:
-    - _animationClip: {fileID: 0}
-      _durationMode: 0
-      _fixedDuration: 1
-      <TargetRigWeight>k__BackingField: 1
-      <BlendTimeSeconds>k__BackingField: 1
-    - _animationClip: {fileID: 7400000, guid: 7da617ea2e49bd344bcc5d10200a1291, type: 2}
-      _durationMode: 0
-      _fixedDuration: 4
-      <TargetRigWeight>k__BackingField: 0
-      <BlendTimeSeconds>k__BackingField: 1
-    - _animationClip: {fileID: 0}
-      _durationMode: 0
-      _fixedDuration: 1
-      <TargetRigWeight>k__BackingField: 1
-      <BlendTimeSeconds>k__BackingField: 1
+  <Steps>k__BackingField:
+  - <DurationSeconds>k__BackingField: 1
+    <TargetRigWeight>k__BackingField: 1
+    <ResetAttachement>k__BackingField: 0
+    <AnimationToPlay>k__BackingField: {fileID: 0}
+    <AttachToSlot>k__BackingField: 0
+  - <DurationSeconds>k__BackingField: 1
+    <TargetRigWeight>k__BackingField: 0
+    <ResetAttachement>k__BackingField: 0
+    <AnimationToPlay>k__BackingField: {fileID: 7400000, guid: 7da617ea2e49bd344bcc5d10200a1291, type: 2}
+    <AttachToSlot>k__BackingField: 3
+  - <DurationSeconds>k__BackingField: 1
+    <TargetRigWeight>k__BackingField: 1
+    <ResetAttachement>k__BackingField: 0
+    <AnimationToPlay>k__BackingField: {fileID: 0}
+    <AttachToSlot>k__BackingField: 0
+  - <DurationSeconds>k__BackingField: 0
+    <TargetRigWeight>k__BackingField: 1
+    <ResetAttachement>k__BackingField: 1
+    <AnimationToPlay>k__BackingField: {fileID: 0}
+    <AttachToSlot>k__BackingField: 0
+  - <DurationSeconds>k__BackingField: 1
+    <TargetRigWeight>k__BackingField: 0
+    <ResetAttachement>k__BackingField: 0
+    <AnimationToPlay>k__BackingField: {fileID: 0}
+    <AttachToSlot>k__BackingField: 0
   <RequiredPrimarySlots>k__BackingField:
     _entries: 0300000001000000
   <RequiredAmbientSlots>k__BackingField:

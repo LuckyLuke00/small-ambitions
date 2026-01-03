@@ -19,28 +19,28 @@ namespace SmallAmbitions
 
     public sealed class InteractionManager : MonoBehaviour
     {
-        [SerializeField] private Animation _animaton;
+        [SerializeField] private Animator _animator;
         [SerializeField] private SmartObjectRuntimeSet _smartObjects;
         [SerializeField] private SerializableMap<InteractionSlotType, IKRig> _interactionSlotBindings;
 
         private Interaction _activeInteraction;
-        private InteractionSequence _activeSequence;
+        private InteractionRunner _activeRunner;
 
         private SmartObject _activePrimary;
         private SmartObject _activeAmbient;
 
-        public bool IsInteracting => _activeInteraction != null;
+        public bool IsInteracting => _activeRunner != null;
 
         private void Update()
         {
-            if (!IsInteracting)
+            if (_activeRunner == null)
             {
                 return;
             }
 
-            _activeSequence.Update();
+            _activeRunner.Update(Time.deltaTime);
 
-            if (_activeSequence.IsComplete)
+            if (_activeRunner.IsInteractionComplete)
             {
                 StopInteraction();
             }
@@ -48,11 +48,7 @@ namespace SmallAmbitions
 
         public void StopInteraction()
         {
-            if (_activeSequence != null)
-            {
-                _activeSequence.End();
-                _activeSequence = null;
-            }
+            _activeRunner = null;
 
             if (_activePrimary != null)
             {
@@ -101,18 +97,18 @@ namespace SmallAmbitions
 
         public bool TryStartInteraction(Interaction interaction, SmartObject primarySmartObject, SmartObject ambientSmartObject = null)
         {
-            if (interaction == null || interaction.InteractionSequence == null || primarySmartObject == null)
+            if (interaction == null || primarySmartObject == null)
             {
                 return false;
             }
 
-            if (_animaton == null)
+            if (_animator == null)
             {
-                Debug.LogError($"{nameof(InteractionManager)}: Cannot start interaction, {nameof(_animaton)} is null.");
+                Debug.LogError($"{nameof(InteractionManager)}: Cannot start interaction, Animator is null.");
                 return false;
             }
 
-            if (_activeInteraction != null)
+            if (_activeRunner != null)
             {
                 StopInteraction();
             }
@@ -134,9 +130,9 @@ namespace SmallAmbitions
             _activeInteraction = interaction;
             _activePrimary = primarySmartObject;
             _activeAmbient = needsAmbient ? ambientSmartObject : null;
-            _activeSequence = interaction.InteractionSequence;
 
-            _activeSequence.Begin(_animaton, _interactionSlotBindings, _activePrimary.InteractionSlots);
+            _activeRunner = new InteractionRunner(interaction, _animator, primarySmartObject);
+            _activeRunner.Initialize(_interactionSlotBindings, primarySmartObject.InteractionSlots);
 
             return true;
         }

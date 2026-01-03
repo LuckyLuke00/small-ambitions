@@ -75,6 +75,10 @@ PrefabInstance:
       value: 2
       objectReference: {fileID: 0}
     - target: {fileID: 1355675428780554474, guid: 2d28192f13accf14fa9ff63826b6b0de, type: 3}
+      propertyPath: <AttachmentObject>k__BackingField
+      value: 
+      objectReference: {fileID: 1819441348128709758}
+    - target: {fileID: 1355675428780554474, guid: 2d28192f13accf14fa9ff63826b6b0de, type: 3}
       propertyPath: _interactions._entries.Array.size
       value: 1
       objectReference: {fileID: 0}
@@ -247,6 +251,11 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 9a3d49a261ebd354ca590502b47e20d3, type: 3}
+--- !u!1 &1819441348128709758 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: -1329135409744636692, guid: 9a3d49a261ebd354ca590502b47e20d3, type: 3}
+  m_PrefabInstance: {fileID: 8408785821437102226}
+  m_PrefabAsset: {fileID: 0}
 --- !u!4 &8302591909782941561 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: 9a3d49a261ebd354ca590502b47e20d3, type: 3}
