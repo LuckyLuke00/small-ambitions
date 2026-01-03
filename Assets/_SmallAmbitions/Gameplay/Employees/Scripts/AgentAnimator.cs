@@ -3,6 +3,12 @@ using UnityEngine.AI;
 
 namespace SmallAmbitions
 {
+    public enum OneShotAnimationLayer
+    {
+        Base,
+        UpperBody
+    }
+
     [RequireComponent(typeof(NavMeshAgent), typeof(Animator))]
     public sealed class AgentAnimator : MonoBehaviour
     {
@@ -12,12 +18,18 @@ namespace SmallAmbitions
 
         [Header("One-Shot Animation")]
         [SerializeField] private AnimationClip _oneShotPlaceholder;
-        [SerializeField] private AnimatorParameter _oneShotTrigger;
+        [SerializeField] private SerializableMap<OneShotAnimationLayer, AnimatorParameter> _oneShotTriggers;
 
         [Header("Locomotion")]
         [SerializeField] private AnimatorParameter _speed;
 
         private AnimatorOverrideController _oneShotOverride;
+
+        private void Awake()
+        {
+            _oneShotOverride = new AnimatorOverrideController(_animator.runtimeAnimatorController);
+            _animator.runtimeAnimatorController = _oneShotOverride;
+        }
 
         private void Update()
         {
@@ -25,7 +37,7 @@ namespace SmallAmbitions
             _animator.SetFloat(_speed.Hash, speedPercent);
         }
 
-        public void PlayOneShot(AnimationClip clip)
+        public void PlayOneShot(AnimationClip clip, OneShotAnimationLayer layer = OneShotAnimationLayer.Base)
         {
             if (clip == null)
             {
@@ -33,15 +45,11 @@ namespace SmallAmbitions
                 return;
             }
 
-            if (_oneShotOverride == null)
-            {
-                _oneShotOverride = new AnimatorOverrideController(_animator.runtimeAnimatorController);
-                _animator.runtimeAnimatorController = _oneShotOverride;
-            }
+            AnimatorParameter oneShotTrigger = _oneShotTriggers[layer];
 
             _oneShotOverride[_oneShotPlaceholder] = clip;
-            _animator.ResetTrigger(_oneShotTrigger.Hash);
-            _animator.SetTrigger(_oneShotTrigger.Hash);
+            _animator.ResetTrigger(oneShotTrigger.Hash);
+            _animator.SetTrigger(oneShotTrigger.Hash);
         }
     }
 }
