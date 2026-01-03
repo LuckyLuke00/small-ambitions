@@ -45,9 +45,12 @@ namespace SmallAmbitions
                 return;
             }
 
-            AnimatorParameter oneShotTrigger = _oneShotTriggers[layer];
+            if (!_oneShotTriggers.TryGetValue(layer, out AnimatorParameter oneShotTrigger))
+            {
+                Debug.LogWarning($"[{nameof(AgentAnimator)}] Cannot play one-shot animation: no one-shot trigger configured for layer '{layer}'.");
+                return;
+            }
 
-            _oneShotOverride[_oneShotPlaceholder] = clip;
             _animator.ResetTrigger(oneShotTrigger.Hash);
             _animator.SetTrigger(oneShotTrigger.Hash);
         }
