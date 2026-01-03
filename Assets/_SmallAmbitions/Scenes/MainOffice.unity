@@ -3504,8 +3504,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2ce72d93835f69146b9deb02e49d288a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::SmallAmbitions.SmartObject
-  _interactionSlots: []
-  _interactions:
+  _interactionSlots:
     _entries: []
   _smartObjects: {fileID: 11400000, guid: 7e78ed2093b7c9a4ba514b1475974dbc, type: 2}
   <AttachmentObject>k__BackingField: {fileID: 0}

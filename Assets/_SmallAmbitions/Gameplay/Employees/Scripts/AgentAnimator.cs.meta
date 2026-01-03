@@ -1,2 +1,14 @@
 fileFormatVersion: 2
 guid: c402591203729c44790316fd925c4c42
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences:
+  - _animator: {instanceID: 0}
+  - _navMeshAgent: {instanceID: 0}
+  - _oneShotPlaceholder: {fileID: 7400000, guid: 4cbae2c2abb8b3541958b26d956561cd, type: 2}
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
