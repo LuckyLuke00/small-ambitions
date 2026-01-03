@@ -51,6 +51,7 @@ namespace SmallAmbitions
                 return;
             }
 
+            _oneShotOverride[_oneShotPlaceholder.name] = clip;
             _animator.ResetTrigger(oneShotTrigger.Hash);
             _animator.SetTrigger(oneShotTrigger.Hash);
         }
