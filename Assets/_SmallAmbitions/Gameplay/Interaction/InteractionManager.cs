@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 namespace SmallAmbitions
@@ -31,7 +32,7 @@ namespace SmallAmbitions
 
         public bool IsInteracting => _activeRunner != null;
 
-        private void Update()
+        private void LateUpdate()
         {
             if (_activeRunner == null)
             {
@@ -63,6 +64,7 @@ namespace SmallAmbitions
             }
 
             _activeInteraction = null;
+            ResetRigWeights();
         }
 
         public bool TryGetAvailableInteractions(out List<InteractionCandidate> availableInteractions)
@@ -99,6 +101,12 @@ namespace SmallAmbitions
         {
             if (interaction == null || primarySmartObject == null)
             {
+                return false;
+            }
+
+            if (!primarySmartObject.Interactions.Contains(interaction))
+            {
+                Debug.LogError($"Interaction '{interaction.name}' does not belong to SmartObject '{primarySmartObject.name}'");
                 return false;
             }
 
@@ -194,6 +202,17 @@ namespace SmallAmbitions
             }
 
             return ambientSmartObjects.Count > 0;
+        }
+
+        private void ResetRigWeights()
+        {
+            foreach (var rigBinding in _interactionSlotBindings)
+            {
+                if (rigBinding.Value.Rig != null)
+                {
+                    rigBinding.Value.Rig.weight = 0f;
+                }
+            }
         }
     }
 }

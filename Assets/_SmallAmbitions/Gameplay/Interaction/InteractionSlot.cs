@@ -60,6 +60,8 @@ namespace SmallAmbitions
         [field: SerializeField] public Transform IKTarget { get; private set; }
         [field: SerializeField] public Transform AttachmentPoint { get; private set; }
 
+        public bool IsActive => Rig != null && Rig.isActiveAndEnabled;
+
         public float Weight
         {
             get => Rig.weight;
@@ -68,6 +70,11 @@ namespace SmallAmbitions
 
         public void MoveIKTarget(Transform target)
         {
+            if (IKTarget == null)
+            {
+                return;
+            }
+
             IKTarget.position = target.position;
             IKTarget.rotation = target.rotation;
         }

@@ -1,0 +1,48 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c61186f248df50144a5166caa0d7aa09, type: 3}
+  m_Name: SitInChair
+  m_EditorClassIdentifier: Assembly-CSharp::SmallAmbitions.Interaction
+  <Steps>k__BackingField:
+  - <DurationSeconds>k__BackingField: 1
+    <RigBlendDurationSeconds>k__BackingField: 0
+    <TargetRigWeight>k__BackingField: 0
+    <ResetAttachement>k__BackingField: 0
+    <AttachToSlot>k__BackingField: 0
+    <AnimationLayer>k__BackingField: 0
+    <AnimationToPlay>k__BackingField: {fileID: 7400000, guid: b37e053b9922dae4a9b7b85215b536b4, type: 2}
+  - <DurationSeconds>k__BackingField: 0.17
+    <RigBlendDurationSeconds>k__BackingField: 0.17
+    <TargetRigWeight>k__BackingField: 1
+    <ResetAttachement>k__BackingField: 0
+    <AttachToSlot>k__BackingField: 0
+    <AnimationLayer>k__BackingField: 0
+    <AnimationToPlay>k__BackingField: {fileID: 0}
+  - <DurationSeconds>k__BackingField: 1.063
+    <RigBlendDurationSeconds>k__BackingField: 0
+    <TargetRigWeight>k__BackingField: 1
+    <ResetAttachement>k__BackingField: 0
+    <AttachToSlot>k__BackingField: 0
+    <AnimationLayer>k__BackingField: 0
+    <AnimationToPlay>k__BackingField: {fileID: 0}
+  - <DurationSeconds>k__BackingField: 4.3
+    <RigBlendDurationSeconds>k__BackingField: 0
+    <TargetRigWeight>k__BackingField: 1
+    <ResetAttachement>k__BackingField: 0
+    <AttachToSlot>k__BackingField: 0
+    <AnimationLayer>k__BackingField: 0
+    <AnimationToPlay>k__BackingField: {fileID: 7400000, guid: d96452d985a7ff3468718d8fa1f24a26, type: 2}
+  <RequiredPrimarySlots>k__BackingField:
+    _entries: 0100000004000000
+  <RequiredAmbientSlots>k__BackingField:
+    _entries: 
+  <PositionToleranceRadius>k__BackingField: 0

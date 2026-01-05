@@ -99,6 +99,11 @@ namespace SmallAmbitions
                 var slotType = pair.Key;
                 var ikRig = pair.Value;
 
+                if (!ikRig.IsActive)
+                {
+                    continue;
+                }
+
                 foreach (var slotDef in _slotTargets)
                 {
                     if (slotDef.SlotType != slotType)

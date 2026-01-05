@@ -1,5 +1,6 @@
 using SmallAmbitions;
 using System;
+using System.Collections.Generic;
 using Unity.Behavior;
 using Unity.Properties;
 using UnityEngine;
@@ -19,13 +20,35 @@ public partial class StartInteractionAction : Action
             return Status.Failure;
         }
 
-        if (!Self.Value.TryGetAvailableInteractions(out var availableInteractions) || availableInteractions.Count == 0)
+        // Only interactions offered by THIS smart object
+        var smartObject = SmartObject.Value;
+        var interactions = smartObject.Interactions;
+
+        if (interactions.Count == 0)
         {
             return Status.Failure;
         }
 
-        var interactionCandidate = availableInteractions[UnityEngine.Random.Range(0, availableInteractions.Count)];
-        if (!Self.Value.TryStartInteraction(interactionCandidate.Interaction, interactionCandidate.SmartObject))
+        // Build local candidates
+        var validCandidates = new List<Interaction>();
+
+        foreach (var interaction in interactions)
+        {
+            if (!smartObject.HasAvailableSlots(interaction.RequiredPrimarySlots))
+            {
+                continue;
+            }
+
+            validCandidates.Add(interaction);
+        }
+
+        if (validCandidates.Count == 0)
+        {
+            return Status.Failure;
+        }
+
+        var chosenInteraction = validCandidates[UnityEngine.Random.Range(0, validCandidates.Count)];
+        if (!Self.Value.TryStartInteraction(chosenInteraction, smartObject))
         {
             return Status.Failure;
         }
