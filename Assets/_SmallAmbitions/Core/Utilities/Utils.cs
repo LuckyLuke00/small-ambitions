@@ -4,24 +4,24 @@ namespace SmallAmbitions
 {
     public static class Utils
     {
-        public static bool IsValidIndex<T>(this ICollection<T> collection, int index)
+        public static bool IsValidIndex<T>(this IReadOnlyList<T> list, int index)
         {
-            return collection != null && (uint)index < (uint)collection.Count;
+            return list != null && (uint)index < (uint)list.Count;
         }
 
-        public static bool IsNullOrEmpty<T>(this ICollection<T> collection)
+        public static bool IsNullOrEmpty<T>(this IReadOnlyCollection<T> collection)
         {
             return collection == null || collection.Count == 0;
         }
 
-        public static T GetRandomElement<T>(this IList<T> collection)
+        public static T GetRandomElement<T>(this IReadOnlyList<T> list)
         {
-            if (collection == null || collection.Count == 0)
+            if (list == null || list.Count == 0)
             {
                 return default;
             }
-            int randomIndex = UnityEngine.Random.Range(0, collection.Count);
-            return collection[randomIndex];
+            int randomIndex = UnityEngine.Random.Range(0, list.Count);
+            return list[randomIndex];
         }
 
         public static T GetRandomElement<T>(this ICollection<T> collection)

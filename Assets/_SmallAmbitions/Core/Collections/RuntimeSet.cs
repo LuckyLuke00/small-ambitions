@@ -46,7 +46,7 @@ namespace SmallAmbitions
 
         public T GetRandom()
         {
-            return Utils.GetRandomElement(_items);
+            return _items.GetRandomElement();
         }
     }
 }
