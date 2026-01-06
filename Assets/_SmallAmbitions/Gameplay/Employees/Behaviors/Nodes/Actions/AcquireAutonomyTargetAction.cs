@@ -6,25 +6,23 @@ using UnityEngine;
 using Action = Unity.Behavior.Action;
 
 [Serializable, GeneratePropertyBag]
-[NodeDescription(name: "Acquire Autonomy Target", story: "Acquire New Autonomy [Target] for [Self]", category: "Action", id: "167d046837f2e744ca67b7f70e288be9")]
+[NodeDescription(name: "Acquire Autonomy Target", story: "Acquire New Autonomy Target for [AutonomyController]", category: "Action", id: "167d046837f2e744ca67b7f70e288be9")]
 public partial class AcquireAutonomyTargetAction : Action
 {
-    [SerializeReference] public BlackboardVariable<AutonomyController> Self;
-    [SerializeReference] public BlackboardVariable<SmartObject> Target;
+    [SerializeReference] public BlackboardVariable<AutonomyController> AutonomyController;
 
     protected override Status OnStart()
     {
-        if (Self.Value == null)
+        if (AutonomyController.Value == null)
         {
             return Status.Failure;
         }
 
-        if (!Self.Value.TryGetAutonomyTarget(out var autonomyTarget))
+        if (!AutonomyController.Value.AquireNewAutonomyTarget())
         {
             return Status.Failure;
         }
 
-        Target.Value = autonomyTarget;
         return Status.Success;
     }
 }

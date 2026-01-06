@@ -1,5 +1,4 @@
 using System.Collections.Generic;
-using System.Linq;
 using UnityEngine;
 
 namespace SmallAmbitions
@@ -20,56 +19,186 @@ namespace SmallAmbitions
 
     public sealed class InteractionManager : MonoBehaviour
     {
+        [Header("References")]
         [SerializeField] private AgentAnimator _animator;
         [SerializeField] private SmartObjectRuntimeSet _smartObjects;
         [SerializeField] private SerializableMap<InteractionSlotType, IKRig> _interactionSlotBindings;
 
-        private Interaction _activeInteraction;
-        private InteractionRunner _activeRunner;
+        private InteractionRunner _ambientInteractionRunner;
+        private InteractionRunner _primaryInteractionRunner;
 
-        private SmartObject _activePrimary;
-        private SmartObject _activeAmbient;
+        private SmartObject _activePrimaryObject;
+        private SmartObject _activeAmbientObject;
 
-        public bool IsInteracting => _activeRunner != null;
+        public bool IsInteracting => _primaryInteractionRunner != null;
 
         private void LateUpdate()
         {
-            if (_activeRunner == null)
+            // Primary only runs if:
+            // - there is no ambient interaction
+            // - OR the ambient interaction is looping
+            bool canRunPrimary = _primaryInteractionRunner != null && (_ambientInteractionRunner == null || _ambientInteractionRunner.IsLooping);
+
+            if (_ambientInteractionRunner != null)
+            {
+                _ambientInteractionRunner.IsAnimationPaused = canRunPrimary;
+                _ambientInteractionRunner.Update();
+
+                if (_ambientInteractionRunner.IsFinished)
+                {
+                    StopAmbientInteraction();
+                }
+            }
+
+            if (canRunPrimary)
+            {
+                _primaryInteractionRunner.Update();
+
+                if (_primaryInteractionRunner.IsFinished)
+                {
+                    StopPrimaryInteraction();
+                }
+            }
+        }
+
+        public bool TryStartInteraction(AutonomyTarget target)
+        {
+            var interaction = target.Interaction;
+            var primaryObject = target.PrimarySmartObject;
+            var ambientObject = target.AmbientSmartObject;
+
+            if (interaction == null || primaryObject == null)
+            {
+                return false;
+            }
+
+            if (_animator == null)
+            {
+                Debug.LogError($"{nameof(InteractionManager)}: Cannot start interaction, Animator is null.");
+                return false;
+            }
+
+            // Validate ambient requirement (if any)
+            bool needsAmbient = interaction.RequiredAmbientSlots != null && interaction.RequiredAmbientSlots.Count > 0;
+            if (needsAmbient)
+            {
+                if (ambientObject == null || ambientObject == primaryObject)
+                {
+                    return false;
+                }
+
+                if (!ambientObject.HasAvailableSlots(interaction.RequiredAmbientSlots))
+                {
+                    return false;
+                }
+            }
+
+            // Validate primary slots availability
+            if (!primaryObject.HasAvailableSlots(interaction.RequiredPrimarySlots))
+            {
+                return false;
+            }
+
+            // Stop existing activity first (this also releases its slots)
+            StopPrimaryInteraction();
+
+            // Start prerequisite posture (optional) before activity.
+            Interaction required = interaction.RequiredAmbientInteraction;
+            if (required != null)
+            {
+                // Decide which object is the "posture object".
+                SmartObject postureObject = ambientObject != null ? ambientObject : primaryObject;
+                StartAmbientInteraction(required, postureObject, primaryObject: primaryObject);
+            }
+            else
+            {
+                StopAmbientInteraction();
+            }
+
+            if (!primaryObject.TryReserveSlots(interaction.RequiredPrimarySlots, gameObject))
+            {
+                // Roll back ambient reservation if we took it
+                if (needsAmbient)
+                {
+                    ambientObject.ReleaseSlots(gameObject);
+                }
+                return false;
+            }
+
+            _activePrimaryObject = primaryObject;
+            _activeAmbientObject = needsAmbient ? ambientObject : null;
+
+            // Build the slot target list for the runner: primary + ambient (if any)
+            _primaryInteractionRunner = new InteractionRunner(interaction, _animator, primaryObject, _interactionSlotBindings, _activePrimaryObject.InteractionSlots);
+            return true;
+        }
+
+        private void StartAmbientInteraction(Interaction interaction, SmartObject postureObject, SmartObject primaryObject)
+        {
+            StopAmbientInteraction();
+
+            if (interaction == null || postureObject == null)
             {
                 return;
             }
 
-            _activeRunner.Update(Time.deltaTime);
-
-            if (_activeRunner.IsInteractionComplete)
+            // Reserve the posture's primary slots on the posture object.
+            if (!postureObject.HasAvailableSlots(interaction.RequiredPrimarySlots))
             {
-                StopInteraction();
+                return;
             }
+
+            if (!postureObject.TryReserveSlots(interaction.RequiredPrimarySlots, gameObject))
+            {
+                return;
+            }
+
+            _activeAmbientObject = postureObject;
+            _ambientInteractionRunner = new InteractionRunner(interaction, _animator, postureObject, _interactionSlotBindings, _activeAmbientObject.InteractionSlots);
         }
 
-        public void StopInteraction()
+        private void StopAmbientInteraction()
         {
-            _activeRunner = null;
-
-            if (_activePrimary != null)
+            if (_ambientInteractionRunner == null)
             {
-                _activePrimary.ReleaseSlots(gameObject);
-                _activePrimary = null;
+                return;
             }
 
-            if (_activeAmbient != null)
+            _ambientInteractionRunner.ForceCancel();
+            _ambientInteractionRunner = null;
+
+            // Important: release ONLY what this layer reserved.
+            // Here we assume posture reserved slots on _activeAmbientObject (postureObject).
+            _activeAmbientObject?.ReleaseSlots(gameObject);
+            _activeAmbientObject = null;
+        }
+
+        private void StopPrimaryInteraction()
+        {
+            if (_primaryInteractionRunner == null)
             {
-                _activeAmbient.ReleaseSlots(gameObject);
-                _activeAmbient = null;
+                return;
             }
 
-            _activeInteraction = null;
-            ResetRigWeights();
+            _primaryInteractionRunner.ForceCancel();
+            _primaryInteractionRunner = null;
+
+            ReleaseSlots(_activePrimaryObject, _activeAmbientObject);
+
+            _activePrimaryObject = null;
+            _activeAmbientObject = null;
+        }
+
+        private void ReleaseSlots(SmartObject primaryObject, SmartObject ambientObject)
+        {
+            primaryObject?.ReleaseSlots(gameObject);
+            ambientObject?.ReleaseSlots(gameObject);
         }
 
         public bool TryGetAvailableInteractions(out List<InteractionCandidate> availableInteractions)
         {
             availableInteractions = new List<InteractionCandidate>(_smartObjects.Count);
+
             foreach (var smartObject in _smartObjects)
             {
                 foreach (var interaction in smartObject.Interactions)
@@ -87,62 +216,14 @@ namespace SmallAmbitions
 
                     if (TryFindAvailableAmbientSmartObjects(interaction, smartObject, out var ambientSmartObjects))
                     {
-                        var interactionCandidate = new InteractionCandidate(interaction, smartObject);
-                        interactionCandidate.CandidateAmbientSmartObjects.AddRange(ambientSmartObjects);
-                        availableInteractions.Add(interactionCandidate);
+                        var candidate = new InteractionCandidate(interaction, smartObject);
+                        candidate.CandidateAmbientSmartObjects.AddRange(ambientSmartObjects);
+                        availableInteractions.Add(candidate);
                     }
                 }
             }
 
             return availableInteractions.Count > 0;
-        }
-
-        public bool TryStartInteraction(Interaction interaction, SmartObject primarySmartObject, SmartObject ambientSmartObject = null)
-        {
-            if (interaction == null || primarySmartObject == null)
-            {
-                return false;
-            }
-
-            if (!primarySmartObject.Interactions.Contains(interaction))
-            {
-                Debug.LogError($"Interaction '{interaction.name}' does not belong to SmartObject '{primarySmartObject.name}'");
-                return false;
-            }
-
-            if (_animator == null)
-            {
-                Debug.LogError($"{nameof(InteractionManager)}: Cannot start interaction, Animator is null.");
-                return false;
-            }
-
-            if (_activeRunner != null)
-            {
-                StopInteraction();
-            }
-
-            bool needsAmbient = interaction.RequiredAmbientSlots != null && interaction.RequiredAmbientSlots.Count > 0;
-            if (needsAmbient)
-            {
-                if (ambientSmartObject == null || ambientSmartObject == primarySmartObject || !ambientSmartObject.TryReserveSlots(interaction.RequiredAmbientSlots, gameObject))
-                {
-                    return false;
-                }
-            }
-
-            if (!primarySmartObject.TryReserveSlots(interaction.RequiredPrimarySlots, gameObject))
-            {
-                return false;
-            }
-
-            _activeInteraction = interaction;
-            _activePrimary = primarySmartObject;
-            _activeAmbient = needsAmbient ? ambientSmartObject : null;
-
-            _activeRunner = new InteractionRunner(interaction, _animator, primarySmartObject);
-            _activeRunner.Initialize(_interactionSlotBindings, primarySmartObject.InteractionSlots);
-
-            return true;
         }
 
         private bool TryGetSmartObjectsInRangeDistance(float searchRadius, out List<SmartObject> smartObjectsInRange)
@@ -165,27 +246,9 @@ namespace SmallAmbitions
             return smartObjectsInRange.Count > 0;
         }
 
-        private bool TryGetSmartObjectsInRangeOverlap(float searchRadius, out List<SmartObject> smartObjectsInRange)
-        {
-            Vector3 origin = transform.position;
-            Collider[] hits = Physics.OverlapSphere(origin, searchRadius);
-            smartObjectsInRange = new List<SmartObject>(hits.Length);
-
-            foreach (var hit in hits)
-            {
-                SmartObject smartObject = hit.GetComponentInParent<SmartObject>();
-                if (smartObject != null)
-                {
-                    smartObjectsInRange.Add(smartObject);
-                }
-            }
-
-            return smartObjectsInRange.Count > 0;
-        }
-
         private bool TryFindAvailableAmbientSmartObjects(Interaction interaction, SmartObject primarySmartObject, out List<SmartObject> ambientSmartObjects)
         {
-            if (!TryGetSmartObjectsInRangeOverlap(interaction.PositionToleranceRadius, out ambientSmartObjects))
+            if (!TryGetSmartObjectsInRangeDistance(interaction.PositionToleranceRadius, out ambientSmartObjects))
             {
                 return false;
             }
@@ -202,17 +265,6 @@ namespace SmallAmbitions
             }
 
             return ambientSmartObjects.Count > 0;
-        }
-
-        private void ResetRigWeights()
-        {
-            foreach (var rigBinding in _interactionSlotBindings)
-            {
-                if (rigBinding.Value.Rig != null)
-                {
-                    rigBinding.Value.Rig.weight = 0f;
-                }
-            }
         }
     }
 }

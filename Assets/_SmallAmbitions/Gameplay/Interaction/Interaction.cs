@@ -6,7 +6,11 @@ namespace SmallAmbitions
     [CreateAssetMenu(fileName = "Interaction", menuName = "Small Ambitions/Interactions/New Interaction")]
     public sealed class Interaction : ScriptableObject
     {
-        [field: SerializeField] public List<InteractionStep> Steps { get; private set; } = new();
+        [field: SerializeField] public List<InteractionStep> StartSteps { get; private set; } = new();
+        [field: SerializeField] public List<InteractionStep> LoopSteps { get; private set; } = new();
+        [field: SerializeField] public List<InteractionStep> ExitSteps { get; private set; } = new();
+
+        [field: SerializeField] public Interaction RequiredAmbientInteraction { get; private set; }
 
         [Tooltip("Must be resolved on the SmartObject offering the interaction.")]
         [field: SerializeField] public SerializableSet<InteractionSlotType> RequiredPrimarySlots { get; private set; } = new();

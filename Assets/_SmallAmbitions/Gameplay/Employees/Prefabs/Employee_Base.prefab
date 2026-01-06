@@ -363,7 +363,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f0038c16c34866b4f9e25c9c0dc0f7e6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Unity.Behavior::Unity.Behavior.BehaviorGraphAgent
-  m_Graph: {fileID: -2950765659375523651, guid: ea5d3fdd69abf524a9fdb3d59d6fdb37, type: 2}
+  m_Graph: {fileID: 4167951815723838239, guid: ea5d3fdd69abf524a9fdb3d59d6fdb37, type: 2}
   m_BlackboardVariableOverridesList:
   - rid: 6996978783024841053
   m_OriginalGraph: {fileID: -2950765659375523651, guid: ea5d3fdd69abf524a9fdb3d59d6fdb37, type: 2}
@@ -539,7 +539,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 51ec11f1840a54c4a9449cc075c59d0a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::SmallAmbitions.AutonomyController
-  _smartObjects: {fileID: 11400000, guid: 7e78ed2093b7c9a4ba514b1475974dbc, type: 2}
+  _interactionManager: {fileID: -5910684115990834202}
 --- !u!114 &-5910684115990834202
 MonoBehaviour:
   m_ObjectHideFlags: 0

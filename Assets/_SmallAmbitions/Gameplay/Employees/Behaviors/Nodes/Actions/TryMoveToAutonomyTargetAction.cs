@@ -7,11 +7,11 @@ using UnityEngine.AI;
 using Action = Unity.Behavior.Action;
 
 [Serializable, GeneratePropertyBag]
-[NodeDescription(name: "Try Move to Autonomy Target", story: "[Agent] moves to [AutonomyTarget]", category: "Action", id: "80c12a24784f85827927bfd541e660ab")]
+[NodeDescription(name: "Try Move to Autonomy Target", story: "[Agent] moves to [AutonomyController]'s autonomy target", category: "Action", id: "80c12a24784f85827927bfd541e660ab")]
 public partial class TryMoveToAutonomyTargetAction : Action
 {
     [SerializeReference] public BlackboardVariable<GameObject> Agent;
-    [SerializeReference] public BlackboardVariable<SmartObject> AutonomyTarget;
+    [SerializeReference] public BlackboardVariable<AutonomyController> AutonomyController;
 
     private NavMeshAgent _agent;
     private Vector3 _targetPosition;
@@ -19,7 +19,7 @@ public partial class TryMoveToAutonomyTargetAction : Action
 
     protected override Status OnStart()
     {
-        if (Agent.Value == null || AutonomyTarget.Value == null)
+        if (Agent.Value == null || AutonomyController == null)
         {
             return Status.Failure;
         }
@@ -83,9 +83,13 @@ public partial class TryMoveToAutonomyTargetAction : Action
 
         _agent.ResetPath();
 
-        if (!AutonomyTarget.Value.TryGetAvailableStandPosition(out Transform StandPosition))
+        var target = AutonomyController.Value.CurrentAutonomyTarget;
+        if (!target.PrimarySmartObject.TryGetAvailableStandPosition(out Transform StandPosition))
         {
-            return Status.Failure;
+            if (!target.AmbientSmartObject.TryGetAvailableStandPosition(out StandPosition))
+            {
+                return Status.Failure;
+            }
         }
 
         _targetPosition = StandPosition.position;

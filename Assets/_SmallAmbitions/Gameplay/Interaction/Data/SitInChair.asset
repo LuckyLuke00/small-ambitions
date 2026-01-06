@@ -12,28 +12,23 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c61186f248df50144a5166caa0d7aa09, type: 3}
   m_Name: SitInChair
   m_EditorClassIdentifier: Assembly-CSharp::SmallAmbitions.Interaction
-  <Steps>k__BackingField:
-  - <DurationSeconds>k__BackingField: 1
+  <StartSteps>k__BackingField:
+  - <DurationSeconds>k__BackingField: 0.65
     <RigBlendDurationSeconds>k__BackingField: 0
     <TargetRigWeight>k__BackingField: 0
     <ResetAttachement>k__BackingField: 0
     <AttachToSlot>k__BackingField: 0
     <AnimationLayer>k__BackingField: 0
     <AnimationToPlay>k__BackingField: {fileID: 7400000, guid: b37e053b9922dae4a9b7b85215b536b4, type: 2}
-  - <DurationSeconds>k__BackingField: 0.17
-    <RigBlendDurationSeconds>k__BackingField: 0.17
+  - <DurationSeconds>k__BackingField: 1.583
+    <RigBlendDurationSeconds>k__BackingField: 0.85
     <TargetRigWeight>k__BackingField: 1
     <ResetAttachement>k__BackingField: 0
     <AttachToSlot>k__BackingField: 0
     <AnimationLayer>k__BackingField: 0
     <AnimationToPlay>k__BackingField: {fileID: 0}
-  - <DurationSeconds>k__BackingField: 1.063
-    <RigBlendDurationSeconds>k__BackingField: 0
-    <TargetRigWeight>k__BackingField: 1
-    <ResetAttachement>k__BackingField: 0
-    <AttachToSlot>k__BackingField: 0
-    <AnimationLayer>k__BackingField: 0
-    <AnimationToPlay>k__BackingField: {fileID: 0}
+  <LoopSteps>k__BackingField: []
+  <ExitSteps>k__BackingField:
   - <DurationSeconds>k__BackingField: 4.3
     <RigBlendDurationSeconds>k__BackingField: 0
     <TargetRigWeight>k__BackingField: 1
@@ -41,6 +36,21 @@ MonoBehaviour:
     <AttachToSlot>k__BackingField: 0
     <AnimationLayer>k__BackingField: 0
     <AnimationToPlay>k__BackingField: {fileID: 7400000, guid: d96452d985a7ff3468718d8fa1f24a26, type: 2}
+  - <DurationSeconds>k__BackingField: 1
+    <RigBlendDurationSeconds>k__BackingField: 0
+    <TargetRigWeight>k__BackingField: 1
+    <ResetAttachement>k__BackingField: 0
+    <AttachToSlot>k__BackingField: 0
+    <AnimationLayer>k__BackingField: 0
+    <AnimationToPlay>k__BackingField: {fileID: 7400000, guid: 3b0f7556c594cc042a07273e384d50e0, type: 2}
+  - <DurationSeconds>k__BackingField: 1.267
+    <RigBlendDurationSeconds>k__BackingField: 0.5
+    <TargetRigWeight>k__BackingField: 0
+    <ResetAttachement>k__BackingField: 0
+    <AttachToSlot>k__BackingField: 0
+    <AnimationLayer>k__BackingField: 0
+    <AnimationToPlay>k__BackingField: {fileID: 0}
+  <RequiredAmbientInteraction>k__BackingField: {fileID: 0}
   <RequiredPrimarySlots>k__BackingField:
     _entries: 0100000004000000
   <RequiredAmbientSlots>k__BackingField:

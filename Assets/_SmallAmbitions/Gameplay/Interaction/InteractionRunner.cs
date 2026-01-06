@@ -5,154 +5,208 @@ namespace SmallAmbitions
 {
     public sealed class InteractionRunner
     {
-        private readonly AgentAnimator _animator;
+        private enum Phase
+        {
+            Start,
+            Loop,
+            Exit,
+            Finished
+        }
+
         private readonly Interaction _interaction;
-        private readonly SmartObject _primarySmartObject;
+        private readonly AgentAnimator _animator;
+        private readonly SmartObject _smartObject;
 
-        private IReadOnlyDictionary<InteractionSlotType, IKRig> _interactionSlotBindings;
-        private IReadOnlyList<InteractionSlotDefinition> _slotTargets;
+        private readonly IReadOnlyDictionary<InteractionSlotType, IKRig> _rigs;
+        private readonly IReadOnlyList<InteractionSlotDefinition> _slots;
 
+        private Phase _phase = Phase.Start;
         private int _stepIndex = -1;
-        private float _elapsedSeconds = 0f;
+        private float _stepTime = 0f;
 
-        public bool IsInteractionComplete { get; private set; } = false;
+        public bool IsFinished => _phase == Phase.Finished;
+        public bool IsLooping => _phase == Phase.Loop;
+        public bool IsAnimationPaused { get; set; } = false;
 
-        public InteractionRunner(Interaction interaction, AgentAnimator animator = null, SmartObject primarySmartObject = null)
+        public InteractionRunner(Interaction interaction, AgentAnimator animator, SmartObject smartObject, IReadOnlyDictionary<InteractionSlotType, IKRig> rigs, IReadOnlyList<InteractionSlotDefinition> slots)
         {
             _interaction = interaction;
             _animator = animator;
-            _primarySmartObject = primarySmartObject;
-
-            _stepIndex = -1;
-            _elapsedSeconds = 0f;
-            IsInteractionComplete = false;
+            _smartObject = smartObject;
+            _rigs = rigs;
+            _slots = slots;
         }
 
-        public void Initialize(IReadOnlyDictionary<InteractionSlotType, IKRig> interactionSlotBindings, IReadOnlyList<InteractionSlotDefinition> slotTargets)
+        public void Update()
         {
-            _interactionSlotBindings = interactionSlotBindings;
-            _slotTargets = slotTargets;
-        }
-
-        public void Update(float deltaTime)
-        {
-            if (IsInteractionComplete)
+            if (IsFinished)
             {
                 return;
             }
 
-            if (IsCurrentStepComplete())
+            if (IsStepFinished())
             {
                 AdvanceStep();
-
-                if (IsInteractionComplete)
-                {
-                    return;
-                }
             }
 
-            var currentStep = _interaction.Steps[_stepIndex];
-            ApplyIKWeight(currentStep);
+            var step = GetCurrentStep();
+            ApplyIK(step);
 
-            if (currentStep.ResetAttachement)
+            if (step.ResetAttachement)
             {
-                _primarySmartObject?.ResetAttachmentObjectTransform();
+                _smartObject?.ResetAttachmentObjectTransform();
             }
 
-            _elapsedSeconds += deltaTime;
+            _stepTime += Time.deltaTime;
         }
 
-        private bool IsCurrentStepComplete()
+        public void Cancel()
         {
-            if (!Utils.IsValidIndex(_interaction.Steps, _stepIndex))
+            if (_phase == Phase.Finished || _phase == Phase.Exit)
             {
-                return true;
+                return;
             }
 
-            var step = _interaction.Steps[_stepIndex];
-            return _elapsedSeconds >= step.DurationSeconds;
+            _phase = Phase.Exit;
+            _stepIndex = -1;
+            _stepTime = 0f;
+        }
+
+        public void ForceCancel()
+        {
+            if (_phase == Phase.Finished)
+            {
+                return;
+            }
+
+            _phase = Phase.Finished;
+            Cleanup();
         }
 
         private void AdvanceStep()
         {
             ++_stepIndex;
-            _elapsedSeconds = 0f;
+            _stepTime = 0f;
 
-            if (!Utils.IsValidIndex(_interaction.Steps, _stepIndex))
+            var steps = CurrentList();
+            if (steps != null && steps.IsValidIndex(_stepIndex))
             {
-                IsInteractionComplete = true;
+                StartStep(steps[_stepIndex]);
                 return;
             }
 
-            var currentStep = _interaction.Steps[_stepIndex];
-            AttachToSlot(currentStep);
-            PlayAnimation(currentStep);
+            switch (_phase)
+            {
+                case Phase.Start:
+                    _phase = _interaction.LoopSteps.Count > 0 ? Phase.Loop : Phase.Exit;
+                    _stepIndex = -1;
+                    break;
+
+                case Phase.Loop:
+                    _stepIndex = 0; // loop forever
+                    StartStep(_interaction.LoopSteps[_stepIndex]);
+                    break;
+
+                case Phase.Exit:
+                    _phase = Phase.Finished;
+                    Cleanup();
+                    break;
+            }
         }
 
-        private void ApplyIKWeight(InteractionStep interactionStep)
+        private void StartStep(InteractionStep step)
         {
-            float targetRigWeight = Mathf.Clamp01(interactionStep.TargetRigWeight);
-            float rigWeightBlendTime = MathUtils.SafeDivide(Time.deltaTime, interactionStep.RigBlendDurationSeconds, fallback: 0f);
+            TryAttachSmartObjectToSlot(step);
+            TryPlayAnimation(step);
+        }
 
-            foreach (var pair in _interactionSlotBindings)
+        private void TryAttachSmartObjectToSlot(InteractionStep step)
+        {
+            if (step.AttachToSlot == InteractionSlotType.None || _smartObject?.AttachmentObject == null)
             {
-                var slotType = pair.Key;
-                var ikRig = pair.Value;
+                return;
+            }
 
-                if (!ikRig.IsActive)
+            foreach (var rig in _rigs)
+            {
+                if (rig.Key == step.AttachToSlot)
+                {
+                    _smartObject.AttachAttachmentObject(rig.Value.AttachmentPoint);
+                    break;
+                }
+            }
+        }
+
+        private void TryPlayAnimation(InteractionStep step)
+        {
+            if (!IsAnimationPaused && step.AnimationToPlay != null)
+            {
+                _animator.PlayOneShot(step.AnimationToPlay, step.AnimationLayer);
+            }
+        }
+
+        private void ApplyIK(InteractionStep step)
+        {
+            float targetWeight = Mathf.Clamp01(step.TargetRigWeight);
+            float blendSpeed = MathUtils.SafeDivide(Time.deltaTime, step.RigBlendDurationSeconds, fallback: 0f);
+
+            foreach (var rig in _rigs)
+            {
+                if (!rig.Value.IsActive)
                 {
                     continue;
                 }
 
-                foreach (var slotDef in _slotTargets)
+                foreach (var slot in _slots)
                 {
-                    if (slotDef.SlotType != slotType)
+                    if (slot.SlotType != rig.Key)
                     {
                         continue;
                     }
 
-                    ikRig.MoveIKTarget(slotDef.SlotTransform);
-                    ikRig.Weight = Mathf.MoveTowards(ikRig.Weight, targetRigWeight, rigWeightBlendTime);
+                    rig.Value.MoveIKTarget(slot.SlotTransform);
+                    rig.Value.Weight = blendSpeed == 0f ? targetWeight : Mathf.MoveTowards(rig.Value.Weight, targetWeight, blendSpeed);
                     break;
                 }
             }
         }
 
-        private void AttachToSlot(InteractionStep interactionStep)
+        private bool IsStepFinished()
         {
-            if (interactionStep.AttachToSlot == InteractionSlotType.None)
-            {
-                return;
-            }
-
-            if (_primarySmartObject == null || _primarySmartObject.AttachmentObject == null)
-            {
-                return;
-            }
-
-            foreach (var pair in _interactionSlotBindings)
-            {
-                var slotType = pair.Key;
-                Transform attachementPoint = pair.Value.AttachmentPoint;
-
-                // Parent the attachment object to the rig's transform if the slot types match
-                if (slotType == interactionStep.AttachToSlot)
-                {
-                    _primarySmartObject.AttachAttachmentObject(attachementPoint);
-                    break;
-                }
-            }
+            var step = GetCurrentStep();
+            return _stepTime >= step.DurationSeconds;
         }
 
-        private void PlayAnimation(InteractionStep interactionStep)
+        private InteractionStep GetCurrentStep()
         {
-            var animation = interactionStep.AnimationToPlay;
-            if (animation == null)
+            var steps = CurrentList();
+            if (steps == null || !steps.IsValidIndex(_stepIndex))
             {
-                return;
+                return default;
             }
 
-            _animator.PlayOneShot(animation, interactionStep.AnimationLayer);
+            return steps[_stepIndex];
+        }
+
+        private IReadOnlyList<InteractionStep> CurrentList()
+        {
+            return _phase switch
+            {
+                Phase.Start => _interaction.StartSteps,
+                Phase.Loop => _interaction.LoopSteps,
+                Phase.Exit => _interaction.ExitSteps,
+                _ => null
+            };
+        }
+
+        private void Cleanup()
+        {
+            foreach (var rig in _rigs.Values)
+            {
+                rig.Weight = 0f;
+            }
+
+            _smartObject?.ResetAttachmentObjectTransform();
         }
     }
 }
