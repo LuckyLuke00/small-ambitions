@@ -91,7 +91,7 @@ namespace SmallAmbitions.Editor
             Rect hashRect = new Rect(popupRect.xMax, position.y, hashSize.x, position.height);
 
             int selectedIndex = GetSelectedParameterIndex(nameProp, paramNames);
-            if (!Utils.IsValidIndex(paramNames, selectedIndex))
+            if (!paramNames.IsValidIndex(selectedIndex))
             {
                 return 0;
             }
