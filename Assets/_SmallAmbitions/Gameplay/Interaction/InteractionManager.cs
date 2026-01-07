@@ -32,6 +32,12 @@ namespace SmallAmbitions
 
         public bool IsInteracting => _primaryInteractionRunner != null;
 
+        private void OnDisable()
+        {
+            StopPrimaryInteraction();
+            StopAmbientInteraction();
+        }
+
         private void LateUpdate()
         {
             // Primary only runs if:
