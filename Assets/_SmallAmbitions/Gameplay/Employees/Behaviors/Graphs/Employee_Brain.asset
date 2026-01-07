@@ -57,8 +57,8 @@ MonoBehaviour:
   m_Name: Employee_Brain Blackboard
   m_EditorClassIdentifier: Unity.Behavior.Authoring::Unity.Behavior.BehaviorBlackboardAuthoringAsset
   AssetID:
-    m_Value0: 0
-    m_Value1: 0
+    m_Value0: 2663223225831349738
+    m_Value1: 4024933415671561641
   m_Variables:
   - rid: 5414596839256096830
   m_VersionTimestamp: 639033173679610535
@@ -98,7 +98,7 @@ MonoBehaviour:
   - rid: 5414596839256096852
   - rid: 5414596839256096862
   - rid: 5414596839256096885
-  m_VersionTimestamp: 639033184221382116
+  m_VersionTimestamp: 639033971545059168
   m_SerializedVersion: 1
   m_DebugInfo: {fileID: -5785436387528553490}
   m_RuntimeGraph: {fileID: 4167951815723838239}
@@ -203,7 +203,7 @@ MonoBehaviour:
           m_Value0: 3335272451348827663
           m_Value1: 11549843281177505721
         m_FieldValues: []
-        Repeat: 0
+        Repeat: 1
         AllowMultipleRepeatsPerTick: 0
     - rid: 5414596839256096832
       type: {class: PortModel, ns: Unity.Behavior.GraphFramework, asm: Unity.Behavior.GraphFramework}
@@ -502,14 +502,14 @@ MonoBehaviour:
           rid: 5414596839256096834
         BlackboardGroupReferences: []
         Root:
-          rid: 5414596839256096926
+          rid: 5414596860299444286
         m_ActiveNodes: []
         m_NodesToTick: []
         m_NodesToEnd:
           rid: 5414596839256096836
         m_EndedNodes:
           rid: 5414596839256096837
-        m_VersionTimestamp: 639033184221382116
+        m_VersionTimestamp: 639033971545059168
     - rid: 5414596839256096834
       type: {class: BlackboardReference, ns: Unity.Behavior, asm: Unity.Behavior}
       data:
@@ -526,16 +526,8 @@ MonoBehaviour:
       type: {class: Blackboard, ns: Unity.Behavior, asm: Unity.Behavior}
       data:
         m_Variables:
-        - rid: 5414596839256096918
-    - rid: 5414596839256096918
-      type: {class: 'BlackboardVariable`1[[UnityEngine.GameObject, UnityEngine.CoreModule]]', ns: Unity.Behavior, asm: Unity.Behavior}
-      data:
-        GUID:
-          m_Value0: 1
-          m_Value1: 0
-        Name: Self
-        m_Value: {fileID: 0}
-    - rid: 5414596839256096926
+        - rid: 5414596860299444288
+    - rid: 5414596860299444286
       type: {class: Start, ns: Unity.Behavior, asm: Unity.Behavior}
       data:
         ID:
@@ -546,10 +538,10 @@ MonoBehaviour:
         m_Parent:
           rid: -2
         m_Child:
-          rid: 5414596839256096927
-        Repeat: 0
+          rid: 5414596860299444287
+        Repeat: 1
         AllowMultipleRepeatsPerTick: 0
-    - rid: 5414596839256096927
+    - rid: 5414596860299444287
       type: {class: SequenceComposite, ns: Unity.Behavior, asm: Unity.Behavior}
       data:
         ID:
@@ -558,12 +550,20 @@ MonoBehaviour:
         Graph:
           rid: 5414596839256096833
         m_Parent:
-          rid: 5414596839256096926
+          rid: 5414596860299444286
         m_Children:
-        - rid: 5414596839256096928
-        - rid: 5414596839256096929
-        - rid: 5414596839256096930
-    - rid: 5414596839256096928
+        - rid: 5414596860299444289
+        - rid: 5414596860299444290
+        - rid: 5414596860299444291
+    - rid: 5414596860299444288
+      type: {class: 'BlackboardVariable`1[[UnityEngine.GameObject, UnityEngine.CoreModule]]', ns: Unity.Behavior, asm: Unity.Behavior}
+      data:
+        GUID:
+          m_Value0: 1
+          m_Value1: 0
+        Name: Self
+        m_Value: {fileID: 0}
+    - rid: 5414596860299444289
       type: {class: AcquireAutonomyTargetAction, ns: , asm: Assembly-CSharp}
       data:
         ID:
@@ -572,10 +572,10 @@ MonoBehaviour:
         Graph:
           rid: 5414596839256096833
         m_Parent:
-          rid: 5414596839256096927
+          rid: 5414596860299444287
         AutonomyController:
-          rid: 5414596839256096931
-    - rid: 5414596839256096929
+          rid: 5414596860299444292
+    - rid: 5414596860299444290
       type: {class: TryMoveToAutonomyTargetAction, ns: , asm: Assembly-CSharp}
       data:
         ID:
@@ -584,12 +584,12 @@ MonoBehaviour:
         Graph:
           rid: 5414596839256096833
         m_Parent:
-          rid: 5414596839256096927
+          rid: 5414596860299444287
         Agent:
-          rid: 5414596839256096918
+          rid: 5414596860299444288
         AutonomyController:
-          rid: 5414596839256096932
-    - rid: 5414596839256096930
+          rid: 5414596860299444293
+    - rid: 5414596860299444291
       type: {class: StartInteractionAction, ns: , asm: Assembly-CSharp}
       data:
         ID:
@@ -598,12 +598,12 @@ MonoBehaviour:
         Graph:
           rid: 5414596839256096833
         m_Parent:
-          rid: 5414596839256096927
+          rid: 5414596860299444287
         Self:
-          rid: 5414596839256096933
+          rid: 5414596860299444294
         AutonomyController:
-          rid: 5414596839256096934
-    - rid: 5414596839256096931
+          rid: 5414596860299444295
+    - rid: 5414596860299444292
       type: {class: 'GameObjectToComponentBlackboardVariable`1[[SmallAmbitions.AutonomyController, Assembly-CSharp]]', ns: Unity.Behavior, asm: Unity.Behavior}
       data:
         GUID:
@@ -612,8 +612,8 @@ MonoBehaviour:
         Name: 
         m_Value: {fileID: 0}
         m_LinkedVariable:
-          rid: 5414596839256096918
-    - rid: 5414596839256096932
+          rid: 5414596860299444288
+    - rid: 5414596860299444293
       type: {class: 'GameObjectToComponentBlackboardVariable`1[[SmallAmbitions.AutonomyController, Assembly-CSharp]]', ns: Unity.Behavior, asm: Unity.Behavior}
       data:
         GUID:
@@ -622,8 +622,8 @@ MonoBehaviour:
         Name: 
         m_Value: {fileID: 0}
         m_LinkedVariable:
-          rid: 5414596839256096918
-    - rid: 5414596839256096933
+          rid: 5414596860299444288
+    - rid: 5414596860299444294
       type: {class: 'GameObjectToComponentBlackboardVariable`1[[SmallAmbitions.InteractionManager, Assembly-CSharp]]', ns: Unity.Behavior, asm: Unity.Behavior}
       data:
         GUID:
@@ -632,8 +632,8 @@ MonoBehaviour:
         Name: 
         m_Value: {fileID: 0}
         m_LinkedVariable:
-          rid: 5414596839256096918
-    - rid: 5414596839256096934
+          rid: 5414596860299444288
+    - rid: 5414596860299444295
       type: {class: 'GameObjectToComponentBlackboardVariable`1[[SmallAmbitions.AutonomyController, Assembly-CSharp]]', ns: Unity.Behavior, asm: Unity.Behavior}
       data:
         GUID:
@@ -642,4 +642,4 @@ MonoBehaviour:
         Name: 
         m_Value: {fileID: 0}
         m_LinkedVariable:
-          rid: 5414596839256096918
+          rid: 5414596860299444288

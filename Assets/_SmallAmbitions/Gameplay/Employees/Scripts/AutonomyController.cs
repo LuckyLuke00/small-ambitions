@@ -20,26 +20,134 @@ namespace SmallAmbitions
     public sealed class AutonomyController : MonoBehaviour
     {
         [SerializeField] private InteractionManager _interactionManager;
-        public AutonomyTarget CurrentAutonomyTarget { get; private set; } // Need to cache it, because Unity Behaviors can't hold references to structs
+
+        public AutonomyTarget CurrentAutonomyTarget { get; private set; }
+        public bool HasReservedTarget { get; private set; }
 
         public bool AquireNewAutonomyTarget()
         {
+            ReleaseCurrentTarget();
+
             if (!_interactionManager.TryGetAvailableInteractions(out List<InteractionCandidate> candidates))
             {
                 Debug.LogWarning($"{nameof(AutonomyController)}: No Interaction Candidates found.");
                 return false;
             }
 
-            CurrentAutonomyTarget = ChooseBestCandidate(candidates);
+            if (!TryReserveBestCandidate(candidates, out AutonomyTarget target))
+            {
+                Debug.LogWarning($"{nameof(AutonomyController)}: Failed to reserve any interaction candidate.");
+                return false;
+            }
+
+            CurrentAutonomyTarget = target;
+            HasReservedTarget = true;
             return true;
         }
 
-        private AutonomyTarget ChooseBestCandidate(IReadOnlyList<InteractionCandidate> candidates)
+        public void ReleaseCurrentTarget()
         {
-            // Placeholder: Random selection for now
-            InteractionCandidate bestCandidate = candidates.GetRandomElement();
-            SmartObject closestAmbientSmartObject = TryFindClosest(bestCandidate.CandidateAmbientSmartObjects);
-            return new AutonomyTarget(bestCandidate.Interaction, bestCandidate.SmartObject, closestAmbientSmartObject);
+            if (!HasReservedTarget)
+            {
+                return;
+            }
+
+            var target = CurrentAutonomyTarget;
+            target.PrimarySmartObject?.ReleaseSlots(gameObject);
+            target.AmbientSmartObject?.ReleaseSlots(gameObject);
+
+            HasReservedTarget = false;
+        }
+
+        public void ConsumeReservation()
+        {
+            HasReservedTarget = false;
+        }
+
+        private void OnDisable()
+        {
+            ReleaseCurrentTarget();
+        }
+
+        private bool TryReserveBestCandidate(IReadOnlyList<InteractionCandidate> candidates, out AutonomyTarget target)
+        {
+            List<InteractionCandidate> shuffledCandidates = new List<InteractionCandidate>(candidates);
+            ShuffleList(shuffledCandidates);
+
+            foreach (var candidate in shuffledCandidates)
+            {
+                if (TryReserveCandidate(candidate, out target))
+                {
+                    return true;
+                }
+            }
+
+            target = default;
+            return false;
+        }
+
+        private bool TryReserveCandidate(InteractionCandidate candidate, out AutonomyTarget target)
+        {
+            var interaction = candidate.Interaction;
+            var primaryObject = candidate.SmartObject;
+            SmartObject ambientObject = null;
+
+            if (candidate.CandidateAmbientSmartObjects.Count > 0)
+            {
+                ambientObject = TryFindClosest(candidate.CandidateAmbientSmartObjects);
+            }
+
+            bool needsAmbient = interaction.RequiredAmbientSlots != null && interaction.RequiredAmbientSlots.Count > 0;
+
+            if (needsAmbient)
+            {
+                if (ambientObject == null || ambientObject == primaryObject)
+                {
+                    target = default;
+                    return false;
+                }
+
+                if (!ambientObject.TryReserveSlots(interaction.RequiredAmbientSlots, gameObject))
+                {
+                    target = default;
+                    return false;
+                }
+            }
+
+            if (interaction.RequiredPrimarySlots.Count > 0)
+            {
+                if (!primaryObject.TryReserveSlots(interaction.RequiredPrimarySlots, gameObject))
+                {
+                    if (needsAmbient)
+                    {
+                        ambientObject.ReleaseSlots(gameObject);
+                    }
+                    target = default;
+                    return false;
+                }
+            }
+
+            if (interaction.RequiredAmbientInteraction != null)
+            {
+                SmartObject postureObject = ambientObject != null ? ambientObject : primaryObject;
+
+                if (interaction.RequiredAmbientInteraction.RequiredPrimarySlots.Count > 0)
+                {
+                    if (!postureObject.TryReserveSlots(interaction.RequiredAmbientInteraction.RequiredPrimarySlots, gameObject))
+                    {
+                        primaryObject.ReleaseSlots(gameObject);
+                        if (needsAmbient)
+                        {
+                            ambientObject.ReleaseSlots(gameObject);
+                        }
+                        target = default;
+                        return false;
+                    }
+                }
+            }
+
+            target = new AutonomyTarget(interaction, primaryObject, ambientObject);
+            return true;
         }
 
         private SmartObject TryFindClosest(IReadOnlyList<SmartObject> smartObjects)
@@ -64,6 +172,15 @@ namespace SmallAmbitions
             }
 
             return closest;
+        }
+
+        private void ShuffleList<T>(List<T> list)
+        {
+            for (int i = list.Count - 1; i > 0; --i)
+            {
+                int randomIndex = Random.Range(0, i + 1);
+                (list[i], list[randomIndex]) = (list[randomIndex], list[i]);
+            }
         }
     }
 }

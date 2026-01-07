@@ -183,5 +183,23 @@ namespace SmallAmbitions
             var t = AttachmentObject.transform;
             t.SetParent(parentTransform, worldPositionStays: true);
         }
+
+        public bool TryGetStandPositionForUser(GameObject user, out Transform standTransform)
+        {
+            foreach (var slot in _slotInstances)
+            {
+                if (!slot.HasSlotType(InteractionSlotType.StandPosition))
+                    continue;
+
+                if (slot.IsReservedBy(user))
+                {
+                    standTransform = slot.SlotTransform;
+                    return true;
+                }
+            }
+
+            standTransform = null;
+            return false;
+        }
     }
 }

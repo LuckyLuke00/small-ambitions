@@ -51,6 +51,11 @@ namespace SmallAmbitions
         {
             _currentUsers.Remove(user);
         }
+
+        public bool IsReservedBy(GameObject user)
+        {
+            return _currentUsers.Contains(user);
+        }
     }
 
     [System.Serializable]

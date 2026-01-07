@@ -19,7 +19,7 @@ public partial class TryMoveToAutonomyTargetAction : Action
 
     protected override Status OnStart()
     {
-        if (Agent.Value == null || AutonomyController == null)
+        if (Agent.Value == null || AutonomyController.Value == null)
         {
             return Status.Failure;
         }
@@ -55,14 +55,14 @@ public partial class TryMoveToAutonomyTargetAction : Action
 
     protected override void OnEnd()
     {
-        if (_agent == null)
-        {
-            return;
-        }
-
-        if (_agent.isOnNavMesh)
+        if (_agent != null && _agent.isOnNavMesh)
         {
             _agent.ResetPath();
+        }
+
+        if (CurrentStatus == Status.Failure && AutonomyController.Value != null)
+        {
+            AutonomyController.Value.ReleaseCurrentTarget();
         }
 
         _agent = null;
@@ -73,30 +73,47 @@ public partial class TryMoveToAutonomyTargetAction : Action
         _agent = Agent.Value.GetComponentInChildren<NavMeshAgent>();
         if (_agent == null)
         {
+            Debug.LogError("TryMoveToAutonomyTargetAction: NavMeshAgent not found.");
             return Status.Failure;
         }
 
         if (!_agent.isOnNavMesh)
         {
+            Debug.LogError("TryMoveToAutonomyTargetAction: Agent is not on NavMesh.");
             return Status.Failure;
         }
 
         _agent.ResetPath();
 
         var target = AutonomyController.Value.CurrentAutonomyTarget;
-        if (!target.PrimarySmartObject.TryGetAvailableStandPosition(out Transform StandPosition))
+
+        if (target.PrimarySmartObject == null)
         {
-            if (!target.AmbientSmartObject.TryGetAvailableStandPosition(out StandPosition))
-            {
-                return Status.Failure;
-            }
+            Debug.LogError("TryMoveToAutonomyTargetAction: PrimarySmartObject is null. Did AcquireAutonomyTarget succeed?");
+            return Status.Failure;
         }
 
-        _targetPosition = StandPosition.position;
-        _targetRotation = StandPosition.rotation;
+        Transform standPosition = null;
+
+        if (target.PrimarySmartObject.TryGetStandPositionForUser(Agent.Value, out standPosition))
+        {
+            _targetPosition = standPosition.position;
+            _targetRotation = standPosition.rotation;
+        }
+        else if (target.AmbientSmartObject != null && target.AmbientSmartObject.TryGetStandPositionForUser(Agent.Value, out standPosition))
+        {
+            _targetPosition = standPosition.position;
+            _targetRotation = standPosition.rotation;
+        }
+        else
+        {
+            Debug.LogError($"TryMoveToAutonomyTargetAction: No stand position reserved for agent {Agent.Value.name}. Primary: {target.PrimarySmartObject.name}, Ambient: {target.AmbientSmartObject?.name}");
+            return Status.Failure;
+        }
 
         if (!_agent.SetDestination(_targetPosition))
         {
+            Debug.LogError("TryMoveToAutonomyTargetAction: Failed to set NavMesh destination.");
             return Status.Failure;
         }
 

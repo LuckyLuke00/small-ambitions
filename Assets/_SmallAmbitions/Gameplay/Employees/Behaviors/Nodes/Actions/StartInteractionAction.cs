@@ -14,16 +14,24 @@ public partial class StartInteractionAction : Action
 
     protected override Status OnStart()
     {
-        if (Self.Value == null || AutonomyController == null)
+        if (Self.Value == null || AutonomyController.Value == null)
         {
             return Status.Failure;
         }
 
-        if (!Self.Value.TryStartInteraction(AutonomyController.Value.CurrentAutonomyTarget))
+        if (!AutonomyController.Value.HasReservedTarget)
         {
+            Debug.LogWarning("StartInteractionAction: No reserved target available.");
             return Status.Failure;
         }
 
+        if (!Self.Value.TryStartInteraction(AutonomyController.Value.CurrentAutonomyTarget, slotsAlreadyReserved: true))
+        {
+            AutonomyController.Value.ReleaseCurrentTarget();
+            return Status.Failure;
+        }
+
+        AutonomyController.Value.ConsumeReservation();
         return Status.Running;
     }
 

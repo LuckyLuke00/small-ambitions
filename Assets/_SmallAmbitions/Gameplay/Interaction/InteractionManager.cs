@@ -67,7 +67,7 @@ namespace SmallAmbitions
             }
         }
 
-        public bool TryStartInteraction(AutonomyTarget target)
+        public bool TryStartInteraction(AutonomyTarget target, bool slotsAlreadyReserved = false)
         {
             var interaction = target.Interaction;
             var primaryObject = target.PrimarySmartObject;
@@ -84,62 +84,68 @@ namespace SmallAmbitions
                 return false;
             }
 
-            // Validate ambient requirement (if any)
             bool needsAmbient = interaction.RequiredAmbientSlots != null && interaction.RequiredAmbientSlots.Count > 0;
-            if (needsAmbient)
+
+            if (!slotsAlreadyReserved)
             {
-                if (ambientObject == null || ambientObject == primaryObject)
+                if (needsAmbient)
                 {
-                    return false;
+                    if (ambientObject == null || ambientObject == primaryObject)
+                    {
+                        return false;
+                    }
+
+                    if (!ambientObject.HasAvailableSlots(interaction.RequiredAmbientSlots))
+                    {
+                        return false;
+                    }
                 }
 
-                if (!ambientObject.HasAvailableSlots(interaction.RequiredAmbientSlots))
+                if (!primaryObject.HasAvailableSlots(interaction.RequiredPrimarySlots))
                 {
                     return false;
                 }
             }
 
-            // Validate primary slots availability
-            if (!primaryObject.HasAvailableSlots(interaction.RequiredPrimarySlots))
-            {
-                return false;
-            }
-
-            // Stop existing activity first (this also releases its slots)
             StopPrimaryInteraction();
 
-            // Start prerequisite posture (optional) before activity.
             Interaction required = interaction.RequiredAmbientInteraction;
             if (required != null)
             {
-                // Decide which object is the "posture object".
                 SmartObject postureObject = ambientObject != null ? ambientObject : primaryObject;
-                StartAmbientInteraction(required, postureObject, primaryObject: primaryObject);
+                StartAmbientInteraction(required, postureObject, primaryObject, slotsAlreadyReserved);
             }
             else
             {
                 StopAmbientInteraction();
             }
 
-            if (!primaryObject.TryReserveSlots(interaction.RequiredPrimarySlots, gameObject))
+            if (!slotsAlreadyReserved)
             {
-                // Roll back ambient reservation if we took it
-                if (needsAmbient)
+                if (!primaryObject.TryReserveSlots(interaction.RequiredPrimarySlots, gameObject))
                 {
-                    ambientObject.ReleaseSlots(gameObject);
+                    if (needsAmbient)
+                    {
+                        ambientObject.ReleaseSlots(gameObject);
+                    }
+                    return false;
                 }
-                return false;
+
+                if (needsAmbient && !ambientObject.TryReserveSlots(interaction.RequiredAmbientSlots, gameObject))
+                {
+                    primaryObject.ReleaseSlots(gameObject);
+                    return false;
+                }
             }
 
             _activePrimaryObject = primaryObject;
             _activeAmbientObject = needsAmbient ? ambientObject : null;
 
-            // Build the slot target list for the runner: primary + ambient (if any)
             _primaryInteractionRunner = new InteractionRunner(interaction, _animator, primaryObject, _interactionSlotBindings, _activePrimaryObject.InteractionSlots);
             return true;
         }
 
-        private void StartAmbientInteraction(Interaction interaction, SmartObject postureObject, SmartObject primaryObject)
+        private void StartAmbientInteraction(Interaction interaction, SmartObject postureObject, SmartObject primaryObject, bool slotsAlreadyReserved = false)
         {
             StopAmbientInteraction();
 
@@ -148,15 +154,17 @@ namespace SmallAmbitions
                 return;
             }
 
-            // Reserve the posture's primary slots on the posture object.
-            if (!postureObject.HasAvailableSlots(interaction.RequiredPrimarySlots))
+            if (!slotsAlreadyReserved)
             {
-                return;
-            }
+                if (!postureObject.HasAvailableSlots(interaction.RequiredPrimarySlots))
+                {
+                    return;
+                }
 
-            if (!postureObject.TryReserveSlots(interaction.RequiredPrimarySlots, gameObject))
-            {
-                return;
+                if (!postureObject.TryReserveSlots(interaction.RequiredPrimarySlots, gameObject))
+                {
+                    return;
+                }
             }
 
             _activeAmbientObject = postureObject;
