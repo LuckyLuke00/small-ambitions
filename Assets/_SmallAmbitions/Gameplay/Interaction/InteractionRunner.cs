@@ -85,33 +85,40 @@ namespace SmallAmbitions
 
         private void AdvanceStep()
         {
-            ++_stepIndex;
-            _stepTime = 0f;
+            const int MaxTransitions = 8;
 
-            var steps = CurrentList();
-            if (steps != null && steps.IsValidIndex(_stepIndex))
+            for (int safety = 0; safety < MaxTransitions; ++safety)
             {
-                StartStep(steps[_stepIndex]);
-                return;
+                _stepIndex++;
+                _stepTime = 0f;
+
+                var steps = CurrentList();
+                if (steps != null && steps.IsValidIndex(_stepIndex))
+                {
+                    StartStep(steps[_stepIndex]);
+                    return;
+                }
+
+                switch (_phase)
+                {
+                    case Phase.Start:
+                        _phase = _interaction.LoopSteps.Count > 0 ? Phase.Loop : Phase.Exit;
+                        _stepIndex = -1;
+                        break;
+
+                    case Phase.Loop:
+                        _stepIndex = -1;   // loop forever
+                        break;
+
+                    case Phase.Exit:
+                        _phase = Phase.Finished;
+                        Cleanup();
+                        return;
+                }
             }
 
-            switch (_phase)
-            {
-                case Phase.Start:
-                    _phase = _interaction.LoopSteps.Count > 0 ? Phase.Loop : Phase.Exit;
-                    _stepIndex = -1;
-                    break;
-
-                case Phase.Loop:
-                    _stepIndex = 0; // loop forever
-                    StartStep(_interaction.LoopSteps[_stepIndex]);
-                    break;
-
-                case Phase.Exit:
-                    _phase = Phase.Finished;
-                    Cleanup();
-                    break;
-            }
+            Debug.LogError("AdvanceStep exceeded max transitions. Invalid interaction configuration?");
+            _phase = Phase.Finished;
         }
 
         private void StartStep(InteractionStep step)
