@@ -12,6 +12,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c61186f248df50144a5166caa0d7aa09, type: 3}
   m_Name: UseComputer
   m_EditorClassIdentifier: Assembly-CSharp::SmallAmbitions.Interaction
+  _motiveDecayRates:
+    _entries:
+    - Key: 0
+      Value: -5
   <StartSteps>k__BackingField:
   - <DurationSeconds>k__BackingField: 0.15
     <RigBlendDurationSeconds>k__BackingField: 0

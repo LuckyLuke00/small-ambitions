@@ -145,6 +145,14 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 11400000, guid: 9b6712a620b184f4791de22b2dfc2bf0, type: 2}
     - target: {fileID: 1355675428780554474, guid: 2d28192f13accf14fa9ff63826b6b0de, type: 3}
+      propertyPath: _motiveDecayRates._entries.Array.size
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1355675428780554474, guid: 2d28192f13accf14fa9ff63826b6b0de, type: 3}
+      propertyPath: _motiveDecayRates._entries.Array.data[0].Value
+      value: 0.25
+      objectReference: {fileID: 0}
+    - target: {fileID: 1355675428780554474, guid: 2d28192f13accf14fa9ff63826b6b0de, type: 3}
       propertyPath: _interactionSlots.Array.data[0].<SlotType>k__BackingField
       value: 4
       objectReference: {fileID: 0}

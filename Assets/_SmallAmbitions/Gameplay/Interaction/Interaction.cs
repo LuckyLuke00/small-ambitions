@@ -6,6 +6,9 @@ namespace SmallAmbitions
     [CreateAssetMenu(fileName = "Interaction", menuName = "Small Ambitions/Interactions/New Interaction")]
     public sealed class Interaction : ScriptableObject
     {
+        [SerializeField] private SerializableMap<MotiveType, float> _motiveDecayRates;
+        public IReadOnlyDictionary<MotiveType, float> MotiveDecayRates => _motiveDecayRates;
+
         [field: SerializeField] public List<InteractionStep> StartSteps { get; private set; } = new();
         [field: SerializeField] public List<InteractionStep> LoopSteps { get; private set; } = new();
         [field: SerializeField] public List<InteractionStep> ExitSteps { get; private set; } = new();
