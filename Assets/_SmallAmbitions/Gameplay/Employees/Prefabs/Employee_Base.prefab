@@ -341,7 +341,7 @@ Animator:
   m_Enabled: 1
   m_Avatar: {fileID: 9000000, guid: 652d5da1af336734a8aeb6c5f607a23b, type: 3}
   m_Controller: {fileID: 9100000, guid: 38045d69a4e9909428b1a003c17070cc, type: 2}
-  m_CullingMode: 1
+  m_CullingMode: 0
   m_UpdateMode: 0
   m_ApplyRootMotion: 0
   m_LinearVelocityBlending: 0
@@ -553,6 +553,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: eff6605a9e825d2428d581edf7cb8fa5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::SmallAmbitions.InteractionManager
+  _motiveComponent: {fileID: 523619261607915089}
   _animator: {fileID: 3476717510983712729}
   _smartObjects: {fileID: 11400000, guid: 7e78ed2093b7c9a4ba514b1475974dbc, type: 2}
   _interactionSlotBindings:
