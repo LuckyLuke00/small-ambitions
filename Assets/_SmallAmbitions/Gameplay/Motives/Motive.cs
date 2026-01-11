@@ -10,24 +10,27 @@ namespace SmallAmbitions
     [System.Serializable]
     public sealed class Motive
     {
-        [field: SerializeField] public float BaseDecayRate { get; private set; } = 1f;
+        [Tooltip("The base rate at which this motive changes per second. Positive values increase the motive, negative values decrease it.")]
+        [field: SerializeField] public float BaseRate { get; private set; } = 1f;
         [field: SerializeField] public float CurrentValue { get; private set; } = 100f;
         [field: SerializeField] public float MaxValue { get; private set; } = 100f;
-        [field: SerializeField] public float minValue { get; private set; } = 0f;
+        [field: SerializeField] public float MinValue { get; private set; } = 0f;
+
+        private float _rateModifier = 0f;
 
         public Motive()
         {
-            CurrentValue = Mathf.Clamp(CurrentValue, minValue, MaxValue);
+            CurrentValue = Mathf.Clamp(CurrentValue, MinValue, MaxValue);
         }
 
         public Motive(Motive other)
         {
-            BaseDecayRate = other.BaseDecayRate;
+            BaseRate = other.BaseRate;
             CurrentValue = other.CurrentValue;
             MaxValue = other.MaxValue;
-            minValue = other.minValue;
+            MinValue = other.MinValue;
 
-            CurrentValue = Mathf.Clamp(CurrentValue, minValue, MaxValue);
+            CurrentValue = Mathf.Clamp(CurrentValue, MinValue, MaxValue);
         }
 
         public void FillToMax()
@@ -37,12 +40,23 @@ namespace SmallAmbitions
 
         public void AddValue(float amount)
         {
-            CurrentValue = Mathf.Clamp(CurrentValue + amount, minValue, MaxValue);
+            CurrentValue = Mathf.Clamp(CurrentValue + amount, MinValue, MaxValue);
         }
 
-        public void Decay(float deltaTime)
+        public void AddRateModifier(float delta)
         {
-            CurrentValue = Mathf.Clamp(CurrentValue - (BaseDecayRate * deltaTime), minValue, MaxValue);
+            _rateModifier += delta;
+        }
+
+        public void RemoveRateModifier(float delta)
+        {
+            _rateModifier -= delta;
+        }
+
+        public void Tick(float deltaTime)
+        {
+            float rate = BaseRate + _rateModifier;
+            CurrentValue = Mathf.Clamp(CurrentValue + rate * deltaTime, MinValue, MaxValue);
         }
     }
 }

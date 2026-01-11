@@ -25,7 +25,39 @@ namespace SmallAmbitions
             float deltaTime = Time.deltaTime;
             foreach (var motive in _motives.Values)
             {
-                motive.Decay(deltaTime);
+                motive.Tick(deltaTime);
+            }
+        }
+
+        public void ApplyMotiveModifiers(IReadOnlyDictionary<MotiveType, float> modifiers)
+        {
+            if (modifiers == null)
+            {
+                return;
+            }
+
+            foreach (var modifier in modifiers)
+            {
+                if (_motives.TryGetValue(modifier.Key, out var motive))
+                {
+                    motive.AddRateModifier(modifier.Value);
+                }
+            }
+        }
+
+        public void RemoveMotiveModifiers(IReadOnlyDictionary<MotiveType, float> modifiers)
+        {
+            if (modifiers == null)
+            {
+                return;
+            }
+
+            foreach (var modifier in modifiers)
+            {
+                if (_motives.TryGetValue(modifier.Key, out var motive))
+                {
+                    motive.RemoveRateModifier(modifier.Value);
+                }
             }
         }
 

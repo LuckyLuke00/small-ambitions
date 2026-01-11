@@ -20,6 +20,7 @@ namespace SmallAmbitions
     public sealed class InteractionManager : MonoBehaviour
     {
         [Header("References")]
+        [SerializeField] private MotiveComponent _motiveComponent;
         [SerializeField] private AgentAnimator _animator;
         [SerializeField] private SmartObjectRuntimeSet _smartObjects;
         [SerializeField] private SerializableMap<InteractionSlotType, IKRig> _interactionSlotBindings;
@@ -141,7 +142,7 @@ namespace SmallAmbitions
             _activePrimaryObject = primaryObject;
             _activeAmbientObject = needsAmbient ? ambientObject : null;
 
-            _primaryInteractionRunner = new InteractionRunner(interaction, _animator, primaryObject, _interactionSlotBindings, _activePrimaryObject.InteractionSlots);
+            _primaryInteractionRunner = new InteractionRunner(interaction, _animator, primaryObject, _interactionSlotBindings, _activePrimaryObject.InteractionSlots, _motiveComponent);
             return true;
         }
 
@@ -168,7 +169,7 @@ namespace SmallAmbitions
             }
 
             _activeAmbientObject = postureObject;
-            _ambientInteractionRunner = new InteractionRunner(interaction, _animator, postureObject, _interactionSlotBindings, _activeAmbientObject.InteractionSlots);
+            _ambientInteractionRunner = new InteractionRunner(interaction, _animator, postureObject, _interactionSlotBindings, _activeAmbientObject.InteractionSlots, _motiveComponent);
         }
 
         private void StopAmbientInteraction()

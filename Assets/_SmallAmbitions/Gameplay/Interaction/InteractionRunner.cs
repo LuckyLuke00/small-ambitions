@@ -16,6 +16,7 @@ namespace SmallAmbitions
         private readonly Interaction _interaction;
         private readonly AgentAnimator _animator;
         private readonly SmartObject _smartObject;
+        private readonly MotiveComponent _motiveComponent;
 
         private readonly IReadOnlyDictionary<InteractionSlotType, IKRig> _rigs;
         private readonly IReadOnlyList<InteractionSlotDefinition> _slots;
@@ -28,13 +29,16 @@ namespace SmallAmbitions
         public bool IsLooping => _phase == Phase.Loop;
         public bool IsAnimationPaused { get; set; } = false;
 
-        public InteractionRunner(Interaction interaction, AgentAnimator animator, SmartObject smartObject, IReadOnlyDictionary<InteractionSlotType, IKRig> rigs, IReadOnlyList<InteractionSlotDefinition> slots)
+        public InteractionRunner(Interaction interaction, AgentAnimator animator, SmartObject smartObject, IReadOnlyDictionary<InteractionSlotType, IKRig> rigs, IReadOnlyList<InteractionSlotDefinition> slots, MotiveComponent motiveComponent = null)
         {
             _interaction = interaction;
             _animator = animator;
             _smartObject = smartObject;
             _rigs = rigs;
             _slots = slots;
+            _motiveComponent = motiveComponent;
+
+            ApplyMotiveModifiers();
         }
 
         public void Update()
@@ -107,7 +111,7 @@ namespace SmallAmbitions
                         break;
 
                     case Phase.Loop:
-                        _stepIndex = -1;   // loop forever
+                        _stepIndex = -1;
                         break;
 
                     case Phase.Exit:
@@ -206,8 +210,20 @@ namespace SmallAmbitions
             };
         }
 
+        private void ApplyMotiveModifiers()
+        {
+            _motiveComponent?.ApplyMotiveModifiers(_interaction.MotiveDecayRates);
+        }
+
+        private void RemoveMotiveModifiers()
+        {
+            _motiveComponent?.RemoveMotiveModifiers(_interaction.MotiveDecayRates);
+        }
+
         private void Cleanup()
         {
+            RemoveMotiveModifiers();
+
             foreach (var rig in _rigs.Values)
             {
                 rig.Weight = 0f;
