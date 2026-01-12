@@ -99,6 +99,7 @@ namespace SmallAmbitions
 
             bool needsAmbient = interaction.RequiredAmbientSlots != null && interaction.RequiredAmbientSlots.Count > 0;
 
+            // DON'T reserve RequiredAmbientSlots here - they're validated but not reserved
             if (needsAmbient)
             {
                 if (ambientObject == null || ambientObject == primaryObject)
@@ -107,26 +108,25 @@ namespace SmallAmbitions
                     return false;
                 }
 
-                if (!ambientObject.TryReserveSlots(interaction.RequiredAmbientSlots, gameObject))
+                // Just validate they exist, don't reserve yet
+                if (!ambientObject.HasAvailableSlots(interaction.RequiredAmbientSlots))
                 {
                     target = default;
                     return false;
                 }
             }
 
+            // Reserve primary object slots
             if (interaction.RequiredPrimarySlots.Count > 0)
             {
                 if (!primaryObject.TryReserveSlots(interaction.RequiredPrimarySlots, gameObject))
                 {
-                    if (needsAmbient)
-                    {
-                        ambientObject.ReleaseSlots(gameObject);
-                    }
                     target = default;
                     return false;
                 }
             }
 
+            // Reserve posture/ambient interaction slots
             if (interaction.RequiredAmbientInteraction != null)
             {
                 SmartObject postureObject = ambientObject != null ? ambientObject : primaryObject;
@@ -136,10 +136,6 @@ namespace SmallAmbitions
                     if (!postureObject.TryReserveSlots(interaction.RequiredAmbientInteraction.RequiredPrimarySlots, gameObject))
                     {
                         primaryObject.ReleaseSlots(gameObject);
-                        if (needsAmbient)
-                        {
-                            ambientObject.ReleaseSlots(gameObject);
-                        }
                         target = default;
                         return false;
                     }
