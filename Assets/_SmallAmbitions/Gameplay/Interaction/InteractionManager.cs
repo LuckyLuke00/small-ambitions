@@ -303,11 +303,10 @@ namespace SmallAmbitions
             return availableInteractions.Count > 0;
         }
 
-        private bool TryGetSmartObjectsInRangeDistance(float searchRadius, out List<SmartObject> smartObjectsInRange)
+        private bool TryGetSmartObjectsInRangeDistance(Vector3 origin, float searchRadius, out List<SmartObject> smartObjectsInRange)
         {
             smartObjectsInRange = new List<SmartObject>(_smartObjects.Count);
 
-            Vector3 origin = transform.position;
             float sqrSearchRadius = searchRadius * searchRadius;
 
             foreach (var smartObject in _smartObjects)
@@ -325,7 +324,7 @@ namespace SmallAmbitions
 
         private bool TryFindAvailableAmbientSmartObjects(Interaction interaction, SmartObject primarySmartObject, out List<SmartObject> ambientSmartObjects)
         {
-            if (!TryGetSmartObjectsInRangeDistance(interaction.PositionToleranceRadius, out ambientSmartObjects))
+            if (!TryGetSmartObjectsInRangeDistance(primarySmartObject.transform.position, interaction.PositionToleranceRadius, out ambientSmartObjects))
             {
                 return false;
             }

@@ -95,7 +95,7 @@ namespace SmallAmbitions
 
             if (candidate.CandidateAmbientSmartObjects.Count > 0)
             {
-                ambientObject = TryFindClosest(candidate.CandidateAmbientSmartObjects);
+                ambientObject = TryFindClosestTo(candidate.CandidateAmbientSmartObjects, primaryObject.transform.position);
             }
 
             bool needsAmbient = interaction.RequiredAmbientSlots != null && interaction.RequiredAmbientSlots.Count > 0;
@@ -147,7 +147,7 @@ namespace SmallAmbitions
             return true;
         }
 
-        private SmartObject TryFindClosest(IReadOnlyList<SmartObject> smartObjects)
+        private SmartObject TryFindClosestTo(IReadOnlyList<SmartObject> smartObjects, Vector3 referencePosition)
         {
             SmartObject closest = null;
             float minSqrDistance = float.MaxValue;
@@ -159,7 +159,7 @@ namespace SmallAmbitions
                     continue;
                 }
 
-                float sqrDistance = (item.transform.position - transform.position).sqrMagnitude;
+                float sqrDistance = (item.transform.position - referencePosition).sqrMagnitude;
 
                 if (sqrDistance < minSqrDistance)
                 {

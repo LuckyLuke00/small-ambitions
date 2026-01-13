@@ -51,7 +51,7 @@ MonoBehaviour:
     <AnimationToPlay>k__BackingField: {fileID: 7400000, guid: b3f3ea0424df63d45905546033ee6a19, type: 2}
   <RequiredAmbientInteraction>k__BackingField: {fileID: 11400000, guid: 9b6712a620b184f4791de22b2dfc2bf0, type: 2}
   <RequiredPrimarySlots>k__BackingField:
-    _entries: 
+    _entries: 0200000003000000
   <RequiredAmbientSlots>k__BackingField:
     _entries: 04000000
-  <PositionToleranceRadius>k__BackingField: 3.4028235e+38
+  <PositionToleranceRadius>k__BackingField: 25
