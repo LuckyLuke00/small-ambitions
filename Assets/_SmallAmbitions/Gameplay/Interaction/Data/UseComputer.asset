@@ -54,4 +54,4 @@ MonoBehaviour:
     _entries: 0200000003000000
   <RequiredAmbientSlots>k__BackingField:
     _entries: 04000000
-  <PositionToleranceRadius>k__BackingField: 25
+  <PositionToleranceRadius>k__BackingField: 6

@@ -43,7 +43,7 @@ MonoBehaviour:
   - <DurationSeconds>k__BackingField: 0.5
     <RigBlendDurationSeconds>k__BackingField: 0.5
     <TargetRigWeight>k__BackingField: 1
-    <ResetAttachement>k__BackingField: 1
+    <ResetAttachement>k__BackingField: 0
     <AttachToSlot>k__BackingField: 0
     <AnimationLayer>k__BackingField: 0
     <AnimationToPlay>k__BackingField: {fileID: 0}
