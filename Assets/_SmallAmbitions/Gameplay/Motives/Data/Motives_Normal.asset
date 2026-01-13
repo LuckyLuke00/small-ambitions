@@ -16,6 +16,12 @@ MonoBehaviour:
     _entries:
     - Key: 0
       Value:
+        <BaseRate>k__BackingField: -2
+        <CurrentValue>k__BackingField: 0
+        <MaxValue>k__BackingField: 100
+        <MinValue>k__BackingField: 0
+    - Key: 1
+      Value:
         <BaseRate>k__BackingField: -1
         <CurrentValue>k__BackingField: 100
         <MaxValue>k__BackingField: 100

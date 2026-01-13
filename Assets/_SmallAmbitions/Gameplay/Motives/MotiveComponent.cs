@@ -29,6 +29,28 @@ namespace SmallAmbitions
             }
         }
 
+        public bool TryGetMotive(MotiveType type, out Motive motive)
+        {
+            return _motives.TryGetValue(type, out motive);
+        }
+
+        public float GetNormalizedMotiveValue(MotiveType type)
+        {
+            if (!_motives.TryGetValue(type, out var motive))
+            {
+                return 0f; // Unknown motive = no urgency
+            }
+
+            float range = motive.MaxValue - motive.MinValue;
+            if (range <= 0f)
+            {
+                return 0f; // Invalid range = no urgency
+            }
+
+            // Invert so empty motives (low CurrentValue) return high urgency (close to 1)
+            return 1f - (motive.CurrentValue - motive.MinValue) / range;
+        }
+
         public void ApplyMotiveModifiers(IReadOnlyDictionary<MotiveType, float> modifiers)
         {
             if (modifiers == null)

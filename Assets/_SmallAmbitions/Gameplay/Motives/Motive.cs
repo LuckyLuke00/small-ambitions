@@ -4,7 +4,8 @@ namespace SmallAmbitions
 {
     public enum MotiveType
     {
-        Energy,
+        Ambition, // How desperately our hero pretends they'll be productive today
+        Energy,   // How much coffee the character needs
     }
 
     [System.Serializable]

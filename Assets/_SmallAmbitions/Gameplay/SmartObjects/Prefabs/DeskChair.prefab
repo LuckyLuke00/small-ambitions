@@ -143,7 +143,7 @@ PrefabInstance:
     - target: {fileID: 1355675428780554474, guid: 2d28192f13accf14fa9ff63826b6b0de, type: 3}
       propertyPath: '_interactions._entries.Array.data[0]'
       value: 
-      objectReference: {fileID: 11400000, guid: 9b6712a620b184f4791de22b2dfc2bf0, type: 2}
+      objectReference: {fileID: 11400000, guid: 861848f945c1863458b27d59fb0c0a4e, type: 2}
     - target: {fileID: 1355675428780554474, guid: 2d28192f13accf14fa9ff63826b6b0de, type: 3}
       propertyPath: _motiveDecayRates._entries.Array.size
       value: 0

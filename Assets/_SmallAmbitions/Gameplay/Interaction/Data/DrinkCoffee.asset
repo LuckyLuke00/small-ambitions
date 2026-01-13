@@ -14,8 +14,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::SmallAmbitions.Interaction
   _motiveDecayRates:
     _entries:
-    - Key: 0
-      Value: 2.5
+    - Key: 1
+      Value: 10
   <StartSteps>k__BackingField:
   - <DurationSeconds>k__BackingField: 0.5
     <RigBlendDurationSeconds>k__BackingField: 0.5

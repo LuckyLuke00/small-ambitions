@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 namespace SmallAmbitions
@@ -20,6 +21,7 @@ namespace SmallAmbitions
     public sealed class AutonomyController : MonoBehaviour
     {
         [SerializeField] private InteractionManager _interactionManager;
+        [SerializeField] private MotiveComponent _motiveComponent;
 
         public AutonomyTarget CurrentAutonomyTarget { get; private set; }
         public bool HasReservedTarget { get; private set; }
@@ -71,10 +73,9 @@ namespace SmallAmbitions
 
         private bool TryReserveBestCandidate(IReadOnlyList<InteractionCandidate> candidates, out AutonomyTarget target)
         {
-            List<InteractionCandidate> shuffledCandidates = new List<InteractionCandidate>(candidates);
-            ShuffleList(shuffledCandidates);
-
-            foreach (var candidate in shuffledCandidates)
+            // Sort candidates by urgency-weighted score, try to reserve highest first
+            var sortedCandidates = candidates.OrderByDescending(c => ScoreInteraction(c.Interaction));
+            foreach (var candidate in sortedCandidates)
             {
                 if (TryReserveCandidate(candidate, out target))
                 {
@@ -177,6 +178,27 @@ namespace SmallAmbitions
                 int randomIndex = Random.Range(0, i + 1);
                 (list[i], list[randomIndex]) = (list[randomIndex], list[i]);
             }
+        }
+
+        private float ScoreInteraction(Interaction interaction)
+        {
+            if (_motiveComponent == null || interaction == null)
+            {
+                return 0f;
+            }
+
+            float totalScore = 0f;
+
+            // Multiply each motive effect by its urgency to prioritize urgent needs
+            foreach (var motiveModifier in interaction.MotiveDecayRates)
+            {
+                float effect = motiveModifier.Value; // Positive = boost, negative = drain
+                float urgency = _motiveComponent.GetNormalizedMotiveValue(motiveModifier.Key);
+
+                totalScore += effect * urgency;
+            }
+
+            return totalScore;
         }
     }
 }

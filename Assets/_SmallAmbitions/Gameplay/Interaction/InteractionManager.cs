@@ -31,7 +31,7 @@ namespace SmallAmbitions
         private SmartObject _activePrimaryObject;
         private SmartObject _activeAmbientObject;
 
-        public bool IsInteracting => _primaryInteractionRunner != null;
+        public bool IsInteracting => _primaryInteractionRunner != null || _ambientInteractionRunner != null;
 
         private void OnDisable()
         {
@@ -41,14 +41,30 @@ namespace SmallAmbitions
 
         private void LateUpdate()
         {
-            // Primary only runs if:
-            // - there is no ambient interaction
-            // - OR the ambient interaction is looping
-            bool canRunPrimary = _primaryInteractionRunner != null && (_ambientInteractionRunner == null || _ambientInteractionRunner.IsLooping);
+            bool hasAmbient = _ambientInteractionRunner != null;
+            bool hasPrimary = _primaryInteractionRunner != null;
 
-            if (_ambientInteractionRunner != null)
+            // Determine if ambient should pause to let primary run
+            // Ambient pauses when:
+            // - It has completed its Start phase AND
+            // - Primary is still running (not finished)
+            bool shouldPauseAmbient = hasAmbient && hasPrimary &&
+                _ambientInteractionRunner.HasCompletedStartPhase &&
+                !_primaryInteractionRunner.IsFinished;
+
+            // Primary can run when:
+            // - There is no ambient OR
+            // - Ambient is looping OR
+            // - Ambient has completed its Start phase (for non-looping ambient)
+            bool canRunPrimary = hasPrimary &&
+                (!hasAmbient ||
+                 _ambientInteractionRunner.IsLooping ||
+                 _ambientInteractionRunner.HasCompletedStartPhase);
+
+            if (hasAmbient)
             {
-                _ambientInteractionRunner.IsAnimationPaused = canRunPrimary;
+                _ambientInteractionRunner.IsProgressionPaused = shouldPauseAmbient;
+                _ambientInteractionRunner.IsAnimationPaused = shouldPauseAmbient;
                 _ambientInteractionRunner.Update();
 
                 if (_ambientInteractionRunner.IsFinished)

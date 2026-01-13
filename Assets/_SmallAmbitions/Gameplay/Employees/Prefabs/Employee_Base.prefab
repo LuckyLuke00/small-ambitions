@@ -541,6 +541,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::SmallAmbitions.AutonomyController
   _interactionManager: {fileID: -5910684115990834202}
+  _motiveComponent: {fileID: 523619261607915089}
 --- !u!114 &-5910684115990834202
 MonoBehaviour:
   m_ObjectHideFlags: 0

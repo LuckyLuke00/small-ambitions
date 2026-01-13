@@ -25,9 +25,42 @@ namespace SmallAmbitions
         private int _stepIndex = -1;
         private float _stepTime = 0f;
 
+        private bool _isAnimationPaused;
+        private bool _animationSkippedDuringPause;
+
         public bool IsFinished => _phase == Phase.Finished;
         public bool IsLooping => _phase == Phase.Loop;
-        public bool IsAnimationPaused { get; set; } = false;
+        public bool IsInExitPhase => _phase == Phase.Exit;
+        public bool HasLoopPhase => _interaction.LoopSteps.Count > 0;
+        public bool HasCompletedStartPhase => _phase != Phase.Start;
+
+        /// <summary>
+        /// When true, the runner maintains its current state (IK weights, etc.) but does not advance to the next phase.
+        /// </summary>
+        public bool IsProgressionPaused { get; set; } = false;
+
+        public bool IsAnimationPaused
+        {
+            get => _isAnimationPaused;
+            set
+            {
+                if (_isAnimationPaused == value)
+                {
+                    return;
+                }
+
+                bool wasUnpaused = _isAnimationPaused && !value;
+                _isAnimationPaused = value;
+
+                // Replay animation if we skipped it during pause
+                if (wasUnpaused && _animationSkippedDuringPause)
+                {
+                    _animationSkippedDuringPause = false;
+                    var step = GetCurrentStep();
+                    ForcePlayAnimation(step);
+                }
+            }
+        }
 
         public InteractionRunner(Interaction interaction, AgentAnimator animator, SmartObject smartObject, IReadOnlyDictionary<InteractionSlotType, IKRig> rigs, IReadOnlyList<InteractionSlotDefinition> slots, MotiveComponent motiveComponent = null)
         {
@@ -48,7 +81,7 @@ namespace SmallAmbitions
                 return;
             }
 
-            if (IsStepFinished())
+            if (IsStepFinished() && !IsProgressionPaused)
             {
                 AdvanceStep();
             }
@@ -61,7 +94,10 @@ namespace SmallAmbitions
                 _smartObject?.ResetAttachmentObjectTransform();
             }
 
-            _stepTime += Time.deltaTime;
+            if (!IsProgressionPaused)
+            {
+                _stepTime += Time.deltaTime;
+            }
         }
 
         public void Cancel()
@@ -150,7 +186,23 @@ namespace SmallAmbitions
 
         private void TryPlayAnimation(InteractionStep step)
         {
-            if (!IsAnimationPaused && step.AnimationToPlay != null)
+            if (step.AnimationToPlay == null)
+            {
+                return;
+            }
+
+            if (IsAnimationPaused)
+            {
+                _animationSkippedDuringPause = true;
+                return;
+            }
+
+            _animator.PlayOneShot(step.AnimationToPlay, step.AnimationLayer);
+        }
+
+        private void ForcePlayAnimation(InteractionStep step)
+        {
+            if (step.AnimationToPlay != null)
             {
                 _animator.PlayOneShot(step.AnimationToPlay, step.AnimationLayer);
             }

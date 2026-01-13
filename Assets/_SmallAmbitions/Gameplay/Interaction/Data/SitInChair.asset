@@ -12,6 +12,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c61186f248df50144a5166caa0d7aa09, type: 3}
   m_Name: SitInChair
   m_EditorClassIdentifier: Assembly-CSharp::SmallAmbitions.Interaction
+  _motiveDecayRates:
+    _entries: []
   <StartSteps>k__BackingField:
   - <DurationSeconds>k__BackingField: 0.65
     <RigBlendDurationSeconds>k__BackingField: 0
@@ -29,13 +31,6 @@ MonoBehaviour:
     <AnimationToPlay>k__BackingField: {fileID: 0}
   <LoopSteps>k__BackingField: []
   <ExitSteps>k__BackingField:
-  - <DurationSeconds>k__BackingField: 4.3
-    <RigBlendDurationSeconds>k__BackingField: 0
-    <TargetRigWeight>k__BackingField: 1
-    <ResetAttachement>k__BackingField: 0
-    <AttachToSlot>k__BackingField: 0
-    <AnimationLayer>k__BackingField: 0
-    <AnimationToPlay>k__BackingField: {fileID: 7400000, guid: d96452d985a7ff3468718d8fa1f24a26, type: 2}
   - <DurationSeconds>k__BackingField: 1
     <RigBlendDurationSeconds>k__BackingField: 0
     <TargetRigWeight>k__BackingField: 1
