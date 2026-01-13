@@ -127,26 +127,5 @@ namespace SmallAmbitions
                 }
             }
         }
-
-        // TODO: Move this to a proper UI system
-        private void OnGUI()
-        {
-            const float lineHeight = 20f;
-            float y = 10f;
-
-            GUI.Label(new Rect(10f, y, 300f, lineHeight), "Motives");
-            y += lineHeight;
-
-            foreach (var pair in _motives)
-            {
-                var type = pair.Key;
-                var motive = pair.Value;
-
-                string criticalLabel = motive.IsCritical(_criticalThreshold) ? " [CRITICAL]" : "";
-                GUI.Label(new Rect(10f, y, 300f, lineHeight), $"{type}: {motive.CurrentValue:0.0}{criticalLabel}");
-
-                y += lineHeight;
-            }
-        }
     }
 }
