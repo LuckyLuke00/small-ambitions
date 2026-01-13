@@ -12,6 +12,8 @@ namespace SmallAmbitions.Editor
         private const float ColorSaturation = 0.9f;
         private const float ColorValue = 0.9f;
 
+        private static readonly Color ToleranceRadiusColor = new Color(1f, 0.5f, 0f, 0.5f);
+
         private static readonly InteractionSlotType[] SlotTypes = (InteractionSlotType[])Enum.GetValues(typeof(InteractionSlotType));
 
         [DrawGizmo(GizmoType.Selected | GizmoType.NonSelected)]
@@ -32,6 +34,8 @@ namespace SmallAmbitions.Editor
                     DrawSlotHandle(slot, slotType);
                 }
             }
+
+            DrawPositionToleranceRadius(smartObject);
         }
 
         private static bool ShouldDrawGizmos()
@@ -67,6 +71,27 @@ namespace SmallAmbitions.Editor
             Handles.DrawLine(position, position + transform.forward * OrientationLineLength);
 
             Handles.color = prevHandleColor;
+        }
+
+        private static void DrawPositionToleranceRadius(SmartObject smartObject)
+        {
+            float maxRadius = 0f;
+
+            foreach (var interaction in smartObject.Interactions)
+            {
+                if (interaction != null && interaction.PositionToleranceRadius > maxRadius)
+                {
+                    maxRadius = interaction.PositionToleranceRadius;
+                }
+            }
+
+            if (maxRadius > 0f)
+            {
+                var prevGizmoColor = Gizmos.color;
+                Gizmos.color = ToleranceRadiusColor;
+                Gizmos.DrawWireSphere(smartObject.transform.position, maxRadius);
+                Gizmos.color = prevGizmoColor;
+            }
         }
 
         private static Color GetColorForSlotType(InteractionSlotType slotType)
