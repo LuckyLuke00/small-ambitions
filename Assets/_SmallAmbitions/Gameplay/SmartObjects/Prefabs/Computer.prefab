@@ -146,7 +146,7 @@ PrefabInstance:
     - target: {fileID: 1355675428780554474, guid: 2d28192f13accf14fa9ff63826b6b0de, type: 3}
       propertyPath: '_interactions._entries.Array.data[0]'
       value: 
-      objectReference: {fileID: 11400000, guid: 969102230e8cd0d49abc770d2108b5f2, type: 2}
+      objectReference: {fileID: 11400000, guid: 73364c3f78f01184fb38bc6f58c0b811, type: 2}
     - target: {fileID: 1355675428780554474, guid: 2d28192f13accf14fa9ff63826b6b0de, type: 3}
       propertyPath: _interactionSlots.Array.data[0].<SlotType>k__BackingField
       value: 2

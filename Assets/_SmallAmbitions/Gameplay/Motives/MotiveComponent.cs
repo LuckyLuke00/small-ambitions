@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -8,7 +9,13 @@ namespace SmallAmbitions
         [Header("Motives")]
         [SerializeField] private MotiveSettings _motiveSettings;
 
+        [Header("Critical Threshold")]
+        [Tooltip("Normalized threshold (0-1) below which a motive is considered critical.")]
+        [SerializeField, Range(0f, 1f)] private float _criticalThreshold = 0.1f;
+
         private Dictionary<MotiveType, Motive> _motives;
+
+        public event Action<MotiveType> OnMotiveCritical;
 
         private void Awake()
         {
@@ -23,15 +30,53 @@ namespace SmallAmbitions
         private void Update()
         {
             float deltaTime = Time.deltaTime;
-            foreach (var motive in _motives.Values)
+            foreach (var pair in _motives)
             {
+                var motive = pair.Value;
+                bool wasCritical = motive.IsCritical(_criticalThreshold);
+
                 motive.Tick(deltaTime);
+
+                // Check if motive just became critical
+                if (!wasCritical && motive.IsCritical(_criticalThreshold))
+                {
+                    OnMotiveCritical?.Invoke(pair.Key);
+                }
             }
         }
 
         public bool TryGetMotive(MotiveType type, out Motive motive)
         {
             return _motives.TryGetValue(type, out motive);
+        }
+
+        /// <summary>
+        /// Returns true if any motive is at or below the critical threshold.
+        /// </summary>
+        public bool HasCriticalMotive()
+        {
+            foreach (var motive in _motives.Values)
+            {
+                if (motive.IsCritical(_criticalThreshold))
+                {
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        public bool TryGetCriticalMotive(out MotiveType criticalType)
+        {
+            foreach (var pair in _motives)
+            {
+                if (pair.Value.IsCritical(_criticalThreshold))
+                {
+                    criticalType = pair.Key;
+                    return true;
+                }
+            }
+            criticalType = default;
+            return false;
         }
 
         public float GetNormalizedMotiveValue(MotiveType type)
@@ -84,7 +129,6 @@ namespace SmallAmbitions
         }
 
         // TODO: Move this to a proper UI system
-
         private void OnGUI()
         {
             const float lineHeight = 20f;
@@ -98,7 +142,8 @@ namespace SmallAmbitions
                 var type = pair.Key;
                 var motive = pair.Value;
 
-                GUI.Label(new Rect(10f, y, 300f, lineHeight), $"{type}: {motive.CurrentValue:0.0}");
+                string criticalLabel = motive.IsCritical(_criticalThreshold) ? " [CRITICAL]" : "";
+                GUI.Label(new Rect(10f, y, 300f, lineHeight), $"{type}: {motive.CurrentValue:0.0}{criticalLabel}");
 
                 y += lineHeight;
             }

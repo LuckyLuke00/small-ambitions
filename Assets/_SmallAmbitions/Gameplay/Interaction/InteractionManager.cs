@@ -31,10 +31,25 @@ namespace SmallAmbitions
         private SmartObject _activePrimaryObject;
         private SmartObject _activeAmbientObject;
 
+        private bool _ambientPendingCancel;
+
         public bool IsInteracting => _primaryInteractionRunner != null || _ambientInteractionRunner != null;
+
+        private void OnEnable()
+        {
+            if (_motiveComponent != null)
+            {
+                _motiveComponent.OnMotiveCritical += HandleMotiveCritical;
+            }
+        }
 
         private void OnDisable()
         {
+            if (_motiveComponent != null)
+            {
+                _motiveComponent.OnMotiveCritical -= HandleMotiveCritical;
+            }
+
             StopPrimaryInteraction();
             StopAmbientInteraction();
         }
@@ -44,34 +59,22 @@ namespace SmallAmbitions
             bool hasAmbient = _ambientInteractionRunner != null;
             bool hasPrimary = _primaryInteractionRunner != null;
 
-            // Determine if ambient should pause to let primary run
-            // Ambient pauses when:
-            // - It has completed its Start phase AND
-            // - Primary is still running (not finished)
-            bool shouldPauseAmbient = hasAmbient && hasPrimary &&
-                _ambientInteractionRunner.HasCompletedStartPhase &&
-                !_primaryInteractionRunner.IsFinished;
-
-            // Primary can run when:
+            // Primary runs first when:
             // - There is no ambient OR
             // - Ambient is looping OR
-            // - Ambient has completed its Start phase (for non-looping ambient)
+            // - Ambient has completed its Start phase
             bool canRunPrimary = hasPrimary &&
                 (!hasAmbient ||
                  _ambientInteractionRunner.IsLooping ||
                  _ambientInteractionRunner.HasCompletedStartPhase);
 
-            if (hasAmbient)
-            {
-                _ambientInteractionRunner.IsProgressionPaused = shouldPauseAmbient;
-                _ambientInteractionRunner.IsAnimationPaused = shouldPauseAmbient;
-                _ambientInteractionRunner.Update();
-
-                if (_ambientInteractionRunner.IsFinished)
-                {
-                    StopAmbientInteraction();
-                }
-            }
+            // Ambient pauses when:
+            // - Primary is still running (not finished) AND
+            // - Ambient has completed its Start phase
+            // This keeps ambient paused during primary's Exit phase too
+            bool shouldPauseAmbient = hasAmbient && hasPrimary &&
+                _ambientInteractionRunner.HasCompletedStartPhase &&
+                !_primaryInteractionRunner.IsFinished;
 
             if (canRunPrimary)
             {
@@ -80,7 +83,49 @@ namespace SmallAmbitions
                 if (_primaryInteractionRunner.IsFinished)
                 {
                     StopPrimaryInteraction();
+
+                    // Now that primary is done, start ambient's Exit phase if pending
+                    if (_ambientPendingCancel && _ambientInteractionRunner != null)
+                    {
+                        _ambientPendingCancel = false;
+                        _ambientInteractionRunner.Cancel();
+                    }
                 }
+            }
+
+            if (hasAmbient)
+            {
+                _ambientInteractionRunner.IsPaused = shouldPauseAmbient;
+                _ambientInteractionRunner.Update();
+
+                if (_ambientInteractionRunner.IsFinished)
+                {
+                    StopAmbientInteraction();
+                }
+            }
+        }
+
+        private void HandleMotiveCritical(MotiveType motiveType)
+        {
+            RequestInterrupt();
+        }
+
+        public void RequestInterrupt()
+        {
+            if (_primaryInteractionRunner == null)
+            {
+                // No primary, just cancel ambient directly
+                _ambientInteractionRunner?.Cancel();
+                return;
+            }
+
+            // Cancel primary immediately
+            _primaryInteractionRunner.Cancel();
+
+            // Mark ambient for cancellation after primary finishes
+            if (_ambientInteractionRunner != null)
+            {
+                _ambientPendingCancel = true;
             }
         }
 
@@ -197,6 +242,7 @@ namespace SmallAmbitions
 
             _ambientInteractionRunner.ForceCancel();
             _ambientInteractionRunner = null;
+            _ambientPendingCancel = false;
 
             // Important: release ONLY what this layer reserved.
             // Here we assume posture reserved slots on _activeAmbientObject (postureObject).

@@ -59,5 +59,17 @@ namespace SmallAmbitions
             float rate = BaseRate + _rateModifier;
             CurrentValue = Mathf.Clamp(CurrentValue + rate * deltaTime, MinValue, MaxValue);
         }
+
+        public bool IsCritical(float criticalThreshold)
+        {
+            float range = MaxValue - MinValue;
+            if (range <= 0f)
+            {
+                return false;
+            }
+
+            float normalizedValue = (CurrentValue - MinValue) / range;
+            return normalizedValue <= criticalThreshold;
+        }
     }
 }
