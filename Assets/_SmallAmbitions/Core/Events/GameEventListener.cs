@@ -9,19 +9,28 @@ namespace SmallAmbitions
         where UER : UnityEventBase
     {
         [SerializeField] private E _event;
-        [SerializeField] protected UER _response;
+        [SerializeField] private UER _response;
 
         private void OnEnable()
         {
-            _event?.RegisterListener(OnEventRaised);
+            if (_event != null)
+            {
+                _event.RegisterListener(OnEventRaised);
+            }
         }
 
         private void OnDisable()
         {
-            _event?.UnregisterListener(OnEventRaised);
+            if (_event != null)
+            {
+                _event.UnregisterListener(OnEventRaised);
+            }
         }
 
-        protected abstract void OnEventRaised(T value);
+        private void OnEventRaised(T value)
+        {
+            (_response as UnityEvent<T>)?.Invoke(value);
+        }
     }
 
     [Serializable]
@@ -29,10 +38,5 @@ namespace SmallAmbitions
     { }
 
     public sealed class GameEventListener : GameEventListener<Void, GameEvent, VoidUnityEvent>
-    {
-        protected override void OnEventRaised(Void value)
-        {
-            _response?.Invoke(value);
-        }
-    }
+    { }
 }
