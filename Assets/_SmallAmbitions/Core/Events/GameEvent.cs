@@ -20,6 +20,6 @@ namespace SmallAmbitions
     [CreateAssetMenu(menuName = "Small Ambitions/Game Events/Game Event", fileName = "GameEvent")]
     public sealed class GameEvent : GameEvent<Void>
     {
-        public void Raise() => Raise(new Void());
+        public void Raise() => Raise(default);
     }
 }
