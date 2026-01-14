@@ -1,4 +1,6 @@
+using System;
 using UnityEngine;
+using UnityEngine.Events;
 
 namespace SmallAmbitions
 {
@@ -6,4 +8,8 @@ namespace SmallAmbitions
     public sealed class CameraDragStateEvent : GameEvent<CameraDragState>
     {
     }
+
+    [Serializable]
+    public class CameraDragStateUnityEvent : UnityEvent<CameraDragState>
+    { }
 }
