@@ -4371,7 +4371,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 5263839998645613914, guid: 6e6e6c76b760462439cd3662e3df6c85, type: 3}
       propertyPath: m_Name
-      value: Employee_Base
+      value: Employee_Mid
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -4386,6 +4386,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 1000063016}
     m_Modifications:
+    - target: {fileID: 523619261607915089, guid: 6e6e6c76b760462439cd3662e3df6c85, type: 3}
+      propertyPath: _motiveSettings
+      value: 
+      objectReference: {fileID: 11400000, guid: 5c29138400f06ad479acef6a7894b8fc, type: 2}
     - target: {fileID: 1798884220012120685, guid: 6e6e6c76b760462439cd3662e3df6c85, type: 3}
       propertyPath: m_LocalPosition.x
       value: 25
@@ -4428,7 +4432,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 5263839998645613914, guid: 6e6e6c76b760462439cd3662e3df6c85, type: 3}
       propertyPath: m_Name
-      value: Employee_Base
+      value: Employee_Senior
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []

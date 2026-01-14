@@ -19,6 +19,36 @@ namespace SmallAmbitions
 
     public sealed class InteractionManager : MonoBehaviour
     {
+#if UNITY_EDITOR || DEVELOPMENT_BUILD
+
+        // Debug properties - only available in Editor and Development builds
+        public string DebugPrimaryPhase => _primaryInteractionRunner != null
+            ? GetRunnerPhaseString(_primaryInteractionRunner)
+            : "None";
+
+        public string DebugAmbientPhase => _ambientInteractionRunner != null
+            ? GetRunnerPhaseString(_ambientInteractionRunner)
+            : "None";
+
+        public string DebugPrimaryInteractionName => _primaryInteractionRunner != null && _activePrimaryObject != null
+            ? _activePrimaryObject.name
+            : "None";
+
+        public string DebugAmbientInteractionName => _activeAmbientObject != null
+            ? _activeAmbientObject.name
+            : "None";
+
+        private static string GetRunnerPhaseString(InteractionRunner runner)
+        {
+            if (runner.IsFinished) return "Finished";
+            if (runner.IsInExitPhase) return "Exit";
+            if (runner.IsLooping) return "Loop";
+            if (!runner.HasCompletedStartPhase) return "Start";
+            return "Unknown";
+        }
+
+#endif
+
         [Header("References")]
         [SerializeField] private MotiveComponent _motiveComponent;
         [SerializeField] private AgentAnimator _animator;
