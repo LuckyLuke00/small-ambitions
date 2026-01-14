@@ -18,8 +18,14 @@ namespace SmallAmbitions
     { }
 
     [CreateAssetMenu(menuName = "Small Ambitions/Game Events/Game Event", fileName = "GameEvent")]
-    public sealed class GameEvent : GameEvent<Void>
+    public class GameEvent : ScriptableObject
     {
-        public void Raise() => Raise(default);
+        private event Action _event;
+
+        public void Raise() => _event?.Invoke();
+
+        public void RegisterListener(Action callback) => _event += callback;
+
+        public void UnregisterListener(Action callback) => _event -= callback;
     }
 }
