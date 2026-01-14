@@ -1,4 +1,3 @@
-using System;
 using UnityEngine;
 using UnityEngine.Events;
 
@@ -33,10 +32,33 @@ namespace SmallAmbitions
         }
     }
 
-    [Serializable]
-    public sealed class VoidUnityEvent : UnityEvent<Void>
-    { }
+    public class GameEventListener : MonoBehaviour
+    {
+        [SerializeField] private GameEvent _event;
+        [SerializeField] private UnityEvent _response;
 
-    public sealed class GameEventListener : GameEventListener<Void, GameEvent, VoidUnityEvent>
-    { }
+        private void OnEnable()
+        {
+            if (_event != null)
+            {
+                _event.RegisterListener(OnEventRaised);
+            }
+        }
+
+        private void OnDisable()
+        {
+            if (_event != null)
+            {
+                _event.UnregisterListener(OnEventRaised);
+            }
+        }
+
+        private void OnEventRaised()
+        {
+            if (_response != null)
+            {
+                _response.Invoke();
+            }
+        }
+    }
 }
