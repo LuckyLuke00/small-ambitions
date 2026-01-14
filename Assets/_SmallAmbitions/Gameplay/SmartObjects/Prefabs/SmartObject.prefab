@@ -79,4 +79,6 @@ MonoBehaviour:
   _interactionSlots: []
   _interactions:
     _entries: []
+  _slotsReleasedEvent: {fileID: 11400000, guid: 3f405366367e374408ef20e7f84841e3, type: 2}
   _smartObjects: {fileID: 11400000, guid: 7e78ed2093b7c9a4ba514b1475974dbc, type: 2}
+  <AttachmentObject>k__BackingField: {fileID: 0}

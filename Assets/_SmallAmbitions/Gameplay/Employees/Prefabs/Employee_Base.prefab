@@ -308,6 +308,7 @@ GameObject:
   - component: {fileID: -5910684115990834202}
   - component: {fileID: 523619261607915089}
   - component: {fileID: 5069763202725832921}
+  - component: {fileID: 5944034518750678689}
   m_Layer: 0
   m_Name: Employee_Base
   m_TagString: Untagged
@@ -601,21 +602,42 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f8c97b64103eb6f4e9cb763f2f6d5435, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::SmallAmbitions.InteractionSystemDebugger
-  _enabled: 1
   _motiveComponent: {fileID: 523619261607915089}
   _interactionManager: {fileID: -5910684115990834202}
   _autonomyController: {fileID: 6012067894194855043}
-  _worldOffset: {x: 0, y: 2.5, z: 0}
-  _backgroundColor: {r: 0, g: 0, b: 0, a: 0.8}
-  _textColor: {r: 1, g: 1, b: 1, a: 1}
-  _criticalColor: {r: 1, g: 0.3, b: 0.3, a: 1}
-  _goodColor: {r: 0.3, g: 1, b: 0.3, a: 1}
-  _fontSize: 12
   _showMotives: 1
   _showWeightedInteractions: 1
   _showCurrentInteraction: 1
   _showActiveObjects: 1
   _maxWeightedInteractionsToShow: 5
+--- !u!114 &5944034518750678689
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5263839998645613914}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1fcbefd5934ae6d44965769a815a0963, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::SmallAmbitions.GameEventListener
+  _event: {fileID: 11400000, guid: 3f405366367e374408ef20e7f84841e3, type: 2}
+  _response:
+    m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 523619261607915089}
+        m_TargetAssemblyTypeName: SmallAmbitions.MotiveComponent, Assembly-CSharp
+        m_MethodName: OnSlotsReleased
+        m_Mode: 0
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!1 &5376613160728717634
 GameObject:
   m_ObjectHideFlags: 0

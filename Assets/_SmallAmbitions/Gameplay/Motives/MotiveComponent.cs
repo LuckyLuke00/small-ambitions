@@ -45,6 +45,15 @@ namespace SmallAmbitions
             }
         }
 
+        public void OnSlotsReleased()
+        {
+            // Re-raise the critical event if we still have a critical motive
+            if (TryGetCriticalMotive(out MotiveType criticalType))
+            {
+                OnMotiveCritical?.Invoke(criticalType);
+            }
+        }
+
         public bool TryGetMotive(MotiveType type, out Motive motive)
         {
             return _motives.TryGetValue(type, out motive);

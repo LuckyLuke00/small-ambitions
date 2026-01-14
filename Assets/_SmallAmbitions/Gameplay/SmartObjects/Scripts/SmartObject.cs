@@ -31,6 +31,7 @@ namespace SmallAmbitions
     {
         [SerializeField] private List<InteractionSlotDefinition> _interactionSlots = new();
         [SerializeField] private SerializableSet<Interaction> _interactions = new();
+        [SerializeField] private GameEvent _slotsReleasedEvent;
         [SerializeField] private SmartObjectRuntimeSet _smartObjects;
         [field: SerializeField] public GameObject AttachmentObject { get; private set; }
         private TransformSnapshot _attachmentOriginalPose;
@@ -143,6 +144,8 @@ namespace SmallAmbitions
             {
                 slot.UnregisterUser(user);
             }
+
+            _slotsReleasedEvent?.Raise();
         }
 
         public bool TryGetAvailableStandPosition(out Transform standTransform)
