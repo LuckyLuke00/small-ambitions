@@ -195,7 +195,7 @@ namespace SmallAmbitions
                 }
 
                 rig.Value.MoveIKTarget(slot.SlotTransform);
-                rig.Value.Weight = blendSpeed == 0f ? targetWeight : Mathf.MoveTowards(rig.Value.Weight, targetWeight, blendSpeed);
+                rig.Value.Weight = MathUtils.IsNearlyZero(blendSpeed) ? targetWeight : Mathf.MoveTowards(rig.Value.Weight, targetWeight, blendSpeed);
             }
         }
 
