@@ -65,7 +65,7 @@ namespace SmallAmbitions
             // Always update IK, even when paused
             ApplyIK(step);
 
-            if (step.ResetAttachement)
+            if (step.ResetAttachment)
             {
                 _smartObject?.ResetAttachmentObjectTransform();
             }

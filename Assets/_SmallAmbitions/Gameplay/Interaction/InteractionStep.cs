@@ -10,7 +10,7 @@ namespace SmallAmbitions
         [field: SerializeField, Min(0f)] public float RigBlendDurationSeconds { get; private set; }
         [field: SerializeField, Range(0f, 1f)] public float TargetRigWeight { get; private set; }
 
-        [field: SerializeField] public bool ResetAttachement { get; private set; }
+        [field: SerializeField] public bool ResetAttachment { get; private set; }
         [field: SerializeField] public InteractionSlotType AttachToSlot { get; private set; }
 
         [field: SerializeField] public OneShotAnimationLayer AnimationLayer { get; private set; }
