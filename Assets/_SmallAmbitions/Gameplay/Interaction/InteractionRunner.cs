@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 namespace SmallAmbitions
@@ -20,6 +21,7 @@ namespace SmallAmbitions
 
         private readonly IReadOnlyDictionary<InteractionSlotType, IKRig> _rigs;
         private readonly IReadOnlyList<InteractionSlotDefinition> _slots;
+        private readonly Dictionary<InteractionSlotType, InteractionSlotDefinition> _slotsByType;
 
         private Phase _phase = Phase.Start;
         private int _stepIndex = -1;
@@ -44,6 +46,8 @@ namespace SmallAmbitions
             _rigs = rigs;
             _slots = slots;
             _motiveComponent = motiveComponent;
+
+            _slotsByType = slots.ToDictionary(slot => slot.SlotType, slot => slot);
 
             ApplyMotiveModifiers();
         }
@@ -185,17 +189,13 @@ namespace SmallAmbitions
                     continue;
                 }
 
-                foreach (var slot in _slots)
+                if (!_slotsByType.TryGetValue(rig.Key, out var slot))
                 {
-                    if (slot.SlotType != rig.Key)
-                    {
-                        continue;
-                    }
-
-                    rig.Value.MoveIKTarget(slot.SlotTransform);
-                    rig.Value.Weight = blendSpeed == 0f ? targetWeight : Mathf.MoveTowards(rig.Value.Weight, targetWeight, blendSpeed);
-                    break;
+                    continue;
                 }
+
+                rig.Value.MoveIKTarget(slot.SlotTransform);
+                rig.Value.Weight = blendSpeed == 0f ? targetWeight : Mathf.MoveTowards(rig.Value.Weight, targetWeight, blendSpeed);
             }
         }
 
