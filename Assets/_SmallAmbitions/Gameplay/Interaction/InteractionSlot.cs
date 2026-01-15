@@ -32,7 +32,7 @@ namespace SmallAmbitions
     public sealed class InteractionSlotInstance
     {
         private InteractionSlotDefinition _slotDefinition;
-        private HashSet<GameObject> _currentUsers = new HashSet<GameObject>();
+        private readonly HashSet<GameObject> _currentUsers = new HashSet<GameObject>();
 
         public Transform SlotTransform => _slotDefinition.SlotTransform;
 
