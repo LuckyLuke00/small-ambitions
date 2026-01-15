@@ -18,7 +18,7 @@ public partial class AcquireAutonomyTargetAction : Action
             return Status.Failure;
         }
 
-        if (!AutonomyController.Value.AquireNewAutonomyTarget())
+        if (!AutonomyController.Value.AcquireNewAutonomyTarget())
         {
             return Status.Failure;
         }

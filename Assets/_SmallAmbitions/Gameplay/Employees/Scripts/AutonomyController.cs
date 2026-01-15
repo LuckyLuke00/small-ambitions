@@ -26,7 +26,7 @@ namespace SmallAmbitions
         public AutonomyTarget CurrentAutonomyTarget { get; private set; }
         public bool HasReservedTarget { get; private set; }
 
-        public bool AquireNewAutonomyTarget()
+        public bool AcquireNewAutonomyTarget()
         {
             ReleaseCurrentTarget();
 
