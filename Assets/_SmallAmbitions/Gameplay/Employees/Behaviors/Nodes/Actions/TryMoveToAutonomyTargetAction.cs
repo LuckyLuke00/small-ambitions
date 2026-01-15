@@ -129,6 +129,7 @@ public partial class TryMoveToAutonomyTargetAction : Action
 
     private bool IsFacingSmartObject()
     {
+        // Quaternion == uses dot product internally, not exact floating-point comparison
         return _agent.transform.rotation == _targetRotation;
     }
 }
