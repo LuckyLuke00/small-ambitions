@@ -39,6 +39,7 @@ namespace SmallAmbitions
         private readonly StringBuilder _stringBuilder = new();
 
         private void OnEnable() => _activeDebuggers.Add(this);
+
         private void OnDisable() => _activeDebuggers.Remove(this);
 
         private void OnGUI()
