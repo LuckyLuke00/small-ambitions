@@ -27,7 +27,7 @@ public partial class TryMoveToAutonomyTargetAction : Action
         return Initialize();
     }
 
-    // NOTE: Might fail when we add doors later
+    // TODO: Handle NavMesh/door interactions for autonomy targets when doors are added
     protected override Status OnUpdate()
     {
         if (_agent.pathPending)
