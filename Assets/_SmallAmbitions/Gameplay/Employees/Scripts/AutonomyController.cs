@@ -132,7 +132,7 @@ namespace SmallAmbitions
             {
                 SmartObject postureObject = ambientObject != null ? ambientObject : primaryObject;
 
-                if (interaction.RequiredAmbientInteraction.RequiredPrimarySlots.IsNullOrEmpty())
+                if (!interaction.RequiredAmbientInteraction.RequiredPrimarySlots.IsNullOrEmpty())
                 {
                     if (!postureObject.TryReserveSlots(interaction.RequiredAmbientInteraction.RequiredPrimarySlots, gameObject))
                     {
