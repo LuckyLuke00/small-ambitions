@@ -157,13 +157,9 @@ namespace SmallAmbitions
                 return;
             }
 
-            foreach (var rig in _rigs)
+            if (_rigs.TryGetValue(step.AttachToSlot, out var rig))
             {
-                if (rig.Key == step.AttachToSlot)
-                {
-                    _smartObject.AttachAttachmentObject(rig.Value.AttachmentPoint);
-                    break;
-                }
+                _smartObject.AttachAttachmentObject(rig.AttachmentPoint);
             }
         }
 
