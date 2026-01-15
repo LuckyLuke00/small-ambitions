@@ -1,0 +1,57 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c61186f248df50144a5166caa0d7aa09, type: 3}
+  m_Name: UseComputerLoop
+  m_EditorClassIdentifier: Assembly-CSharp::SmallAmbitions.Interaction
+  _motiveDecayRates:
+    _entries:
+    - Key: 0
+      Value: 5
+    - Key: 1
+      Value: -5
+  <StartSteps>k__BackingField:
+  - <DurationSeconds>k__BackingField: 0.15
+    <RigBlendDurationSeconds>k__BackingField: 0
+    <TargetRigWeight>k__BackingField: 0
+    <ResetAttachment>k__BackingField: 0
+    <AttachToSlot>k__BackingField: 0
+    <AnimationLayer>k__BackingField: 0
+    <AnimationToPlay>k__BackingField: {fileID: 7400000, guid: f7d880a2208b8c448b6dd3d228b46d02, type: 2}
+  - <DurationSeconds>k__BackingField: 1.05
+    <RigBlendDurationSeconds>k__BackingField: 0.5
+    <TargetRigWeight>k__BackingField: 1
+    <ResetAttachment>k__BackingField: 0
+    <AttachToSlot>k__BackingField: 0
+    <AnimationLayer>k__BackingField: 0
+    <AnimationToPlay>k__BackingField: {fileID: 0}
+  <LoopSteps>k__BackingField:
+  - <DurationSeconds>k__BackingField: 16.467
+    <RigBlendDurationSeconds>k__BackingField: 0
+    <TargetRigWeight>k__BackingField: 1
+    <ResetAttachment>k__BackingField: 0
+    <AttachToSlot>k__BackingField: 0
+    <AnimationLayer>k__BackingField: 0
+    <AnimationToPlay>k__BackingField: {fileID: 7400000, guid: dfae0d1b78d958a429a2ad2806bbdd13, type: 2}
+  <ExitSteps>k__BackingField:
+  - <DurationSeconds>k__BackingField: 0.933
+    <RigBlendDurationSeconds>k__BackingField: 0.5
+    <TargetRigWeight>k__BackingField: 0
+    <ResetAttachment>k__BackingField: 0
+    <AttachToSlot>k__BackingField: 0
+    <AnimationLayer>k__BackingField: 0
+    <AnimationToPlay>k__BackingField: {fileID: 7400000, guid: b3f3ea0424df63d45905546033ee6a19, type: 2}
+  <RequiredAmbientInteraction>k__BackingField: {fileID: 11400000, guid: 9b6712a620b184f4791de22b2dfc2bf0, type: 2}
+  <RequiredPrimarySlots>k__BackingField:
+    _entries: 0200000003000000
+  <RequiredAmbientSlots>k__BackingField:
+    _entries: 04000000
+  <PositionToleranceRadius>k__BackingField: 7.5

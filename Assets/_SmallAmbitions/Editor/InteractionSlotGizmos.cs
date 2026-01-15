@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using UnityEditor;
 using UnityEngine;
 
@@ -6,11 +7,13 @@ namespace SmallAmbitions.Editor
 {
     public static class InteractionSlotGizmos
     {
-        private const float GizmoSize = 0.15f;
-        private const float OrientationLineLength = 0.25f;
+        private const float GizmoSize = 0.1f;
+        private const float OrientationLineLength = 0.15f;
 
         private const float ColorSaturation = 0.9f;
         private const float ColorValue = 0.9f;
+
+        private static readonly Color ToleranceRadiusColor = new Color(1f, 0.5f, 0f, 0.5f);
 
         private static readonly InteractionSlotType[] SlotTypes = (InteractionSlotType[])Enum.GetValues(typeof(InteractionSlotType));
 
@@ -22,13 +25,18 @@ namespace SmallAmbitions.Editor
                 return;
             }
 
-            foreach (var (slotType, slot) in smartObject.InteractionSlots)
+            foreach (var interactionSlot in smartObject.InteractionSlots)
             {
+                var slotType = interactionSlot.SlotType;
+                var slot = interactionSlot.SlotTransform;
+
                 if (slot != null)
                 {
                     DrawSlotHandle(slot, slotType);
                 }
             }
+
+            DrawPositionToleranceRadius(smartObject);
         }
 
         private static bool ShouldDrawGizmos()
@@ -64,6 +72,19 @@ namespace SmallAmbitions.Editor
             Handles.DrawLine(position, position + transform.forward * OrientationLineLength);
 
             Handles.color = prevHandleColor;
+        }
+
+        private static void DrawPositionToleranceRadius(SmartObject smartObject)
+        {
+            foreach (var interaction in smartObject.Interactions.Where(
+                interaction => interaction != null &&
+                !MathUtils.IsNearlyZero(interaction.PositionToleranceRadius)))
+            {
+                var prevGizmoColor = Gizmos.color;
+                Gizmos.color = ToleranceRadiusColor;
+                Gizmos.DrawWireSphere(smartObject.transform.position, interaction.PositionToleranceRadius);
+                Gizmos.color = prevGizmoColor;
+            }
         }
 
         private static Color GetColorForSlotType(InteractionSlotType slotType)

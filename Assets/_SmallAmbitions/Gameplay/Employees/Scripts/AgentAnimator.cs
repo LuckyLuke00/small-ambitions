@@ -19,6 +19,7 @@ namespace SmallAmbitions
         [Header("One-Shot Animation")]
         [SerializeField] private AnimationClip _oneShotPlaceholder;
         [SerializeField] private SerializableMap<OneShotAnimationLayer, AnimatorParameter> _oneShotTriggers;
+        [SerializeField] private SerializableMap<OneShotAnimationLayer, AnimatorParameter> _oneShotBools;
 
         [Header("Locomotion")]
         [SerializeField] private AnimatorParameter _speed;
@@ -45,15 +46,30 @@ namespace SmallAmbitions
                 return;
             }
 
-            if (!_oneShotTriggers.TryGetValue(layer, out AnimatorParameter oneShotTrigger))
+            if (!_oneShotTriggers.TryGetValue(layer, out AnimatorParameter trigger) ||
+                !_oneShotBools.TryGetValue(layer, out AnimatorParameter stayBool))
             {
-                Debug.LogWarning($"[{nameof(AgentAnimator)}] Cannot play one-shot animation: no one-shot trigger configured for layer '{layer}'.");
+                Debug.LogWarning($"[{nameof(AgentAnimator)}] No one-shot parameters configured for layer '{layer}'.");
                 return;
             }
 
             _oneShotOverride[_oneShotPlaceholder.name] = clip;
-            _animator.ResetTrigger(oneShotTrigger.Hash);
-            _animator.SetTrigger(oneShotTrigger.Hash);
+            _animator.ResetTrigger(trigger.Hash);
+            _animator.SetBool(stayBool.Hash, true);
+            _animator.SetTrigger(trigger.Hash);
+        }
+
+        public void StopAllOneShots()
+        {
+            foreach (var pair in _oneShotTriggers)
+            {
+                _animator.ResetTrigger(pair.Value.Hash);
+            }
+
+            foreach (var pair in _oneShotBools)
+            {
+                _animator.SetBool(pair.Value.Hash, false);
+            }
         }
     }
 }

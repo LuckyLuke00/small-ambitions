@@ -23,5 +23,10 @@ namespace SmallAmbitions
         {
             return denominator != 0f ? numerator / denominator : fallback;
         }
+
+        public static float SqrDistance(Vector3 a, Vector3 b)
+        {
+            return (a - b).sqrMagnitude;
+        }
     }
 }
