@@ -22,21 +22,21 @@ MonoBehaviour:
   - <DurationSeconds>k__BackingField: 0.15
     <RigBlendDurationSeconds>k__BackingField: 0
     <TargetRigWeight>k__BackingField: 0
-    <ResetAttachement>k__BackingField: 0
+    <ResetAttachment>k__BackingField: 0
     <AttachToSlot>k__BackingField: 0
     <AnimationLayer>k__BackingField: 0
     <AnimationToPlay>k__BackingField: {fileID: 7400000, guid: f7d880a2208b8c448b6dd3d228b46d02, type: 2}
   - <DurationSeconds>k__BackingField: 1.05
     <RigBlendDurationSeconds>k__BackingField: 0.5
     <TargetRigWeight>k__BackingField: 1
-    <ResetAttachement>k__BackingField: 0
+    <ResetAttachment>k__BackingField: 0
     <AttachToSlot>k__BackingField: 0
     <AnimationLayer>k__BackingField: 0
     <AnimationToPlay>k__BackingField: {fileID: 0}
   - <DurationSeconds>k__BackingField: 16.467
     <RigBlendDurationSeconds>k__BackingField: 0
     <TargetRigWeight>k__BackingField: 1
-    <ResetAttachement>k__BackingField: 0
+    <ResetAttachment>k__BackingField: 0
     <AttachToSlot>k__BackingField: 0
     <AnimationLayer>k__BackingField: 0
     <AnimationToPlay>k__BackingField: {fileID: 7400000, guid: dfae0d1b78d958a429a2ad2806bbdd13, type: 2}
@@ -45,7 +45,7 @@ MonoBehaviour:
   - <DurationSeconds>k__BackingField: 0.933
     <RigBlendDurationSeconds>k__BackingField: 0.5
     <TargetRigWeight>k__BackingField: 0
-    <ResetAttachement>k__BackingField: 0
+    <ResetAttachment>k__BackingField: 0
     <AttachToSlot>k__BackingField: 0
     <AnimationLayer>k__BackingField: 0
     <AnimationToPlay>k__BackingField: {fileID: 7400000, guid: b3f3ea0424df63d45905546033ee6a19, type: 2}
