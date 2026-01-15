@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using UnityEditor;
 using UnityEngine;
 
@@ -75,21 +76,13 @@ namespace SmallAmbitions.Editor
 
         private static void DrawPositionToleranceRadius(SmartObject smartObject)
         {
-            float maxRadius = 0f;
-
-            foreach (var interaction in smartObject.Interactions)
-            {
-                if (interaction != null && interaction.PositionToleranceRadius > maxRadius)
-                {
-                    maxRadius = interaction.PositionToleranceRadius;
-                }
-            }
-
-            if (maxRadius > 0f)
+            foreach (var interaction in smartObject.Interactions.Where(
+                interaction => interaction != null &&
+                !MathUtils.IsNearlyZero(interaction.PositionToleranceRadius)))
             {
                 var prevGizmoColor = Gizmos.color;
                 Gizmos.color = ToleranceRadiusColor;
-                Gizmos.DrawWireSphere(smartObject.transform.position, maxRadius);
+                Gizmos.DrawWireSphere(smartObject.transform.position, interaction.PositionToleranceRadius);
                 Gizmos.color = prevGizmoColor;
             }
         }
