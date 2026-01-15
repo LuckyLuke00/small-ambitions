@@ -26,19 +26,6 @@ namespace SmallAmbitions
                 return;
             }
 
-            var seen = new HashSet<T>();
-
-            for (int i = 0; i < count; ++i)
-            {
-                if (!seen.Add(_entries[i]))
-                {
-                    Debug.LogError(
-                        $"Duplicate value '{_entries[i]}' found in SerializedSet<{typeof(T).Name}>. " +
-                        $"Each value must be unique."
-                    );
-                }
-            }
-
             _values = new T[count];
             Array.Copy(_entries, _values, count);
         }
