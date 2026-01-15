@@ -16,15 +16,9 @@ namespace SmallAmbitions.Editor
                 return;
             }
 
-            try
-            {
-                AssetDatabase.ForceReserializeAssets();
-                Debug.Log("Reserialization complete.");
-            }
-            catch (System.Exception ex)
-            {
-                Debug.LogError($"Reserialization failed: {ex.Message}");
-            }
+            AssetDatabase.ForceReserializeAssets();
+            AssetDatabase.Refresh();
+            Debug.Log("Reserialization complete.");
         }
     }
 }
