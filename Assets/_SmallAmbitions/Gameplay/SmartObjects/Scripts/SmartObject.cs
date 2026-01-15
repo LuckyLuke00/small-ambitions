@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 namespace SmallAmbitions
@@ -62,75 +63,42 @@ namespace SmallAmbitions
 
         private void BuildSlotInstances()
         {
-            _slotInstances = new List<InteractionSlotInstance>(_interactionSlots.Count);
-            foreach (var slotDefinition in _interactionSlots)
+            _slotInstances = _interactionSlots.ConvertAll(def => new InteractionSlotInstance(def));
+        }
+
+        private List<InteractionSlotInstance> FindMatchingSlots(IReadOnlyCollection<InteractionSlotType> requiredSlotTypes)
+        {
+            var matched = new List<InteractionSlotInstance>(requiredSlotTypes.Count);
+
+            foreach (var requiredType in requiredSlotTypes)
             {
-                _slotInstances.Add(new InteractionSlotInstance(slotDefinition));
+                var found = _slotInstances.FirstOrDefault(slot => !matched.Contains(slot) && slot.HasSlotType(requiredType) && slot.IsAvailable());
+
+                if (found == null)
+                {
+                    return null;
+                }
+
+                matched.Add(found);
             }
+
+            return matched;
         }
 
         public bool HasAvailableSlots(IReadOnlyCollection<InteractionSlotType> requiredSlotTypes)
         {
-            var used = new HashSet<InteractionSlotInstance>();
-
-            foreach (var requiredSlotType in requiredSlotTypes)
-            {
-                var foundSlot = false;
-                foreach (var slot in _slotInstances)
-                {
-                    if (used.Contains(slot))
-                    {
-                        continue;
-                    }
-
-                    if (slot.HasSlotType(requiredSlotType) && slot.IsAvailable())
-                    {
-                        used.Add(slot);
-                        foundSlot = true;
-                        break;
-                    }
-                }
-
-                if (!foundSlot)
-                {
-                    return false;
-                }
-            }
-
-            return true;
+            return FindMatchingSlots(requiredSlotTypes) != null;
         }
 
         public bool TryReserveSlots(IReadOnlyCollection<InteractionSlotType> requiredSlotTypes, GameObject user)
         {
-            var slotsToReserve = new List<InteractionSlotInstance>();
-
-            foreach (var requiredSlotType in requiredSlotTypes)
+            var slots = FindMatchingSlots(requiredSlotTypes);
+            if (slots == null)
             {
-                InteractionSlotInstance foundSlot = null;
-
-                foreach (var slot in _slotInstances)
-                {
-                    if (slotsToReserve.Contains(slot))
-                    {
-                        continue;
-                    }
-
-                    if (slot.HasSlotType(requiredSlotType) && slot.IsAvailable())
-                    {
-                        foundSlot = slot;
-                        break;
-                    }
-                }
-
-                if (foundSlot == null)
-                {
-                    return false;
-                }
-
-                slotsToReserve.Add(foundSlot);
+                return false;
             }
 
-            foreach (var slot in slotsToReserve)
+            foreach (var slot in slots)
             {
                 slot.RegisterUser(user);
             }
