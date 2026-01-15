@@ -4599,6 +4599,14 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 3476717510983712729, guid: 6e6e6c76b760462439cd3662e3df6c85, type: 3}
+      propertyPath: _isPlayingOneShot._hash
+      value: -823668238
+      objectReference: {fileID: 0}
+    - target: {fileID: 3476717510983712729, guid: 6e6e6c76b760462439cd3662e3df6c85, type: 3}
+      propertyPath: _isPlayingOneShot._name
+      value: Speed
+      objectReference: {fileID: 0}
     - target: {fileID: 5263839998645613914, guid: 6e6e6c76b760462439cd3662e3df6c85, type: 3}
       propertyPath: m_Name
       value: Employee_Mid

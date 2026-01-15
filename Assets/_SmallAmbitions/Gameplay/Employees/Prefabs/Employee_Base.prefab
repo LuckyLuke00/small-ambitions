@@ -527,6 +527,16 @@ MonoBehaviour:
       Value:
         _name: PlayOneShotUpperBody
         _hash: 67770089
+  _oneShotBools:
+    _entries:
+    - Key: 0
+      Value:
+        _name: IsPlayingOneShotBase
+        _hash: 1294044775
+    - Key: 1
+      Value:
+        _name: IsPlayingOneShotUpperBody
+        _hash: 209341560
   _speed:
     _name: Speed
     _hash: -823668238

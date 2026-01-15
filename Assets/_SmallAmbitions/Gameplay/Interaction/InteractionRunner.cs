@@ -246,6 +246,7 @@ namespace SmallAmbitions
                 rig.Weight = 0f;
             }
 
+            _animator.StopAllOneShots();
             _smartObject?.ResetAttachmentObjectTransform();
         }
     }
