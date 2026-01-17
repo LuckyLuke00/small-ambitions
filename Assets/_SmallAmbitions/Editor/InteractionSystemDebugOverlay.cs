@@ -27,13 +27,17 @@ namespace SmallAmbitions.Editor
         private static Texture2D _criticalBackgroundTexture;
         private static readonly StringBuilder _stringBuilder = new();
         private static readonly Dictionary<int, CachedDebugInfo> _cache = new();
+        private static readonly HashSet<int> _currentFrameIds = new();
         private static double _lastRefreshTime;
         private static bool _stylesInitialized;
+        private static bool _styleInitAttempted;
 
         private struct CachedDebugInfo
         {
             public string Content;
             public bool HasCritical;
+            public GUIContent GUIContent;
+            public Vector2 ContentSize;
         }
 
         [InitializeOnLoadMethod]
@@ -47,9 +51,14 @@ namespace SmallAmbitions.Editor
 
         private static void OnPlayModeStateChanged(PlayModeStateChange state)
         {
-            _cache.Clear();
-            CleanupTextures();
-            _stylesInitialized = false;
+            // Only cleanup when entering edit mode - textures may still be in use during transitions
+            if (state == PlayModeStateChange.EnteredEditMode)
+            {
+                _cache.Clear();
+                CleanupTextures();
+                _stylesInitialized = false;
+                _styleInitAttempted = false;
+            }
         }
 
         private static void CleanupTextures()
@@ -69,7 +78,8 @@ namespace SmallAmbitions.Editor
 
         private static void OnSceneGUI(SceneView _)
         {
-            if (!EditorApplication.isPlaying || EditorApplication.isPaused)
+            // Allow viewing debug info while paused for easier debugging
+            if (!EditorApplication.isPlaying)
             {
                 return;
             }
@@ -89,7 +99,6 @@ namespace SmallAmbitions.Editor
             if (shouldRefresh)
             {
                 _lastRefreshTime = EditorApplication.timeSinceStartup;
-                _cache.Clear();
             }
 
             EnsureStylesInitialized();
@@ -100,6 +109,7 @@ namespace SmallAmbitions.Editor
 
             Handles.BeginGUI();
 
+            _currentFrameIds.Clear();
             int panelIndex = 0;
             foreach (var go in selectedObjects)
             {
@@ -109,17 +119,33 @@ namespace SmallAmbitions.Editor
                 }
 
                 int id = go.GetInstanceID();
-                if (!_cache.TryGetValue(id, out var cached))
+                _currentFrameIds.Add(id);
+
+                if (shouldRefresh || !_cache.TryGetValue(id, out var cached))
                 {
+                    string content = BuildDebugContent(go.name, motive, interaction, autonomy);
+                    var guiContent = new GUIContent(content);
                     cached = new CachedDebugInfo
                     {
-                        Content = BuildDebugContent(go.name, motive, interaction, autonomy),
-                        HasCritical = motive != null && motive.HasCriticalMotive()
+                        Content = content,
+                        HasCritical = motive != null && motive.HasCriticalMotive(),
+                        GUIContent = guiContent,
+                        ContentSize = _labelStyle.CalcSize(guiContent)
                     };
                     _cache[id] = cached;
                 }
 
                 DrawPanel(panelIndex++, cached);
+            }
+
+            // Remove cache entries for objects no longer selected
+            if (shouldRefresh)
+            {
+                var keysToRemove = _cache.Keys.Where(k => !_currentFrameIds.Contains(k)).ToList();
+                foreach (var key in keysToRemove)
+                {
+                    _cache.Remove(key);
+                }
             }
 
             Handles.EndGUI();
@@ -143,20 +169,18 @@ namespace SmallAmbitions.Editor
             GUIStyle bgStyle = cached.HasCritical ? _criticalBackgroundStyle : _backgroundStyle;
             float xPos = PanelPadding + panelIndex * (PanelWidth + PanelSpacing);
 
-            GUIContent content = new(cached.Content);
-            Vector2 contentSize = _labelStyle.CalcSize(content);
-            float panelHeight = contentSize.y + bgStyle.padding.top + bgStyle.padding.bottom;
+            float panelHeight = cached.ContentSize.y + bgStyle.padding.top + bgStyle.padding.bottom;
 
             Rect backgroundRect = new(xPos, PanelPadding, PanelWidth, panelHeight);
             Rect labelRect = new(
                 xPos + bgStyle.padding.left,
                 PanelPadding + bgStyle.padding.top,
                 PanelWidth - bgStyle.padding.left - bgStyle.padding.right,
-                contentSize.y
+                cached.ContentSize.y
             );
 
             GUI.Box(backgroundRect, GUIContent.none, bgStyle);
-            GUI.Label(labelRect, content, _labelStyle);
+            GUI.Label(labelRect, cached.GUIContent, _labelStyle);
         }
 
         private static string BuildDebugContent(string name, MotiveComponent motive, InteractionManager interaction, AutonomyController autonomy)
@@ -327,6 +351,11 @@ namespace SmallAmbitions.Editor
 
             if (GUI.skin == null)
             {
+                if (!_styleInitAttempted)
+                {
+                    _styleInitAttempted = true;
+                    Debug.LogWarning("[InteractionSystemDebugOverlay] GUI.skin is null, cannot initialize styles.");
+                }
                 return;
             }
 
