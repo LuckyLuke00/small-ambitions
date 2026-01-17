@@ -51,18 +51,23 @@ namespace SmallAmbitions.Editor
 
         private static void OnPlayModeStateChanged(PlayModeStateChange state)
         {
-            // Only cleanup when entering edit mode - textures may still be in use during transitions
-            if (state == PlayModeStateChange.EnteredEditMode)
+            // Cleanup when exiting or entering edit mode to prevent resource leaks during domain reloads
+            if (state == PlayModeStateChange.ExitingPlayMode || state == PlayModeStateChange.EnteredEditMode)
             {
                 _cache.Clear();
-                CleanupTextures();
+                CleanupStyles();
                 _stylesInitialized = false;
                 _styleInitAttempted = false;
             }
         }
 
-        private static void CleanupTextures()
+        private static void CleanupStyles()
         {
+            // Null out style references before destroying textures they reference
+            _backgroundStyle = null;
+            _criticalBackgroundStyle = null;
+            _labelStyle = null;
+
             if (_backgroundTexture != null)
             {
                 Object.DestroyImmediate(_backgroundTexture);
@@ -78,8 +83,7 @@ namespace SmallAmbitions.Editor
 
         private static void OnSceneGUI(SceneView _)
         {
-            // Allow viewing debug info while paused for easier debugging
-            if (!EditorApplication.isPlaying)
+            if (!EditorApplication.isPlaying && !EditorApplication.isPaused)
             {
                 return;
             }
@@ -125,12 +129,14 @@ namespace SmallAmbitions.Editor
                 {
                     string content = BuildDebugContent(go.name, motive, interaction, autonomy);
                     var guiContent = new GUIContent(content);
+                    float availableWidth = PanelWidth - _backgroundStyle.padding.left - _backgroundStyle.padding.right;
+                    float contentHeight = _labelStyle.CalcHeight(guiContent, availableWidth);
                     cached = new CachedDebugInfo
                     {
                         Content = content,
                         HasCritical = motive != null && motive.HasCriticalMotive(),
                         GUIContent = guiContent,
-                        ContentSize = _labelStyle.CalcSize(guiContent)
+                        ContentSize = new Vector2(availableWidth, contentHeight)
                     };
                     _cache[id] = cached;
                 }

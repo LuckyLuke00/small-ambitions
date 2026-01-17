@@ -75,6 +75,7 @@ namespace SmallAmbitions
         {
             // Sort candidates by urgency-weighted score, then by distance (closest first) as tiebreaker
             var sortedCandidates = candidates
+                .Where(c => c.SmartObject != null)
                 .OrderByDescending(c => ScoreInteraction(c.Interaction))
                 .ThenBy(c => MathUtils.SqrDistance(c.SmartObject, this));
 
