@@ -232,7 +232,7 @@ namespace SmallAmbitions.Editor
                 return;
             }
 
-            if (!interaction.TryGetAvailableInteractions(out List<InteractionCandidate> candidates) || candidates.Count == 0)
+            if (!interaction.TryGetAvailableInteractions(out List<InteractionCandidate> candidates))
             {
                 _stringBuilder.AppendLine("  (None)");
                 return;
