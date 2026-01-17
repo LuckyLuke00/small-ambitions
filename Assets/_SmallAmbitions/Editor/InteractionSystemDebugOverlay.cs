@@ -7,10 +7,10 @@ using UnityEngine;
 namespace SmallAmbitions.Editor
 {
     /// <summary>
-    /// Visual debugger for the Interaction System. Shows debug info in the top-left corner
-    /// when NPCs are selected. Multiple selected NPCs stack horizontally.
+    /// Visual debugger overlay for the Interaction System. Shows debug info in the top-left corner
+    /// of the Scene View when NPCs are selected. Multiple selected NPCs stack horizontally.
     /// </summary>
-    public static class InteractionSystemDebuggerWindow
+    public static class InteractionSystemDebugOverlay
     {
         private const float PanelWidth = 280f;
         private const float PanelPadding = 10f;
@@ -18,9 +18,13 @@ namespace SmallAmbitions.Editor
         private const float RefreshInterval = 0.1f;
         private const int MaxWeightedInteractionsToShow = 5;
 
+        private static readonly MotiveType[] _motiveTypes = (MotiveType[])System.Enum.GetValues(typeof(MotiveType));
+
         private static GUIStyle _labelStyle;
         private static GUIStyle _backgroundStyle;
         private static GUIStyle _criticalBackgroundStyle;
+        private static Texture2D _backgroundTexture;
+        private static Texture2D _criticalBackgroundTexture;
         private static readonly StringBuilder _stringBuilder = new();
         private static readonly Dictionary<int, CachedDebugInfo> _cache = new();
         private static double _lastRefreshTime;
@@ -44,10 +48,26 @@ namespace SmallAmbitions.Editor
         private static void OnPlayModeStateChanged(PlayModeStateChange state)
         {
             _cache.Clear();
+            CleanupTextures();
             _stylesInitialized = false;
         }
 
-        private static void OnSceneGUI(SceneView sceneView)
+        private static void CleanupTextures()
+        {
+            if (_backgroundTexture != null)
+            {
+                Object.DestroyImmediate(_backgroundTexture);
+                _backgroundTexture = null;
+            }
+
+            if (_criticalBackgroundTexture != null)
+            {
+                Object.DestroyImmediate(_criticalBackgroundTexture);
+                _criticalBackgroundTexture = null;
+            }
+        }
+
+        private static void OnSceneGUI(SceneView _)
         {
             if (!EditorApplication.isPlaying || EditorApplication.isPaused)
             {
@@ -99,7 +119,7 @@ namespace SmallAmbitions.Editor
                     _cache[id] = cached;
                 }
 
-                DrawPanel(sceneView, panelIndex++, cached);
+                DrawPanel(panelIndex++, cached);
             }
 
             Handles.EndGUI();
@@ -113,7 +133,7 @@ namespace SmallAmbitions.Editor
             return motive != null || interaction != null || autonomy != null;
         }
 
-        private static void DrawPanel(SceneView sceneView, int panelIndex, CachedDebugInfo cached)
+        private static void DrawPanel(int panelIndex, CachedDebugInfo cached)
         {
             if (string.IsNullOrEmpty(cached.Content))
             {
@@ -179,7 +199,7 @@ namespace SmallAmbitions.Editor
             motive.TryGetCriticalMotive(out MotiveType criticalType);
             bool hasCritical = motive.HasCriticalMotive();
 
-            foreach (MotiveType motiveType in System.Enum.GetValues(typeof(MotiveType)))
+            foreach (MotiveType motiveType in _motiveTypes)
             {
                 if (!motive.TryGetMotive(motiveType, out Motive m))
                 {
@@ -253,7 +273,7 @@ namespace SmallAmbitions.Editor
             _stringBuilder.Append("  Phase: ");
             if (interaction != null && interaction.IsInteracting)
             {
-                _stringBuilder.Append(interaction.DebugPrimaryPhase).Append(" / ").AppendLine(interaction.DebugAmbientPhase.ToString());
+                _stringBuilder.Append(interaction.DebugPrimaryPhase).Append(" / ").AppendLine(interaction.DebugAmbientPhase);
             }
             else
             {
@@ -318,17 +338,25 @@ namespace SmallAmbitions.Editor
                 normal = { textColor = Color.white }
             };
 
-            _backgroundStyle = new GUIStyle(GUI.skin.box) { padding = new RectOffset(8, 8, 8, 8) };
-            Texture2D bgTex = new(1, 1);
-            bgTex.SetPixel(0, 0, new Color(0f, 0f, 0f, 0.85f));
-            bgTex.Apply();
-            _backgroundStyle.normal.background = bgTex;
+            _backgroundTexture = new Texture2D(1, 1);
+            _backgroundTexture.SetPixel(0, 0, new Color(0f, 0f, 0f, 0.85f));
+            _backgroundTexture.Apply();
 
-            _criticalBackgroundStyle = new GUIStyle(GUI.skin.box) { padding = new RectOffset(8, 8, 8, 8) };
-            Texture2D criticalTex = new(1, 1);
-            criticalTex.SetPixel(0, 0, new Color(0.4f, 0f, 0f, 0.9f));
-            criticalTex.Apply();
-            _criticalBackgroundStyle.normal.background = criticalTex;
+            _backgroundStyle = new GUIStyle(GUI.skin.box)
+            {
+                padding = new RectOffset(8, 8, 8, 8),
+                normal = { background = _backgroundTexture }
+            };
+
+            _criticalBackgroundTexture = new Texture2D(1, 1);
+            _criticalBackgroundTexture.SetPixel(0, 0, new Color(0.4f, 0f, 0f, 0.9f));
+            _criticalBackgroundTexture.Apply();
+
+            _criticalBackgroundStyle = new GUIStyle(GUI.skin.box)
+            {
+                padding = new RectOffset(8, 8, 8, 8),
+                normal = { background = _criticalBackgroundTexture }
+            };
 
             _stylesInitialized = true;
         }
