@@ -76,7 +76,7 @@ namespace SmallAmbitions
             // Sort candidates by urgency-weighted score, then by distance (closest first) as tiebreaker
             var sortedCandidates = candidates
                 .OrderByDescending(c => ScoreInteraction(c.Interaction))
-                .ThenBy(c => (c.SmartObject.transform.position - transform.position).sqrMagnitude);
+                .ThenBy(c => MathUtils.SqrDistance(c.SmartObject, this));
 
             foreach (var candidate in sortedCandidates)
             {
@@ -162,7 +162,7 @@ namespace SmallAmbitions
                     continue;
                 }
 
-                float sqrDistance = (item.transform.position - referencePosition).sqrMagnitude;
+                float sqrDistance = MathUtils.SqrDistance(item.transform.position, referencePosition);
 
                 if (sqrDistance < minSqrDistance)
                 {
