@@ -35,14 +35,14 @@ namespace SmallAmbitions
 
         public static float SqrDistance(Component a, Component b, float fallback = float.MaxValue)
         {
-            return a && b
+            return a != null && b != null
                 ? SqrDistance(a.transform.position, b.transform.position)
                 : fallback;
         }
 
         public static float SqrDistance(GameObject a, GameObject b, float fallback = float.MaxValue)
         {
-            return a && b
+            return a != null && b != null
                 ? SqrDistance(a.transform.position, b.transform.position)
                 : fallback;
         }
