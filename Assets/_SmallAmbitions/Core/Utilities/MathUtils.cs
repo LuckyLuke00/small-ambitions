@@ -26,7 +26,25 @@ namespace SmallAmbitions
 
         public static float SqrDistance(Vector3 a, Vector3 b)
         {
-            return (a - b).sqrMagnitude;
+            float dx = a.x - b.x;
+            float dy = a.y - b.y;
+            float dz = a.z - b.z;
+
+            return dx * dx + dy * dy + dz * dz;
+        }
+
+        public static float SqrDistance(Component a, Component b, float fallback = float.MaxValue)
+        {
+            return a != null && b != null
+                ? SqrDistance(a.transform.position, b.transform.position)
+                : fallback;
+        }
+
+        public static float SqrDistance(GameObject a, GameObject b, float fallback = float.MaxValue)
+        {
+            return a != null && b != null
+                ? SqrDistance(a.transform.position, b.transform.position)
+                : fallback;
         }
     }
 }

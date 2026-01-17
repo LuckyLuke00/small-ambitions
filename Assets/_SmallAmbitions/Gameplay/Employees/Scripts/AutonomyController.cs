@@ -73,8 +73,12 @@ namespace SmallAmbitions
 
         private bool TryReserveBestCandidate(IReadOnlyList<InteractionCandidate> candidates, out AutonomyTarget target)
         {
-            // Sort candidates by urgency-weighted score, try to reserve highest first
-            var sortedCandidates = candidates.OrderByDescending(c => ScoreInteraction(c.Interaction));
+            // Sort candidates by urgency-weighted score, then by distance (closest first) as tiebreaker
+            var sortedCandidates = candidates
+                .Where(c => c.SmartObject != null)
+                .OrderByDescending(c => ScoreInteraction(c.Interaction))
+                .ThenBy(c => MathUtils.SqrDistance(c.SmartObject, this));
+
             foreach (var candidate in sortedCandidates)
             {
                 if (TryReserveCandidate(candidate, out target))
@@ -159,7 +163,7 @@ namespace SmallAmbitions
                     continue;
                 }
 
-                float sqrDistance = (item.transform.position - referencePosition).sqrMagnitude;
+                float sqrDistance = MathUtils.SqrDistance(item.transform.position, referencePosition);
 
                 if (sqrDistance < minSqrDistance)
                 {
