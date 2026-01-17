@@ -62,6 +62,7 @@ namespace SmallAmbitions
         private SmartObject _activeAmbientObject;
 
         private bool _ambientPendingCancel;
+        private bool _isInterruptRequested;
 
         public bool IsInteracting => _primaryInteractionRunner != null || _ambientInteractionRunner != null;
 
@@ -120,6 +121,10 @@ namespace SmallAmbitions
                         _ambientPendingCancel = false;
                         _ambientInteractionRunner.Cancel();
                     }
+                    else
+                    {
+                        _isInterruptRequested = false;
+                    }
                 }
             }
 
@@ -131,17 +136,25 @@ namespace SmallAmbitions
                 if (_ambientInteractionRunner.IsFinished)
                 {
                     StopAmbientInteraction();
+                    _isInterruptRequested = false;
                 }
             }
         }
 
         private void HandleMotiveCritical(MotiveType motiveType)
         {
+            if (_isInterruptRequested)
+            {
+                return;
+            }
+
             RequestInterrupt();
         }
 
         public void RequestInterrupt()
         {
+            _isInterruptRequested = true;
+
             if (_primaryInteractionRunner == null)
             {
                 // No primary, just cancel ambient directly
