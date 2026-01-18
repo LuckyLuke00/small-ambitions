@@ -51,6 +51,7 @@ namespace SmallAmbitions
 
         [Header("References")]
         [SerializeField] private AgentAnimator _animator;
+        [SerializeField] private LayerMask _smartObjectLayer;
         [SerializeField] private MotiveComponent _motiveComponent;
         [SerializeField] private NavigationLock _navigationLock;
         [SerializeField] private SerializableMap<InteractionSlotType, IKRig> _interactionSlotBindings;
@@ -377,17 +378,15 @@ namespace SmallAmbitions
             return availableInteractions.Count > 0;
         }
 
-        private bool TryGetSmartObjectsInRangeDistance(Vector3 origin, float searchRadius, out List<SmartObject> smartObjectsInRange)
+        private bool TryFindSmartObjectsInRange(Vector3 origin, float searchRadius, out List<SmartObject> smartObjectsInRange)
         {
-            smartObjectsInRange = new List<SmartObject>(_smartObjects.Count);
+            smartObjectsInRange = new List<SmartObject>();
 
-            float sqrSearchRadius = searchRadius * searchRadius;
+            Collider[] colliders = Physics.OverlapSphere(origin, searchRadius, _smartObjectLayer);
 
-            foreach (var smartObject in _smartObjects)
+            foreach (var collider in colliders)
             {
-                var sqrDistance = MathUtils.SqrDistance(origin, smartObject.transform.position);
-
-                if (sqrDistance <= sqrSearchRadius)
+                if (collider.TryGetComponent(out SmartObject smartObject))
                 {
                     smartObjectsInRange.Add(smartObject);
                 }
@@ -398,7 +397,7 @@ namespace SmallAmbitions
 
         private bool TryFindAvailableAmbientSmartObjects(Interaction interaction, SmartObject primarySmartObject, out List<SmartObject> ambientSmartObjects)
         {
-            if (!TryGetSmartObjectsInRangeDistance(primarySmartObject.transform.position, interaction.PositionToleranceRadius, out ambientSmartObjects))
+            if (!TryFindSmartObjectsInRange(primarySmartObject.transform.position, interaction.PositionToleranceRadius, out ambientSmartObjects))
             {
                 return false;
             }

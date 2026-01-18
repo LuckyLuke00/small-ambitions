@@ -599,6 +599,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::SmallAmbitions.InteractionManager
   _animator: {fileID: 3476717510983712729}
+  _smartObjectLayer:
+    serializedVersion: 2
+    m_Bits: 8
   _motiveComponent: {fileID: 523619261607915089}
   _navigationLock: {fileID: 1743052714989685672}
   _interactionSlotBindings:

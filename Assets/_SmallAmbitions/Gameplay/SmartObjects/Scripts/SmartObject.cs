@@ -38,13 +38,15 @@ namespace SmallAmbitions
         private TransformSnapshot _attachmentOriginalPose;
 
         private List<InteractionSlotInstance> _slotInstances;
+        private Dictionary<InteractionSlotType, List<InteractionSlotInstance>> _slotsByType;
 
         public IReadOnlyList<Interaction> Interactions => _interactions;
         public IReadOnlyList<InteractionSlotDefinition> InteractionSlots => _interactionSlots;
 
         private void Awake()
         {
-            BuildSlotInstances();
+            BuildSlotInstances(); // Now builds cache too
+
             if (AttachmentObject != null)
             {
                 _attachmentOriginalPose = new TransformSnapshot(AttachmentObject.transform);
@@ -63,16 +65,54 @@ namespace SmallAmbitions
 
         private void BuildSlotInstances()
         {
-            _slotInstances = _interactionSlots.ConvertAll(def => new InteractionSlotInstance(def));
-        }
+            _slotInstances = new List<InteractionSlotInstance>(_interactionSlots.Count);
+            _slotsByType = new Dictionary<InteractionSlotType, List<InteractionSlotInstance>>();
 
+            foreach (var def in _interactionSlots)
+            {
+                var instance = new InteractionSlotInstance(def);
+                _slotInstances.Add(instance);
+
+                // Build cache at the same time
+                var slotType = def.SlotType;
+                if (slotType != InteractionSlotType.None)
+                {
+                    if (!_slotsByType.ContainsKey(slotType))
+                    {
+                        _slotsByType[slotType] = new List<InteractionSlotInstance>();
+                    }
+                    _slotsByType[slotType].Add(instance);
+                }
+            }
+        }
         private List<InteractionSlotInstance> FindMatchingSlots(IReadOnlyCollection<InteractionSlotType> requiredSlotTypes)
         {
+            if (requiredSlotTypes == null || requiredSlotTypes.Count == 0)
+            {
+                return new List<InteractionSlotInstance>();
+            }
+
             var matched = new List<InteractionSlotInstance>(requiredSlotTypes.Count);
+            var matchedSet = new HashSet<InteractionSlotInstance>();
 
             foreach (var requiredType in requiredSlotTypes)
             {
-                var found = _slotInstances.FirstOrDefault(slot => !matched.Contains(slot) && slot.HasSlotType(requiredType) && slot.IsAvailable());
+                if (!_slotsByType.TryGetValue(requiredType, out var candidates))
+                {
+                    return null;
+                }
+
+                InteractionSlotInstance found = null;
+
+                for (int i = 0; i < candidates.Count; i++)
+                {
+                    var slot = candidates[i];
+                    if (!matchedSet.Contains(slot) && slot.IsAvailable())
+                    {
+                        found = slot;
+                        break;
+                    }
+                }
 
                 if (found == null)
                 {
@@ -80,6 +120,7 @@ namespace SmallAmbitions
                 }
 
                 matched.Add(found);
+                matchedSet.Add(found);
             }
 
             return matched;
@@ -118,16 +159,17 @@ namespace SmallAmbitions
 
         public bool TryGetAvailableStandPosition(out Transform standTransform)
         {
-            foreach (var slot in _slotInstances)
+            // Use cache for direct lookup
+            if (_slotsByType.TryGetValue(InteractionSlotType.StandPosition, out var standSlots))
             {
-                if (!slot.HasSlotType(InteractionSlotType.StandPosition))
-                    continue;
-
-                if (!slot.IsAvailable())
-                    continue;
-
-                standTransform = slot.SlotTransform;
-                return true;
+                for (int i = 0; i < standSlots.Count; i++)
+                {
+                    if (standSlots[i].IsAvailable())
+                    {
+                        standTransform = standSlots[i].SlotTransform;
+                        return true;
+                    }
+                }
             }
 
             standTransform = null;
@@ -157,15 +199,15 @@ namespace SmallAmbitions
 
         public bool TryGetStandPositionForUser(GameObject user, out Transform standTransform)
         {
-            foreach (var slot in _slotInstances)
+            if (_slotsByType.TryGetValue(InteractionSlotType.StandPosition, out var standSlots))
             {
-                if (!slot.HasSlotType(InteractionSlotType.StandPosition))
-                    continue;
-
-                if (slot.IsReservedBy(user))
+                for (int i = 0; i < standSlots.Count; ++i)
                 {
-                    standTransform = slot.SlotTransform;
-                    return true;
+                    if (standSlots[i].IsReservedBy(user))
+                    {
+                        standTransform = standSlots[i].SlotTransform;
+                        return true;
+                    }
                 }
             }
 
