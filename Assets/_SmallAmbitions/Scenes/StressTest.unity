@@ -8027,11 +8027,11 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::SmallAmbitions.CameraController
   _mainCamera: {fileID: 330585545}
-  _moveSpeed: 5
-  _dragMoveSensitivity: 0.0075
-  _zoomSpeed: 50
-  _minFov: 45
-  _maxFov: 60
+  _moveSpeed: 35
+  _dragMoveSensitivity: 0.02
+  _zoomSpeed: 500
+  _minFov: 30
+  _maxFov: 75
   _orbitSpeed: 100
   _dragOrbitSensitivity: 0.25
   _cameraDragStateEvent: {fileID: 11400000, guid: 1bc4e757f90409e48b1b071d17a20187, type: 2}
