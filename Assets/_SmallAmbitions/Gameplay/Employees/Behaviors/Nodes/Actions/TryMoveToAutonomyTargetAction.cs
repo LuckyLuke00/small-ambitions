@@ -53,10 +53,7 @@ public partial class TryMoveToAutonomyTargetAction : Action
 
     protected override void OnEnd()
     {
-        if (_agent != null && _agent.isOnNavMesh)
-        {
-            _agent.ResetPath();
-        }
+        _agent?.StopImmediately();
 
         if (CurrentStatus == Status.Failure && AutonomyController.Value != null)
         {
@@ -69,19 +66,11 @@ public partial class TryMoveToAutonomyTargetAction : Action
     private Status Initialize()
     {
         _agent = Agent.Value.GetComponentInChildren<NavMeshAgent>();
-        if (_agent == null)
+        if (!_agent.IsReady())
         {
-            Debug.LogError("TryMoveToAutonomyTargetAction: NavMeshAgent not found.");
+            Debug.LogError("TryMoveToAutonomyTargetAction: Agent is not ready (disabled or not on NavMesh).");
             return Status.Failure;
         }
-
-        if (!_agent.isOnNavMesh)
-        {
-            Debug.LogError("TryMoveToAutonomyTargetAction: Agent is not on NavMesh.");
-            return Status.Failure;
-        }
-
-        _agent.ResetPath();
 
         var target = AutonomyController.Value.CurrentAutonomyTarget;
 
@@ -91,25 +80,13 @@ public partial class TryMoveToAutonomyTargetAction : Action
             return Status.Failure;
         }
 
-        Transform standPosition = null;
-
-        if (target.PrimarySmartObject.TryGetStandPositionForUser(Agent.Value, out standPosition))
+        if (!TryGetStandPosition(target, Agent.Value, out _targetPosition, out _targetRotation))
         {
-            _targetPosition = standPosition.position;
-            _targetRotation = standPosition.rotation;
-        }
-        else if (target.AmbientSmartObject != null && target.AmbientSmartObject.TryGetStandPositionForUser(Agent.Value, out standPosition))
-        {
-            _targetPosition = standPosition.position;
-            _targetRotation = standPosition.rotation;
-        }
-        else
-        {
-            Debug.LogError($"TryMoveToAutonomyTargetAction: No stand position reserved for agent {Agent.Value.name}. Primary: {target.PrimarySmartObject.name}, Ambient: {target.AmbientSmartObject?.name}");
+            Debug.LogError($"TryMoveToAutonomyTargetAction: No stand position reserved for agent {Agent.Value.name}. Primary: {target.PrimarySmartObject?.name}, Ambient: {target.AmbientSmartObject?.name}");
             return Status.Failure;
         }
 
-        if (!_agent.SetDestination(_targetPosition))
+        if (!_agent.TryMoveTo(_targetPosition))
         {
             Debug.LogError("TryMoveToAutonomyTargetAction: Failed to set NavMesh destination.");
             return Status.Failure;
@@ -118,11 +95,36 @@ public partial class TryMoveToAutonomyTargetAction : Action
         return Status.Running;
     }
 
+    private static bool TryGetStandPosition(AutonomyTarget target, GameObject agent, out Vector3 position, out Quaternion rotation)
+    {
+        position = default;
+        rotation = default;
+
+        Transform standPosition = default;
+
+        // First try to get the stand position from the primary smart object
+        if (target.PrimarySmartObject != null && target.PrimarySmartObject.TryGetStandPositionForUser(agent, out standPosition) && standPosition != null)
+        {
+            position = standPosition.position;
+            rotation = standPosition.rotation;
+            return true;
+        }
+
+        // Then try to get the stand position from the ambient smart object
+        if (target.AmbientSmartObject != null && target.AmbientSmartObject.TryGetStandPositionForUser(agent, out standPosition) && standPosition != null)
+        {
+            position = standPosition.position;
+            rotation = standPosition.rotation;
+            return true;
+        }
+
+        return false;
+    }
+
     private void RotateTowardsTarget()
     {
         Transform agentTransform = _agent.transform;
-        agentTransform.rotation = Quaternion.RotateTowards(agentTransform.rotation, _targetRotation,
-            _agent.angularSpeed * Time.deltaTime);
+        agentTransform.rotation = Quaternion.RotateTowards(agentTransform.rotation, _targetRotation, _agent.angularSpeed * Time.deltaTime);
     }
 
     private bool IsFacingTarget()
