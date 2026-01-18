@@ -30,26 +30,24 @@ public partial class TryMoveToAutonomyTargetAction : Action
     // TODO: Handle NavMesh/door interactions for autonomy targets when doors are added
     protected override Status OnUpdate()
     {
-        if (_agent.pathPending)
-        {
-            return Status.Running;
-        }
-
-        if (_agent.pathStatus == NavMeshPathStatus.PathInvalid)
+        if (_agent == null || !_agent.IsReady())
         {
             return Status.Failure;
         }
 
-        if (_agent.remainingDistance <= _agent.stoppingDistance)
+        if (!_agent.HasReachedDestination())
         {
-            if (IsFacingSmartObject())
-            {
-                return Status.Success;
-            }
-
-            RotateTowardsSmartObject();
+            return Status.Running;
         }
 
+        _agent.StopImmediately();
+
+        if (IsFacingTarget())
+        {
+            return Status.Success;
+        }
+
+        RotateTowardsTarget();
         return Status.Running;
     }
 
@@ -120,14 +118,14 @@ public partial class TryMoveToAutonomyTargetAction : Action
         return Status.Running;
     }
 
-    private void RotateTowardsSmartObject()
+    private void RotateTowardsTarget()
     {
         Transform agentTransform = _agent.transform;
         agentTransform.rotation = Quaternion.RotateTowards(agentTransform.rotation, _targetRotation,
             _agent.angularSpeed * Time.deltaTime);
     }
 
-    private bool IsFacingSmartObject()
+    private bool IsFacingTarget()
     {
         // Quaternion == uses dot product internally, not exact floating-point comparison
         return _agent.transform.rotation == _targetRotation;
