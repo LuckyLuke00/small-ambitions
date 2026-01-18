@@ -128,7 +128,40 @@ namespace SmallAmbitions
 
         public bool HasAvailableSlots(IReadOnlyCollection<InteractionSlotType> requiredSlotTypes)
         {
-            return FindMatchingSlots(requiredSlotTypes) != null;
+            // No requirements means we're always good.
+            if (requiredSlotTypes == null || requiredSlotTypes.Count == 0)
+            {
+                return true;
+            }
+
+            foreach (var requiredType in requiredSlotTypes)
+            {
+                // If we don't even have slots of this type, fail immediately.
+                if (!_slotsByType.TryGetValue(requiredType, out var slots))
+                {
+                    return false;
+                }
+
+                bool foundAvailable = false;
+
+                // Look for at least one free slot of this type.
+                for (int i = 0; i < slots.Count; ++i)
+                {
+                    if (slots[i].IsAvailable())
+                    {
+                        foundAvailable = true;
+                        break;
+                    }
+                }
+
+                // If any required slot type cannot be satisfied, we fail.
+                if (!foundAvailable)
+                {
+                    return false;
+                }
+            }
+
+            return true;
         }
 
         public bool TryReserveSlots(IReadOnlyCollection<InteractionSlotType> requiredSlotTypes, GameObject user)

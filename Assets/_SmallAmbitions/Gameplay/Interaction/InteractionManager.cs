@@ -67,6 +67,11 @@ namespace SmallAmbitions
         private bool _isInterruptRequested;
         private bool _isEndingInteraction;
 
+        private readonly List<InteractionCandidate> _availableInteractionsBuffer = new(64);
+        private readonly List<SmartObject> _ambientSmartObjectsBuffer = new(64);
+        private readonly List<SmartObject> _smartObjectsInRangeBuffer = new List<SmartObject>(64);
+        private static readonly Collider[] _overlapBuffer = new Collider[64];
+
         public bool IsInteracting { get; private set; }
 
         private void OnEnable()
@@ -349,7 +354,7 @@ namespace SmallAmbitions
 
         public bool TryGetAvailableInteractions(out List<InteractionCandidate> availableInteractions)
         {
-            availableInteractions = new List<InteractionCandidate>(_smartObjects.Count);
+            _availableInteractionsBuffer.Clear();
 
             foreach (var smartObject in _smartObjects)
             {
@@ -362,7 +367,7 @@ namespace SmallAmbitions
 
                     if (interaction.RequiredAmbientSlots.Count == 0)
                     {
-                        availableInteractions.Add(new InteractionCandidate(interaction, smartObject));
+                        _availableInteractionsBuffer.Add(new InteractionCandidate(interaction, smartObject));
                         continue;
                     }
 
@@ -370,23 +375,33 @@ namespace SmallAmbitions
                     {
                         var candidate = new InteractionCandidate(interaction, smartObject);
                         candidate.CandidateAmbientSmartObjects.AddRange(ambientSmartObjects);
-                        availableInteractions.Add(candidate);
+                        _availableInteractionsBuffer.Add(candidate);
                     }
                 }
             }
 
-            return availableInteractions.Count > 0;
+            availableInteractions = _availableInteractionsBuffer;
+            return _availableInteractionsBuffer.Count > 0;
         }
 
         private bool TryFindSmartObjectsInRange(Vector3 origin, float searchRadius, out List<SmartObject> smartObjectsInRange)
         {
-            smartObjectsInRange = new List<SmartObject>();
+            smartObjectsInRange = _smartObjectsInRangeBuffer;
+            smartObjectsInRange.Clear();
 
-            Collider[] colliders = Physics.OverlapSphere(origin, searchRadius, _smartObjectLayer);
+            int hitCount = Physics.OverlapSphereNonAlloc(origin, searchRadius, _overlapBuffer, _smartObjectLayer);
 
-            foreach (var collider in colliders)
+            for (int i = 0; i < hitCount; ++i)
             {
-                if (collider.TryGetComponent(out SmartObject smartObject))
+                Collider col = _overlapBuffer[i];
+                _overlapBuffer[i] = null;
+
+                if (!col)
+                {
+                    continue;
+                }
+
+                if (col.TryGetComponent(out SmartObject smartObject) && smartObject)
                 {
                     smartObjectsInRange.Add(smartObject);
                 }
@@ -397,20 +412,34 @@ namespace SmallAmbitions
 
         private bool TryFindAvailableAmbientSmartObjects(Interaction interaction, SmartObject primarySmartObject, out List<SmartObject> ambientSmartObjects)
         {
-            if (!TryFindSmartObjectsInRange(primarySmartObject.transform.position, interaction.PositionToleranceRadius, out ambientSmartObjects))
+            ambientSmartObjects = _ambientSmartObjectsBuffer;
+            ambientSmartObjects.Clear();
+
+            if (!primarySmartObject || interaction == null)
             {
                 return false;
             }
 
-            ambientSmartObjects.Remove(primarySmartObject);
-
-            for (int i = ambientSmartObjects.Count - 1; i >= 0; --i)
+            if (!TryFindSmartObjectsInRange(primarySmartObject.transform.position, interaction.PositionToleranceRadius, out var smartObjectsInRange))
             {
-                var smartObject = ambientSmartObjects[i];
+                return false;
+            }
+
+            for (int i = 0; i < smartObjectsInRange.Count; ++i)
+            {
+                SmartObject smartObject = smartObjectsInRange[i];
+
+                if (!smartObject || smartObject == primarySmartObject)
+                {
+                    continue;
+                }
+
                 if (!smartObject.HasAvailableSlots(interaction.RequiredAmbientSlots))
                 {
-                    ambientSmartObjects.RemoveAt(i);
+                    continue;
                 }
+
+                ambientSmartObjects.Add(smartObject);
             }
 
             return ambientSmartObjects.Count > 0;
