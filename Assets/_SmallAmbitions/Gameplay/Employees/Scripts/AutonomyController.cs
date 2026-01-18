@@ -73,18 +73,33 @@ namespace SmallAmbitions
 
         private bool TryReserveBestCandidate(IReadOnlyList<InteractionCandidate> candidates, out AutonomyTarget target)
         {
-            // Sort candidates by urgency-weighted score, then by distance (closest first) as tiebreaker
-            var sortedCandidates = candidates
-                .Where(c => c.SmartObject != null)
-                .OrderByDescending(c => ScoreInteraction(c.Interaction))
-                .ThenBy(c => MathUtils.SqrDistance(c.SmartObject, this));
+            InteractionCandidate bestCandidate = null;
+            float bestScore = float.MinValue;
+            float bestDistanceSqr = float.MaxValue;
 
-            foreach (var candidate in sortedCandidates)
+            for (int i = 0; i < candidates.Count; ++i)
             {
-                if (TryReserveCandidate(candidate, out target))
+                var candidate = candidates[i];
+                if (candidate.SmartObject == null)
                 {
-                    return true;
+                    continue;
                 }
+
+                float score = ScoreInteraction(candidate.Interaction);
+                float distanceSqr = MathUtils.SqrDistance(candidate.SmartObject, this);
+
+                // Higher score wins, distance is a tiebreaker
+                if (score > bestScore || (Mathf.Approximately(score, bestScore) && distanceSqr < bestDistanceSqr))
+                {
+                    bestScore = score;
+                    bestDistanceSqr = distanceSqr;
+                    bestCandidate = candidate;
+                }
+            }
+
+            if (bestCandidate != null && TryReserveCandidate(bestCandidate, out target))
+            {
+                return true;
             }
 
             target = default;
@@ -177,7 +192,7 @@ namespace SmallAmbitions
 
         private float ScoreInteraction(Interaction interaction)
         {
-            if (_motiveComponent == null || interaction == null)
+            if (_motiveComponent == null || interaction == null || interaction.MotiveDecayRates.Count == 0)
             {
                 return 0f;
             }
@@ -189,6 +204,11 @@ namespace SmallAmbitions
             {
                 float effect = motiveModifier.Value; // Positive = boost, negative = drain
                 float urgency = _motiveComponent.GetNormalizedMotiveValue(motiveModifier.Key);
+
+                if (urgency <= 0f)
+                {
+                    continue;
+                }
 
                 totalScore += effect * urgency;
             }

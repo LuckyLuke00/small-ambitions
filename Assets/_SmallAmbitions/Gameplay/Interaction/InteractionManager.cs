@@ -50,10 +50,12 @@ namespace SmallAmbitions
 #endif
 
         [Header("References")]
-        [SerializeField] private MotiveComponent _motiveComponent;
         [SerializeField] private AgentAnimator _animator;
-        [SerializeField] private SmartObjectRuntimeSet _smartObjects;
+        [SerializeField] private LayerMask _smartObjectLayer;
+        [SerializeField] private MotiveComponent _motiveComponent;
+        [SerializeField] private NavigationLock _navigationLock;
         [SerializeField] private SerializableMap<InteractionSlotType, IKRig> _interactionSlotBindings;
+        [SerializeField] private SmartObjectRuntimeSet _smartObjects;
 
         private InteractionRunner _ambientInteractionRunner;
         private InteractionRunner _primaryInteractionRunner;
@@ -62,8 +64,15 @@ namespace SmallAmbitions
         private SmartObject _activeAmbientObject;
 
         private bool _ambientPendingCancel;
+        private bool _isInterruptRequested;
+        private bool _isEndingInteraction;
 
-        public bool IsInteracting => _primaryInteractionRunner != null || _ambientInteractionRunner != null;
+        private readonly List<InteractionCandidate> _availableInteractionsBuffer = new(64);
+        private readonly List<SmartObject> _ambientSmartObjectsBuffer = new(64);
+        private readonly List<SmartObject> _smartObjectsInRangeBuffer = new List<SmartObject>(64);
+        private static readonly Collider[] _overlapBuffer = new Collider[64];
+
+        public bool IsInteracting { get; private set; }
 
         private void OnEnable()
         {
@@ -82,6 +91,9 @@ namespace SmallAmbitions
 
             StopPrimaryInteraction();
             StopAmbientInteraction();
+
+            IsInteracting = false;
+            _isEndingInteraction = false;
         }
 
         private void LateUpdate()
@@ -120,6 +132,12 @@ namespace SmallAmbitions
                         _ambientPendingCancel = false;
                         _ambientInteractionRunner.Cancel();
                     }
+                    else
+                    {
+                        _isInterruptRequested = false;
+                        _navigationLock.Unlock();
+                        return;
+                    }
                 }
             }
 
@@ -131,17 +149,36 @@ namespace SmallAmbitions
                 if (_ambientInteractionRunner.IsFinished)
                 {
                     StopAmbientInteraction();
+                    _isInterruptRequested = false;
+                    _navigationLock.Unlock();
+                    return;
+                }
+            }
+
+            if (_isEndingInteraction && IsInteracting)
+            {
+                if (_navigationLock == null || !_navigationLock.IsLocked)
+                {
+                    _isEndingInteraction = false;
+                    IsInteracting = false;
                 }
             }
         }
 
         private void HandleMotiveCritical(MotiveType motiveType)
         {
+            if (_isInterruptRequested)
+            {
+                return;
+            }
+
             RequestInterrupt();
         }
 
         public void RequestInterrupt()
         {
+            _isInterruptRequested = true;
+
             if (_primaryInteractionRunner == null)
             {
                 // No primary, just cancel ambient directly
@@ -234,6 +271,8 @@ namespace SmallAmbitions
             _activeAmbientObject = needsAmbient ? ambientObject : null;
 
             _primaryInteractionRunner = new InteractionRunner(interaction, _animator, primaryObject, _interactionSlotBindings, _activePrimaryObject.InteractionSlots, _motiveComponent);
+            _navigationLock.Lock();
+            IsInteracting = true;
             return true;
         }
 
@@ -261,6 +300,7 @@ namespace SmallAmbitions
 
             _activeAmbientObject = postureObject;
             _ambientInteractionRunner = new InteractionRunner(interaction, _animator, postureObject, _interactionSlotBindings, _activeAmbientObject.InteractionSlots, _motiveComponent);
+            IsInteracting = true;
         }
 
         private void StopAmbientInteraction()
@@ -278,6 +318,11 @@ namespace SmallAmbitions
             // Here we assume posture reserved slots on _activeAmbientObject (postureObject).
             _activeAmbientObject?.ReleaseSlots(gameObject);
             _activeAmbientObject = null;
+
+            if (_primaryInteractionRunner == null)
+            {
+                _isEndingInteraction = true;
+            }
         }
 
         private void StopPrimaryInteraction()
@@ -294,6 +339,11 @@ namespace SmallAmbitions
 
             _activePrimaryObject = null;
             _activeAmbientObject = null;
+
+            if (_ambientInteractionRunner == null)
+            {
+                _isEndingInteraction = true;
+            }
         }
 
         private void ReleaseSlots(SmartObject primaryObject, SmartObject ambientObject)
@@ -304,7 +354,7 @@ namespace SmallAmbitions
 
         public bool TryGetAvailableInteractions(out List<InteractionCandidate> availableInteractions)
         {
-            availableInteractions = new List<InteractionCandidate>(_smartObjects.Count);
+            _availableInteractionsBuffer.Clear();
 
             foreach (var smartObject in _smartObjects)
             {
@@ -317,7 +367,7 @@ namespace SmallAmbitions
 
                     if (interaction.RequiredAmbientSlots.Count == 0)
                     {
-                        availableInteractions.Add(new InteractionCandidate(interaction, smartObject));
+                        _availableInteractionsBuffer.Add(new InteractionCandidate(interaction, smartObject));
                         continue;
                     }
 
@@ -325,25 +375,33 @@ namespace SmallAmbitions
                     {
                         var candidate = new InteractionCandidate(interaction, smartObject);
                         candidate.CandidateAmbientSmartObjects.AddRange(ambientSmartObjects);
-                        availableInteractions.Add(candidate);
+                        _availableInteractionsBuffer.Add(candidate);
                     }
                 }
             }
 
-            return availableInteractions.Count > 0;
+            availableInteractions = _availableInteractionsBuffer;
+            return _availableInteractionsBuffer.Count > 0;
         }
 
-        private bool TryGetSmartObjectsInRangeDistance(Vector3 origin, float searchRadius, out List<SmartObject> smartObjectsInRange)
+        private bool TryFindSmartObjectsInRange(Vector3 origin, float searchRadius, out List<SmartObject> smartObjectsInRange)
         {
-            smartObjectsInRange = new List<SmartObject>(_smartObjects.Count);
+            smartObjectsInRange = _smartObjectsInRangeBuffer;
+            smartObjectsInRange.Clear();
 
-            float sqrSearchRadius = searchRadius * searchRadius;
+            int hitCount = Physics.OverlapSphereNonAlloc(origin, searchRadius, _overlapBuffer, _smartObjectLayer);
 
-            foreach (var smartObject in _smartObjects)
+            for (int i = 0; i < hitCount; ++i)
             {
-                var sqrDistance = MathUtils.SqrDistance(origin, smartObject.transform.position);
+                Collider col = _overlapBuffer[i];
+                _overlapBuffer[i] = null;
 
-                if (sqrDistance <= sqrSearchRadius)
+                if (!col)
+                {
+                    continue;
+                }
+
+                if (col.TryGetComponent(out SmartObject smartObject) && smartObject)
                 {
                     smartObjectsInRange.Add(smartObject);
                 }
@@ -354,20 +412,34 @@ namespace SmallAmbitions
 
         private bool TryFindAvailableAmbientSmartObjects(Interaction interaction, SmartObject primarySmartObject, out List<SmartObject> ambientSmartObjects)
         {
-            if (!TryGetSmartObjectsInRangeDistance(primarySmartObject.transform.position, interaction.PositionToleranceRadius, out ambientSmartObjects))
+            ambientSmartObjects = _ambientSmartObjectsBuffer;
+            ambientSmartObjects.Clear();
+
+            if (!primarySmartObject || interaction == null)
             {
                 return false;
             }
 
-            ambientSmartObjects.Remove(primarySmartObject);
-
-            for (int i = ambientSmartObjects.Count - 1; i >= 0; --i)
+            if (!TryFindSmartObjectsInRange(primarySmartObject.transform.position, interaction.PositionToleranceRadius, out var smartObjectsInRange))
             {
-                var smartObject = ambientSmartObjects[i];
+                return false;
+            }
+
+            for (int i = 0; i < smartObjectsInRange.Count; ++i)
+            {
+                SmartObject smartObject = smartObjectsInRange[i];
+
+                if (!smartObject || smartObject == primarySmartObject)
+                {
+                    continue;
+                }
+
                 if (!smartObject.HasAvailableSlots(interaction.RequiredAmbientSlots))
                 {
-                    ambientSmartObjects.RemoveAt(i);
+                    continue;
                 }
+
+                ambientSmartObjects.Add(smartObject);
             }
 
             return ambientSmartObjects.Count > 0;
