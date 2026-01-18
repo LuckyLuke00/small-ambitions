@@ -1,3 +1,4 @@
+using System.Collections;
 using UnityEngine;
 using UnityEngine.AI;
 
@@ -12,19 +13,24 @@ namespace SmallAmbitions
         [Header("Settings")]
         [SerializeField] private bool _enableObstacleWhenLocked = true;
 
-        private int _lockCount;
-        public bool IsLocked => _lockCount > 0;
+        public bool IsLocked => _lockCount > 0 || _unlockRoutine != null;
+
+        private int _lockCount = 0;
+        private Coroutine _unlockRoutine;
 
         private void OnEnable()
         {
             _lockCount = 0;
-            RemoveLock();
+            this.SafeStopCoroutine(ref _unlockRoutine);
+            SetObstacleEnabled(false);
+            EnableAndResyncAgent();
         }
 
         private void OnDisable()
         {
             _lockCount = 0;
-            RemoveLock();
+            this.SafeStopCoroutine(ref _unlockRoutine);
+            SetObstacleEnabled(false);
         }
 
         public void Lock()
@@ -47,49 +53,64 @@ namespace SmallAmbitions
             --_lockCount;
             if (_lockCount == 0)
             {
-                RemoveLock();
+                BeginUnlock();
             }
         }
 
         private void ApplyLock()
         {
-            if (_agent != null)
-            {
-                if (_agent.enabled && _agent.isOnNavMesh)
-                {
-                    _agent.StopImmediately();
-                }
+            this.SafeStopCoroutine(ref _unlockRoutine);
 
-                _agent.enabled = false;
-            }
+            _agent.StopImmediately();
 
-            if (_enableObstacleWhenLocked && _obstacle != null)
+            SetAgentEnabled(false);
+
+            if (_enableObstacleWhenLocked)
             {
-                _obstacle.enabled = true;
+                SetObstacleEnabled(true);
             }
         }
 
-        private void RemoveLock()
+        private void BeginUnlock()
         {
-            if (_obstacle != null)
-            {
-                _obstacle.enabled = false;
-            }
+            SetObstacleEnabled(false);
+            this.SafeStartCoroutine(ref _unlockRoutine, UnlockNextFrame());
+        }
 
-            if (_agent == null)
-            {
-                return;
-            }
+        private IEnumerator UnlockNextFrame()
+        {
+            // Wait 1 frame: gives Unity a chance to process the obstacle toggle and schedule carving changes.
+            yield return null;
 
-            if (!_agent.enabled)
-            {
-                _agent.enabled = true;
-            }
+            // Wait 2nd frame: ensures the carved hole removal is actually reflected for navmesh queries.
+            // Without this, enabling the agent can still see stale data and snap/teleport to the nearest valid point.
+            yield return null;
 
-            if (_agent.isOnNavMesh)
+            EnableAndResyncAgent();
+            _unlockRoutine = null;
+        }
+
+        private void EnableAndResyncAgent()
+        {
+            SetObstacleEnabled(false);
+            SetAgentEnabled(true);
+            _agent.ResyncToTransform();
+            _agent.isStopped = false;
+        }
+
+        private void SetAgentEnabled(bool enabled = true)
+        {
+            if (_agent != null && _agent.enabled != enabled)
             {
-                _agent.ResyncToTransform();
-                _agent.isStopped = false;
+                _agent.enabled = enabled;
+            }
+        }
+
+        private void SetObstacleEnabled(bool enabled = true)
+        {
+            if (_obstacle != null && _obstacle.enabled != enabled)
+            {
+                _obstacle.enabled = enabled;
             }
         }
     }

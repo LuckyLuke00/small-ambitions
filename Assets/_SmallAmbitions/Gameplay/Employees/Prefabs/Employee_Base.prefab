@@ -598,9 +598,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: eff6605a9e825d2428d581edf7cb8fa5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::SmallAmbitions.InteractionManager
-  _motiveComponent: {fileID: 523619261607915089}
   _animator: {fileID: 3476717510983712729}
-  _smartObjects: {fileID: 11400000, guid: 7e78ed2093b7c9a4ba514b1475974dbc, type: 2}
+  _motiveComponent: {fileID: 523619261607915089}
+  _navigationLock: {fileID: 1743052714989685672}
   _interactionSlotBindings:
     _entries:
     - Key: 2
@@ -618,6 +618,7 @@ MonoBehaviour:
         <Rig>k__BackingField: {fileID: 7268329407392915598}
         <IKTarget>k__BackingField: {fileID: 2808030364239161138}
         <AttachmentPoint>k__BackingField: {fileID: 0}
+  _smartObjects: {fileID: 11400000, guid: 7e78ed2093b7c9a4ba514b1475974dbc, type: 2}
 --- !u!114 &523619261607915089
 MonoBehaviour:
   m_ObjectHideFlags: 0

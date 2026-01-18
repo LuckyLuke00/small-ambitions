@@ -50,10 +50,11 @@ namespace SmallAmbitions
 #endif
 
         [Header("References")]
-        [SerializeField] private MotiveComponent _motiveComponent;
         [SerializeField] private AgentAnimator _animator;
-        [SerializeField] private SmartObjectRuntimeSet _smartObjects;
+        [SerializeField] private MotiveComponent _motiveComponent;
+        [SerializeField] private NavigationLock _navigationLock;
         [SerializeField] private SerializableMap<InteractionSlotType, IKRig> _interactionSlotBindings;
+        [SerializeField] private SmartObjectRuntimeSet _smartObjects;
 
         private InteractionRunner _ambientInteractionRunner;
         private InteractionRunner _primaryInteractionRunner;
@@ -63,8 +64,9 @@ namespace SmallAmbitions
 
         private bool _ambientPendingCancel;
         private bool _isInterruptRequested;
+        private bool _isEndingInteraction;
 
-        public bool IsInteracting => _primaryInteractionRunner != null || _ambientInteractionRunner != null;
+        public bool IsInteracting { get; private set; }
 
         private void OnEnable()
         {
@@ -83,6 +85,9 @@ namespace SmallAmbitions
 
             StopPrimaryInteraction();
             StopAmbientInteraction();
+
+            IsInteracting = false;
+            _isEndingInteraction = false;
         }
 
         private void LateUpdate()
@@ -124,6 +129,8 @@ namespace SmallAmbitions
                     else
                     {
                         _isInterruptRequested = false;
+                        _navigationLock.Unlock();
+                        return;
                     }
                 }
             }
@@ -137,6 +144,17 @@ namespace SmallAmbitions
                 {
                     StopAmbientInteraction();
                     _isInterruptRequested = false;
+                    _navigationLock.Unlock();
+                    return;
+                }
+            }
+
+            if (_isEndingInteraction && IsInteracting)
+            {
+                if (_navigationLock == null || !_navigationLock.IsLocked)
+                {
+                    _isEndingInteraction = false;
+                    IsInteracting = false;
                 }
             }
         }
@@ -247,6 +265,8 @@ namespace SmallAmbitions
             _activeAmbientObject = needsAmbient ? ambientObject : null;
 
             _primaryInteractionRunner = new InteractionRunner(interaction, _animator, primaryObject, _interactionSlotBindings, _activePrimaryObject.InteractionSlots, _motiveComponent);
+            _navigationLock.Lock();
+            IsInteracting = true;
             return true;
         }
 
@@ -274,6 +294,7 @@ namespace SmallAmbitions
 
             _activeAmbientObject = postureObject;
             _ambientInteractionRunner = new InteractionRunner(interaction, _animator, postureObject, _interactionSlotBindings, _activeAmbientObject.InteractionSlots, _motiveComponent);
+            IsInteracting = true;
         }
 
         private void StopAmbientInteraction()
@@ -291,6 +312,11 @@ namespace SmallAmbitions
             // Here we assume posture reserved slots on _activeAmbientObject (postureObject).
             _activeAmbientObject?.ReleaseSlots(gameObject);
             _activeAmbientObject = null;
+
+            if (_primaryInteractionRunner == null)
+            {
+                _isEndingInteraction = true;
+            }
         }
 
         private void StopPrimaryInteraction()
@@ -307,6 +333,11 @@ namespace SmallAmbitions
 
             _activePrimaryObject = null;
             _activeAmbientObject = null;
+
+            if (_ambientInteractionRunner == null)
+            {
+                _isEndingInteraction = true;
+            }
         }
 
         private void ReleaseSlots(SmartObject primaryObject, SmartObject ambientObject)
