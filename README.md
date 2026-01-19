@@ -3,11 +3,20 @@
 [![Language](https://img.shields.io/badge/Language-C%23-1864ab?style=flat-square&logo=csharp&logoColor=white&labelColor=212529)](https://learn.microsoft.com/en-us/dotnet/csharp/)
 [![Unity](https://img.shields.io/badge/Unity-6.3-1864ab?style=flat-square&logo=unity&logoColor=white&labelColor=212529)](https://unity.com/)
 
+<div align="center">
+
+[![Video Demo](https://i.ytimg.com/vi_webp/lXiv5GSGe64/maxresdefault.webp)](https://youtu.be/lXiv5GSGe64)
+
+</div>
+
+---
+
 **A small office simulation where autonomous employees balance ambition, energy, and patience.**
 
 Employees decide what to do on their own. They work when ambition demands it, grab coffee when energy is critically low, and wait patiently if someone else is hogging the coffee machine. When priorities shift, they abandon their current task and immediately replan.
 
-No schedules. No scripts. No hard-coded routines. Just motives, decisions, and a surprising amount of IK blending.
+No schedules. No scripts. No hard-coded routines.  
+Just motives, decisions, and a surprising amount of IK blending.
 
 ---
 
@@ -95,16 +104,16 @@ Uses **Unity Animation Rigging** with multiple IK chains running simultaneously:
 
 Each interaction step defines target IK weights and blend durations. Weights default to 0 (natural animation), blend up during specific steps, and reset cleanly on exit.
 
-Once the NPC navigates to the coffee machine (handled by `NavigateToTarget`), here's what happens:
+Once the NPC navigates to the coffee machine, here's the IK choreography:
 
-1. **Reach for cup** - Right hand blends from 0 → 1 over 0.5s, locking smoothly to the cup's position
-2. **Grab cup** - Cup parents to the IK root, drinking animation plays while right hand blends back down (1 → 0 over 0.5s) so the animation takes over
-3. **Wait** - Step duration matches the animation length. Nothing fancy, just letting the animation do its thing
-4. **Move cup back** - Right hand blends back up (0 → 1 over 0.5s) to return the cup precisely
-5. **Place cup** - Detach from IK root and snap back to original position (one designer-friendly checkbox)
-6. **Resume** - Right hand blends down (1 → 0 over 0.5s), returning to natural animation
+1. **Reach for cup** - Right hand: 0 → 1 over 0.5s (IK locks to cup position)
+2. **Grab cup** - Parents cup to IK root, animation plays, hand: 1 → 0 (animation takes over)
+3. **Wait** - Step duration matches animation length
+4. **Move cup back** - Right hand: 0 → 1 (IK precision for placement)
+5. **Place cup** - Detach and snap to original position (one checkbox in editor)
+6. **Resume** - Right hand: 1 → 0 (back to natural animation)
 
-The trick is the blend choreography. IK takes control when precision matters (reaching, placing), then hands control back to the animation when the motion needs to feel natural (drinking). Getting this to work smoothly while also handling mid-interaction interrupts was... an experience.
+IK takes control when precision matters, hands it back to animation when motion needs to feel natural. Getting this to work smoothly during interrupts took some debugging.
 
 _Oh, and **scaling matters**. I'm using Kenney assets, and their sizes are all over the place. So I had to scale the character, which caused all sorts of fun bugs to happen. Turns out IK rigs don't love it when you mess with scale. Who knew?_
 
@@ -191,14 +200,13 @@ NPCs respond to critical needs immediately, but they don't just vanish from what
 
 ## 🛠️ Development Process
 
-Built over a few weeks using:
+Built using:
 
-- **Bezi AI** - Unity-specific help, debugging those annoying bugs that take hours to find just to realize you forgot to uncheck one setting
-- **Cursor** - Used throughout the project for AI-assisted coding, though I ran out of free tokens pretty quickly. Missed the tooling you get with proper IDEs like Visual Studio or Rider (syntax highlighting, refactoring tools, that sort of thing)
-- **GitHub Copilot** - Autocomplete and code suggestions, used it when I ran out of free tokens for Cursor. They both have a similar feature set
-- **ChatGPT** - Planning the interaction system architecture (I adapted almost everything, but it helped plant the seed)
+- **Cursor & GitHub Copilot** - AI-assisted coding, autocomplete, code review
+- **Bezi AI** - Unity-specific debugging and API help
+- **ChatGPT** - Architecture planning and rubber duck debugging
 
-AI tools were genuinely helpful throughout this project. Bezi was especially valuable because it's specifically built for Unity. It helped me find bugs that would've taken hours to track down manually, like that one time I spent way too long debugging IK issues only to realize the problem was asset scaling. Good times.
+Used these tools daily to experiment with what's available and learn their strengths. Cursor excels at project-wide context, Copilot integrates better with IDEs, Bezi is built specifically for Unity.
 
 ---
 
