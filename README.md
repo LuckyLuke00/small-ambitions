@@ -7,6 +7,7 @@
 
 [![Video Demo](https://i.ytimg.com/vi_webp/lXiv5GSGe64/maxresdefault.webp)](https://youtu.be/lXiv5GSGe64)
 
+**[📺 Watch the Tech Demo (1:39)](https://youtu.be/lXiv5GSGe64)**  
 </div>
 
 ---
