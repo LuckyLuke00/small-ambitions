@@ -1,7 +1,7 @@
 # Small Ambitions ☕
 
-[![Language](https://img.shields.io/badge/Language-C%23-1864ab?style=flat-square&logo=csharp&logoColor=white&labelColor=212529)](https://learn.microsoft.com/en-us/dotnet/csharp/)
-[![Unity](https://img.shields.io/badge/Unity-6.3-1864ab?style=flat-square&logo=unity&logoColor=white&labelColor=212529)](https://unity.com/)
+![Language](https://img.shields.io/badge/Language-C%23-1864ab?style=flat-square&logo=data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxMjggMTI4IiBmaWxsPSIjZTZlZGYzIj48cGF0aCBkPSJNMTE3LjUgMzMuNWwuMy0uMmMtLjYtMS4xLTEuNS0yLjEtMi40LTIuNkw2Ny4xIDIuOWMtLjgtLjUtMS45LS43LTMuMS0uN3MtMi4zLjMtMy4xLjdsLTQ4IDI3LjljLTEuNyAxLTIuOSAzLjUtMi45IDUuNHY1NS43YzAgMS4xLjIgMi4zLjkgMy40bC0uMi4xYy41LjggMS4yIDEuNSAxLjkgMS45bDQ4LjIgMjcuOWMuOC41IDEuOS43IDMuMS43czIuMy0uMyAzLjEtLjdsNDgtMjcuOWMxLjctMSAyLjktMy41IDIuOS01LjRWMzYuMWMuMS0uOCAwLTEuNy0uNC0yLjZ6bS01My41IDcwYy0yMS44IDAtMzkuNS0xNy43LTM5LjUtMzkuNVM0Mi4yIDI0LjUgNjQgMjQuNWMxNC43IDAgMjcuNSA4LjEgMzQuMyAybC0xMyA3LjVDODEuMSA0NC41IDczLjEgMzkuNSA2NCAzOS41Yy0xMy41IDAtMjQuNSAxMS0yNC41IDI0LjVzMTEgMjQuNSAyNC41IDI0LjVjOS4xIDAgMTcuMS01IDIxLjMtMTIuNGwxMi45IDcuNmMtNi44IDExLjgtMTkuNiAxOS44LTM0LjIgMTkuOHpNMTE1IDYyaC0zLjJsLS45IDRoNC4xdjVoLTVsLTEuMiA2aC00LjlsMS4yLTZoLTMuOGwtMS4yIDZoLTQuOGwxLjItNkg5NHYtNWgzLjVsLjktNEg5NHYtNWg1LjNsMS4yLTZoNC45bC0xLjIgNmgzLjhsMS4yLTZoNC44bC0xLjIgNmgyLjJ2NXptLTEyLjcgNGgzLjhsLjktNGgtMy44eiIvPjwvc3ZnPg==&logoColor=e6edf3&labelColor=212529)
+![Unity](https://img.shields.io/badge/Unity-6.3-1864ab?style=flat-square&logo=unity&logoColor=e6edf3&labelColor=212529)
 
 <div align="center">
 
